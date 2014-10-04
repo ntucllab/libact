@@ -3,7 +3,7 @@ Base interfaces for use in the package.
 The package works according to the interfaces defined below.
 """
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 
 class QueryStrategy(metaclass=ABCMeta):
