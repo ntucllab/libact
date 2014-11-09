@@ -1,21 +1,24 @@
 from libact.base.interfaces import QueryStrategy
+from libact.models import LogisticRegression
 import numpy as np
 
 
 class UncertaintySampling(QueryStrategy):
 
-    def __init__(self, model):
+    def __init__(self):
         """
         model: trained libact Model object for prediction
                Currently only LogisticRegression is supported.
         """
-        self.model = model
+        self.model = LogisticRegression()
 
     def make_query(self, dataset, n_queries=1, method='le'):
         """
         Three choices for method (default 'le'):
         'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)
         """
+        self.model.fit(dataset)
+
         unlabeled_entry_ids = dataset.get_unlabeled()
         X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
 
@@ -38,3 +41,7 @@ class UncertaintySampling(QueryStrategy):
                 * self.model.predict_log_proba(X_pool), 1))
 
         return unlabeled_entry_ids[ask_id]
+
+    def get_model(self):
+        """Returns the model used by the last query"""
+        return self.model

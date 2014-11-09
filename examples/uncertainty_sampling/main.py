@@ -80,25 +80,28 @@ def main():
 
     # ==============================================================================================
 
-    model = LogisticRegression()
-
     dataset = Dataset(X_train,
         np.concatenate([y_train[:10], [None] * (len(y_train) - 10)]))
     quota = N - 10  # the student can only ask [quota] questions, otherwise the teacher will get unpatient
-    model.fit(dataset)
 
     # now, the student start asking questions
-    qs = UncertaintySampling(model)
+    qs = UncertaintySampling()
     for i in range(quota) :
+        # select a question
         ask_id = qs.make_query(dataset, method=sys.argv[1])
+
+        if i != 0:
+            # the student redo the exam and see the result
+            E_in_2 = np.append(E_in_2, 1 - qs.get_model().score(dataset))
+            E_out_2 = np.append(E_out_2, 1 - qs.get_model().score(Dataset(X_test, y_test)))
 
         # the student asks the teacher the most confusing question and learns it
         dataset.update(ask_id, y_train[ask_id])
 
-        # the student redo the exam and see the result
-        model.fit(dataset)
-        E_in_2 = np.append(E_in_2, 1 - model.score(dataset))
-        E_out_2 = np.append(E_out_2, 1 - model.score(Dataset(X_test, y_test)))
+    # the student redo the exam and see the result
+    qs.get_model().fit(dataset)
+    E_in_2 = np.append(E_in_2, 1 - qs.get_model().score(dataset))
+    E_out_2 = np.append(E_out_2, 1 - qs.get_model().score(Dataset(X_test, y_test)))
 
     print('< Scenario 2 > The student chooses which question to ask :')
     print('After wisely asking %d questions, (E_in, E_out) = (%f, %f)' % (quota,
