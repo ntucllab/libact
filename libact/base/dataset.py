@@ -7,8 +7,10 @@ May be exported in different formats for application on other libraries.
 
 class Dataset(object):
 
-    def __init__(self):
-        self.data = []
+    def __init__(self, X, y):
+        """Constructor with scikit-learn style (X, y) data
+        """
+        self.data = list(zip(X, y))
 
     def add(self, feature, label):
         """Add a (feature, label) entry into the dataset.
