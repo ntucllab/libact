@@ -22,7 +22,7 @@ class Labeler(metaclass=ABCMeta):
         pass
 
 
-class Classifier(metaclass=ABCMeta):
+class Model(metaclass=ABCMeta):
     #TODO: documentation
 
     @abstractmethod
