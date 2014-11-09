@@ -11,6 +11,10 @@ class Dataset(object):
         """Constructor with scikit-learn style (X, y) data"""
         self.data = list(zip(X, y))
 
+    def __getitem__(self, key):
+        """Allow list-like access: dataset[key]"""
+        return self.data[key]
+
     def add(self, feature, label):
         """Add a (feature, label) entry into the dataset.
         A None label indicates an unlabeled entry.
