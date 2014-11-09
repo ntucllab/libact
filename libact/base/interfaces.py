@@ -10,7 +10,7 @@ class QueryStrategy(metaclass=ABCMeta):
     #TODO: documentation
 
     @abstractmethod
-    def make_query(self, dataset, n_queries = 1):
+    def make_query(self, dataset, n_queries=1):
         pass
 
 
