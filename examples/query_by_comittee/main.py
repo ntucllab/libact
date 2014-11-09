@@ -77,15 +77,14 @@ def main():
 
     # ==============================================================================================
 
-    models = [Perceptron() for i in range(30)]
+    models = [Perceptron() for i in range(5)]
 
     dataset = Dataset(X_train,
         np.concatenate([y_train[:10], [None] * (len(y_train) - 10)]))
     quota = N - 10  # the student can only ask [quota] questions, otherwise the teacher will get unpatient
-    #model.fit(dataset)
 
     # now, the student start asking questions
-    qbc = QueryByCommittee(model)
+    qbc = QueryByCommittee(models)
     for i in range(quota) :
         ask_ids = qbc.make_query(dataset)
 
