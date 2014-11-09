@@ -34,5 +34,5 @@ class Model(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def score(self, training_dataset, testing_dataset):
+    def score(self, testing_dataset):
         pass
