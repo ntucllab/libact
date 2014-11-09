@@ -33,3 +33,8 @@ class Dataset(object):
         """
         l = list(zip(*[entry for entry in self.data if entry[1] is not None]))
         return (list(l[0]), list(l[1]))
+
+    def get_unlabeled(self):
+        """Returns list of entry_ids of unlabeled features"""
+        return [entry_id for entry_id, entry in enumerate(self.data)
+            if entry[1] == None]
