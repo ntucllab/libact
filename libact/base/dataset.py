@@ -17,8 +17,16 @@ class Dataset(object):
         return self.data[key]
 
     def __len__(self):
-        """Return the number of data entries in this object."""
+        """Return the number of all data entries in this object."""
         return len(self.data)
+
+    def len_labeled(self):
+        """Return the number of labeled data entries in this object."""
+        ret = 0
+        for ent in self.data:
+            if ent[1] != None:
+                ret += 1
+        return ret
 
     def add(self, feature, label):
         """Add a (feature, label) entry into the dataset.
