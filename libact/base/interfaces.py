@@ -26,13 +26,13 @@ class Model(metaclass=ABCMeta):
     #TODO: documentation
 
     @abstractmethod
-    def fit(self, dataset):
+    def fit(self, dataset, *args, **kwargs):
         pass
 
     @abstractmethod
-    def predict(self, feature):
+    def predict(self, feature, *args, **kwargs):
         pass
 
     @abstractmethod
-    def score(self, testing_dataset):
+    def score(self, testing_dataset, *args, **kwargs):
         pass
