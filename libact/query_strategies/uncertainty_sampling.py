@@ -6,10 +6,7 @@ import numpy as np
 class UncertaintySampling(QueryStrategy):
 
     def __init__(self):
-        """
-        model: trained libact Model object for prediction
-               Currently only LogisticRegression is supported.
-        """
+        """Currently only LogisticRegression is supported."""
         self.model = LogisticRegression()
 
     def make_query(self, dataset, n_queries=1, method='le'):
