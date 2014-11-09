@@ -8,17 +8,20 @@ May be exported in different formats for application on other libraries.
 class Dataset(object):
 
     def __init__(self, X=[], y=[]):
-        """Constructor with scikit-learn style (X, y) data
-        """
+        """Constructor with scikit-learn style (X, y) data"""
         self.data = list(zip(X, y))
 
     def add(self, feature, label):
         """Add a (feature, label) entry into the dataset.
         A None label indicates an unlabeled entry.
+        Returns entry_id for updating labels.
         """
         self.data.append((feature, label))
+        return len(self.data) - 1
 
-    # TODO: remove, update
+    def update(self, entry_id, label):
+        """Updates an entry at entry_id with the given new label"""
+        self.data[entry_id] = (self.data[entry_id][0], label)
 
     def format_sklearn(self):
         """Returns dataset in (X, y) format for use in scikit-learn.
