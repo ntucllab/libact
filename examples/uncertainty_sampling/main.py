@@ -49,7 +49,7 @@ def main():
     # print('X looks like this :\n' + str(X))
     # print('y looks like this :\n' + str(y))
 
-    N = 2 * len(X) / 3                      # control the number of training and testing examples
+    N = int(2 * len(X) / 3)  # control the number of training and testing examples
 
     X_train, y_train = X[ : N], y[ : N]		# training examples, which will then be splitted into two pieces
     X_test, y_test = X[N : ], y[N :]		# testing examples used for calculating E_out
