@@ -14,7 +14,7 @@ class UncertaintySampling(QueryStrategy):
         Three choices for method (default 'le'):
         'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)
         """
-        self.model.fit(dataset)
+        self.model.train(dataset)
 
         unlabeled_entry_ids = dataset.get_unlabeled()
         X_pool = [dataset[i][0] for i in unlabeled_entry_ids]

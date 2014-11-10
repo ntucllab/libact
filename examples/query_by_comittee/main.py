@@ -66,7 +66,7 @@ def main():
 
     # simulate the scenario when student don't choose which question to ask
     for i in range(10, N) :
-        model.fit(Dataset(X_train[ : i + 1], y_train[ : i + 1]))
+        model.train(Dataset(X_train[ : i + 1], y_train[ : i + 1]))
         E_in_1 = np.append(E_in_1, 1 - model.score(Dataset(X_train[ : i + 1], y_train[ : i + 1])))
         E_out_1 = np.append(E_out_1, 1 - model.score(Dataset(X_test, y_test)))
 
@@ -96,7 +96,7 @@ def main():
         # the student redo the exam and see the result
         model = Perceptron()
         #model = LogisticRegression()
-        model.fit(dataset)
+        model.train(dataset)
         E_in_2 = np.append(E_in_2, 1 - model.score(dataset))
         E_out_2 = np.append(E_out_2, 1 - model.score(Dataset(X_test, y_test)))
         #print(dataset.len_labeled(), E_in_2[-1], E_out_2[-1])

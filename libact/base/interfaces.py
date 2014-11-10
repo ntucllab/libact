@@ -26,7 +26,7 @@ class Model(metaclass=ABCMeta):
     #TODO: documentation
 
     @abstractmethod
-    def fit(self, dataset, *args, **kwargs):
+    def train(self, dataset, *args, **kwargs):
         pass
 
     @abstractmethod

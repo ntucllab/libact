@@ -9,7 +9,7 @@ class Perceptron(Model):
     def __init__(self, *args, **kwargs):
         self.model = sklearn.linear_model.Perceptron(*args, **kwargs)
 
-    def fit(self, dataset, *args, **kwargs):
+    def train(self, dataset, *args, **kwargs):
         return self.model.fit(*(dataset.format_sklearn() + args), **kwargs)
 
     def predict(self, feature, *args, **kwargs):
