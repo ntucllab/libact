@@ -72,8 +72,7 @@ def main():
 
     print('< Scenario 1 > The student doesn\'t choose which question to ask :')
     print('After randomly asking %d questions, (E_in, E_out) = (%f, %f)' % (N -
-        10, 1 - model.score(Dataset(X_train, y_train)), 1 -
-        model.score(Dataset(X_test, y_test))))
+        10, E_in_1[-1], E_out_1[-1]))
 
     # ==============================================================================================
 
@@ -103,8 +102,7 @@ def main():
 
     print('< Scenario 2 > The student chooses which question to ask :')
     print('After wisely asking %d questions, (E_in, E_out) = (%f, %f)' % (quota,
-        1 - model.score(dataset), 1 - model.score(Dataset(X_test,
-            y_test))))
+        E_in_2[-1], E_out_2[-1]))
 
     # now let's plot the result
     query_num = np.arange(1, quota + 1)
