@@ -1,11 +1,8 @@
 # Task : Multiclass Classification
 
-# Basic Training Algorithm : Logistic Regression
+# Basic Training Algorithm : Logistic Regression and Perceptron
 
-# Query Strategy : Uncertainty Sampling by :
-# (a) Least Confidence
-# (b) Smallest Margin
-# (c) Label Ertropy
+# Query Strategy : Query-by-committee
 
 import sys
 import numpy as np
@@ -18,8 +15,10 @@ sys.path.append(BASE_DIR)
 
 from libact.base.dataset import Dataset
 from libact.models import Perceptron
+from libact.models import LogisticRegression
 from libact.query_strategies import QueryByCommittee
 
+N_STUDENTS = 5
 
 def simple_read(file_name) :
     X, y = [], []
@@ -58,6 +57,7 @@ def main():
     #                           (b) There are 7 (1 ~ 7) labels
 
     model = Perceptron()
+    #model = LogisticRegression()
 
     E_in_1 = []
     E_in_2 = []
@@ -77,7 +77,8 @@ def main():
 
     # ==============================================================================================
 
-    models = [Perceptron() for i in range(5)]
+    models = [Perceptron() for i in range(N_STUDENTS)]
+    #models = [LogisticRegression() for i in range(N_STUDENTS)]
 
     dataset = Dataset(X_train,
         np.concatenate([y_train[:10], [None] * (len(y_train) - 10)]))
@@ -94,9 +95,11 @@ def main():
 
         # the student redo the exam and see the result
         model = Perceptron()
+        #model = LogisticRegression()
         model.fit(dataset)
         E_in_2 = np.append(E_in_2, 1 - model.score(dataset))
         E_out_2 = np.append(E_out_2, 1 - model.score(Dataset(X_test, y_test)))
+        #print(dataset.len_labeled(), E_in_2[-1], E_out_2[-1])
 
     print('< Scenario 2 > The student chooses which question to ask :')
     print('After wisely asking %d questions, (E_in, E_out) = (%f, %f)' % (quota,
