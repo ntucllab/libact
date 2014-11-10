@@ -55,9 +55,10 @@ class Dataset(object):
             if entry[1] == None]
 
     def labeled_uniform_sample(self, samplesize, replace=True):
-        """Returns a Dataset object with only its labeled data, and it is
-        resampled uniformly with given a samplsize. Parameter replace decides
-        whether sampling with replacement or not"""
+        """Returns a Dataset object with labeled data only, which is
+        resampled uniformly with given sample size.
+        Parameter `replace` decides whether sampling with replacement or not.
+        """
         ret = Dataset()
         labeled_data_id = [entry_id for entry_id, entry in enumerate(self.data)
             if entry[1] != None]
