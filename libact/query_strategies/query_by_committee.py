@@ -36,8 +36,9 @@ class QueryByCommittee(QueryStrategy):
 
         # Training models with labeled data using bootstrap aggregating
         # (bagging)
+        # TODO exception on only one label is sampled.
         for student in self.students:
-            student.fit(dataset.labeled_uniform_sample(int(dataset.len_labeled()/2), 100))
+            student.fit(dataset.labeled_uniform_sample(int(dataset.len_labeled()), 100))
 
         # Let the trained students vote for unlabeled data
         for X in X_pool:
@@ -47,7 +48,7 @@ class QueryByCommittee(QueryStrategy):
             votes.append(vote)
 
         id_disagreement = [(i, dis) for i, dis in
-                enumerate(self.disagreement(votes))]
+                zip(unlabeled_entry_ids, self.disagreement(votes))]
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
                 reverse=True)
