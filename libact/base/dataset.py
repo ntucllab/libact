@@ -5,6 +5,9 @@ Datasets consists of data used for training, represented by a list of
 May be exported in different formats for application on other libraries.
 """
 
+import random
+
+
 class Dataset(object):
 
     def __init__(self, X=[], y=[]):
@@ -14,6 +17,18 @@ class Dataset(object):
     def __getitem__(self, key):
         """Allow list-like access: dataset[key]"""
         return self.data[key]
+
+    def __len__(self):
+        """Return the number of all data entries in this object."""
+        return len(self.data)
+
+    def len_labeled(self):
+        """Return the number of labeled data entries in this object."""
+        ret = 0
+        for ent in self.data:
+            if ent[1] != None:
+                ret += 1
+        return ret
 
     def add(self, feature, label):
         """Add a (feature, label) entry into the dataset.
@@ -38,3 +53,20 @@ class Dataset(object):
         """Returns list of entry_ids of unlabeled features"""
         return [entry_id for entry_id, entry in enumerate(self.data)
             if entry[1] == None]
+
+    def labeled_uniform_sample(self, samplesize, replace=True):
+        """Returns a Dataset object with labeled data only, which is
+        resampled uniformly with given sample size.
+        Parameter `replace` decides whether sampling with replacement or not.
+        """
+        ret = Dataset()
+        labeled_data_id = [entry_id for entry_id, entry in enumerate(self.data)
+            if entry[1] != None]
+        if replace:
+            for i in range(samplesize):
+                ran = random.choice(labeled_data_id)
+                ret.add(self.data[ran][0], self.data[ran][1])
+            return ret
+        else:
+            ret.data = random.sample(self.data, samplesize)
+            return ret
