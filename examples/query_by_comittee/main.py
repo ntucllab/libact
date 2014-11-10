@@ -35,8 +35,7 @@ def main():
 
     # shuffle the data for 100 times
     zipper = list(zip(X, y))
-    for i in range(100) :
-        np.random.shuffle(zipper)
+    np.random.shuffle(zipper)
     X, y = zip(*zipper)
     X, y = np.array(X), np.array(y)
 
