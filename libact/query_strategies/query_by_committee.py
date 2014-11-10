@@ -8,8 +8,7 @@ class QueryByCommittee(QueryStrategy):
 
     def __init__(self, models):
         """
-        model: list trained libact Model object for prediction
-               Currently only LogisticRegression is supported.
+        model: a list of initialized libact Model object for prediction.
         """
         self.students = models
         self.n_students = len(self.students)

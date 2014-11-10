@@ -67,5 +67,3 @@ class Dataset(object):
         else:
             ret.data = random.sample(self.data, samplesize)
             return ret
-            
-
