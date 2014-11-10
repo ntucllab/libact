@@ -1,5 +1,5 @@
 from libact.base.interfaces import Model
-import sklearn.linear_model 
+import sklearn.linear_model
 
 """
 A interface for scikit-learn's perceptron model
@@ -17,4 +17,3 @@ class Perceptron(Model):
 
     def score(self, testing_dataset, *args, **kwargs):
         return self.model.score(*(testing_dataset.format_sklearn() + args), **kwargs)
-
