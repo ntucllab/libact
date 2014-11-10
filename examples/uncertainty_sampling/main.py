@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+
 # < Active Learning Experiment >
 
 # Task : Multiclass Classification
 
 # Basic Training Algorithm : Logistic Regression
 
-# Query Strategy : Uncertainty Sampling by :
+# Query Strategy - Uncertainty Sampling by -
 #                                            (a) Least Confidence
 #					     (b) Smallest Margin
 #                                            (c) Label Ertropy
@@ -39,8 +40,7 @@ def main():
 
     # shuffle the data for 100 times
     zipper = list(zip(X, y))
-    for i in range(100) :
-        np.random.shuffle(zipper)
+    np.random.shuffle(zipper)
     X, y = zip(*zipper)
     X, y = np.array(X), np.array(y)
 
@@ -49,7 +49,7 @@ def main():
     # print('X looks like this :\n' + str(X))
     # print('y looks like this :\n' + str(y))
 
-    N = 770     # control the number of training and testing examples
+    N = 2 * len(X) / 3                      # control the number of training and testing examples
 
     X_train, y_train = X[ : N], y[ : N]		# training examples, which will then be splitted into two pieces
     X_test, y_test = X[N : ], y[N :]		# testing examples used for calculating E_out
@@ -62,10 +62,8 @@ def main():
 
     model = LogisticRegression()
 
-    E_in_1 = []
-    E_in_2 = []
-    E_out_1 = []
-    E_out_2 = []
+    E_in_1, E_out_1 = [], []
+    E_in_2, E_out_2 = [], []
 
     # simulate the scenario when student don't choose which question to ask
     for i in range(10, N) :
