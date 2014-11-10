@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Task : Multiclass Classification
 
 # Basic Training Algorithm : Logistic Regression and Perceptron
