@@ -34,7 +34,7 @@ def simple_read(file_name) :
 def main():
     X, y = simple_read(BASE_DIR + '/examples/uncertainty_sampling/datasets.txt')
 
-    # shuffle the data for 100 times
+    # shuffle the data
     zipper = list(zip(X, y))
     np.random.shuffle(zipper)
     X, y = zip(*zipper)
@@ -59,10 +59,8 @@ def main():
     model = Perceptron()
     #model = LogisticRegression()
 
-    E_in_1 = []
-    E_in_2 = []
-    E_out_1 = []
-    E_out_2 = []
+    E_in_1, E_out_1 = [], []
+    E_in_2, E_out_2 = [], []
 
     # simulate the scenario when student don't choose which question to ask
     for i in range(10, N) :
