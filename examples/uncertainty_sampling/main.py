@@ -38,7 +38,7 @@ def simple_read(file_name) :
 def main():
     X, y = simple_read(BASE_DIR + '/examples/uncertainty_sampling/datasets.txt')
 
-    # shuffle the data for 100 times
+    # shuffle the data
     zipper = list(zip(X, y))
     np.random.shuffle(zipper)
     X, y = zip(*zipper)
