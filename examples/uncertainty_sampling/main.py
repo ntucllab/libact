@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 
-# < Active Learning Experiment >
-
-# Task : Multiclass Classification
-
-# Basic Training Algorithm : Logistic Regression
-
-# Query Strategy - Uncertainty Sampling by -
-#                                            (a) Least Confidence
-#					     (b) Smallest Margin
-#                                            (c) Label Ertropy
+'''
+    < Query Strategy >       Uncertainty Sampling
+    < Task >                 Multi-class Classification
+    < Based Training Model > Logistic Regression
+'''
 
 import sys
 import numpy as np
@@ -25,7 +20,7 @@ from libact.models import LogisticRegression
 from libact.query_strategies import UncertaintySampling
 
 
-def simple_read(file_name) :
+def load(file_name) :
     X, y = [], []
     with open(file_name) as f :
         for line in f :
@@ -36,7 +31,7 @@ def simple_read(file_name) :
 
 
 def main():
-    X, y = simple_read(BASE_DIR + '/examples/uncertainty_sampling/datasets.txt')
+    X, y = load(BASE_DIR + '/examples/uncertainty_sampling/datasets.txt')
 
     # shuffle the data
     zipper = list(zip(X, y))
@@ -46,8 +41,6 @@ def main():
 
     # X is a 2D [m x n] numpy.ndarray, where m is the number of examples and n is the number of features.
     # y is a 1D numpy.ndarray of length m.
-    # print('X looks like this :\n' + str(X))
-    # print('y looks like this :\n' + str(y))
 
     N = int(2 * len(X) / 3)  # control the number of training and testing examples
 
