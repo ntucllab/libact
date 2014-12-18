@@ -30,6 +30,12 @@ class Dataset(object):
                 ret += 1
         return ret
 
+    def get_num_of_labels(self):
+        s = set()
+        for d in self.data:
+            s.add(d[1])
+        return (len(s)-1) #None is in this set
+
     def add(self, feature, label):
         """Add a (feature, label) entry into the dataset.
         A None label indicates an unlabeled entry.
@@ -53,6 +59,11 @@ class Dataset(object):
         """Returns list of entry_ids of unlabeled features"""
         return [entry_id for entry_id, entry in enumerate(self.data)
             if entry[1] == None]
+
+    def get_labeled(self):
+        """Returns list of entry_ids of labeled features"""
+        return [entry_id for entry_id, entry in enumerate(self.data)
+            if entry[1] != None]
 
     def labeled_uniform_sample(self, samplesize, replace=True):
         """Returns a Dataset object with labeled data only, which is
