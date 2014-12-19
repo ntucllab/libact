@@ -41,7 +41,7 @@ class VarianceReduction(QueryStrategy):
                     for f2 in range(feature_count):
                         if l1 == l2 and f1 == f2:
                             fisher[col][l2*feature_count+f2] =\
-                                x[f1] * x[f2] * pi[l1] * (1-pi[l2])
+                                x[f1] * x[f2] * pi[l1] * (1-pi[l2]) + 1/10000000
                             #fisher[col].append(
                             #    x[f1] * x[f2] * pi[l1] * (1-pi[l2])
                             #)
@@ -58,7 +58,6 @@ class VarianceReduction(QueryStrategy):
                             #    x[f1] * x[f2] * pi[l1] * pi[l2]
                             #)
         #print(np.shape(np.array(fisher)))
-
         return np.linalg.pinv(np.array(fisher))
 
     def Phi(self, pi, x, label_count, feature_count):
