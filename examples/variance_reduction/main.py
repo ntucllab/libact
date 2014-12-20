@@ -3,7 +3,7 @@
 
 # Basic Training Algorithm : Logistic Regression
 
-# Query Strategy : Query-by-committee
+# Query Strategy : Variance-Reduction
 
 import sys
 import numpy as np
@@ -62,6 +62,7 @@ def main():
 
     # simulate the scenario when student don't choose which question to ask
     for i in range(10, N) :
+        model = LogisticRegression()
         model.train(Dataset(X_train[ : i + 1], y_train[ : i + 1]))
         E_in_1 = np.append(E_in_1, 1 - model.score(Dataset(X_train[ : i + 1], y_train[ : i + 1])))
         E_out_1 = np.append(E_out_1, 1 - model.score(Dataset(X_test, y_test)))
@@ -91,6 +92,7 @@ def main():
         model.train(dataset)
         E_in_2 = np.append(E_in_2, 1 - model.score(dataset))
         E_out_2 = np.append(E_out_2, 1 - model.score(Dataset(X_test, y_test)))
+        print(len(dataset))
         print(i, E_in_1[i], E_in_2[i])
         print(i, E_out_1[i], E_out_2[i])
 
