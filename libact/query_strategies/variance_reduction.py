@@ -17,6 +17,9 @@ class VarianceReduction(QueryStrategy):
         self.optimality = optimality
 
     def A(self, pi, c, x, label_count, feature_count):
+        """
+        import time
+        s = time.time()
         grad = pi[c] *  np.ones((feature_count*label_count))
         for i in range(feature_count):
             for j in range(label_count):
@@ -26,12 +29,22 @@ class VarianceReduction(QueryStrategy):
                 else:
                     grad[i*label_count+j] *= (-pi[j]) * x[i]
                     #grad.append(-pi[c] * pi[j] * x[i])
-        #grad = np.array(grad)
-        #print(np.shape(grad))
+        print(s-time.time())
+        print(np.shape(grad))
+        """
+        _pi = -1 * np.array(pi)
+        _pi[c] += 1
+        grad = pi[c] * np.tile(np.array([x]).T, (1, label_count)) *\
+                        np.tile(np.array([_pi]), (feature_count, 1))
+        grad = grad.reshape((feature_count*label_count))
 
         return np.dot(grad.T, grad)
 
     def Fisher(self, pi, x, label_count, feature_count):
+        sigma = 100000000.0
+        """
+        import time
+        s = time.time()
         fisher = np.ones((label_count*feature_count, label_count*feature_count))
         for l1 in range(label_count):
             for f1 in range(feature_count):
@@ -41,13 +54,13 @@ class VarianceReduction(QueryStrategy):
                     for f2 in range(feature_count):
                         if l1 == l2 and f1 == f2:
                             fisher[col][l2*feature_count+f2] =\
-                                x[f1] * x[f2] * pi[l1] * (1-pi[l2]) + 1/10000000
+                                x[f1] * x[f2] * pi[l1] * (1-pi[l1]) + 1/sigma
                             #fisher[col].append(
                             #    x[f1] * x[f2] * pi[l1] * (1-pi[l2])
                             #)
                         elif l1 == l2 and f1 != f2:
                             fisher[col][l2*feature_count+f2] =\
-                                x[f1] * x[f2] * pi[l1] * (1-pi[l2])
+                                x[f1] * x[f2] * pi[l1] * (1-pi[l1])
                             #fisher[col].append(
                             #    x[f1] * x[f2] * pi[l1] * (1-pi[l2])
                             #)
@@ -58,6 +71,21 @@ class VarianceReduction(QueryStrategy):
                             #    x[f1] * x[f2] * pi[l1] * pi[l2]
                             #)
         #print(np.shape(np.array(fisher)))
+        """
+        _pi_l2 = np.ones((1, feature_count*label_count))
+        for i in range(label_count):
+            _pi_l2[0, i*feature_count:(i+1)*feature_count] = pi[i]
+
+        _pi = np.tile(_pi_l2, (label_count*feature_count, 1))
+        for i in range(label_count):
+            _pi[i*feature_count:(i+1)*feature_count,
+                i*feature_count:(i+1)*feature_count] = 1 - pi[i] 
+        fisher =\
+            np.tile(np.array([x]).T, (label_count, label_count*feature_count)) *\
+            np.tile(np.array([x]), (label_count*feature_count, label_count)) *\
+            np.tile(_pi_l2.T, (1, label_count*feature_count)) *\
+            _pi
+        fisher += (1/sigma) * np.eye(feature_count*label_count)
         return np.linalg.pinv(np.array(fisher))
 
     def Phi(self, pi, x, label_count, feature_count):
@@ -98,7 +126,7 @@ class VarianceReduction(QueryStrategy):
         print(time.time()-s)
         #errors = []
         #for x in X_pool:
-        #    errors.append(self.E(Xlabeled, y, x, label_count))
+        #    errors.append(self.E(Xlabeled, y, x, clf, label_count))
         #    print(errors[-1])
 
         return [unlabeled_entry_ids[errors.index(min(errors))]]
