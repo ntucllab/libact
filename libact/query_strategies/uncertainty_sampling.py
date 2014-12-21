@@ -10,7 +10,7 @@ class UncertaintySampling(QueryStrategy):
         self.model = LogisticRegression()
         self.method = method
 
-    def make_query(self, dataset, n_queries=1):
+    def make_query(self, dataset):
         """
         Three choices for method (default 'le'):
         'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)

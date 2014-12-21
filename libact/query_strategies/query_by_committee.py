@@ -35,7 +35,7 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
-    def make_query(self, dataset, n_queries=1):
+    def make_query(self, dataset):
         unlabeled_entry_ids = dataset.get_unlabeled()
         X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
         votes = []
@@ -58,6 +58,6 @@ class QueryByCommittee(QueryStrategy):
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
                 reverse=True)
-        ret = [i[0] for i in disagreement[:n_queries]]
+        ret = disagreement[0][0]
 
         return ret
