@@ -52,3 +52,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# dataset for examples (use script to download)
+examples/dataset.txt
