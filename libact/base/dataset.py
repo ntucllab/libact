@@ -6,6 +6,7 @@ May be exported in different formats for application on other libraries.
 """
 
 import random
+import numpy as np
 
 
 class Dataset(object):
@@ -70,3 +71,28 @@ class Dataset(object):
         else:
             ret.data = random.sample(self.data, samplesize)
             return ret
+
+
+def import_libsvm_sparse(filename):
+    """Imports dataset file in libsvm sparse format"""
+    entries = list()
+    dim = 0
+    with open(filename, 'r') as f:
+        for line in f:
+            cols = line.split()
+            entry = dict()
+            entry['label'] = int(cols[0])
+            for col in cols[1:]:
+                n_component = int(col.split(':')[0]) - 1  # start from 0
+                value = float(col.split(':')[1])
+                entry[n_component] = value
+                if n_component > dim: dim = n_component + 1
+            entries.append(entry)
+    dataset = Dataset()
+    for entry in entries:
+        vec = np.zeros(dim)
+        for n_component in entry:
+            if type(n_component) is not str:
+                vec[n_component] = entry[n_component]
+        dataset.add(vec, entry['label'])
+    return dataset
