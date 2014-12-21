@@ -31,7 +31,7 @@ class Dataset(object):
                 ret += 1
         return ret
 
-    def add(self, feature, label):
+    def append(self, feature, label):
         """Add a (feature, label) entry into the dataset.
         A None label indicates an unlabeled entry.
         Returns entry_id for updating labels.
@@ -66,7 +66,7 @@ class Dataset(object):
         if replace:
             for i in range(samplesize):
                 ran = random.choice(labeled_data_id)
-                ret.add(self.data[ran][0], self.data[ran][1])
+                ret.append(self.data[ran][0], self.data[ran][1])
             return ret
         else:
             ret.data = random.sample(self.data, samplesize)
@@ -94,5 +94,5 @@ def import_libsvm_sparse(filename):
         for n_component in entry:
             if type(n_component) is not str:
                 vec[n_component] = entry[n_component]
-        dataset.add(vec, entry['label'])
+        dataset.append(vec, entry['label'])
     return dataset
