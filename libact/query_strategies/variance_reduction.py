@@ -7,7 +7,7 @@ from joblib import Parallel, delayed
 
 class VarianceReduction(QueryStrategy):
 
-    def __init__(self, model, optimality='trace'):
+    def __init__(self, model, sigma=100000000.0, optimality='trace'):
         """
         model: a list of initialized libact Model object for prediction.
         optimality: string, 'trace', 'determinant' or 'eigenvalue'
@@ -15,6 +15,7 @@ class VarianceReduction(QueryStrategy):
         """
         self.model = model
         self.optimality = optimality
+        self.sigma = sigma
 
     def A(self, pi, c, x, label_count, feature_count):
         """
@@ -41,7 +42,7 @@ class VarianceReduction(QueryStrategy):
         return np.dot(grad.T, grad)
 
     def Fisher(self, pi, x, label_count, feature_count):
-        sigma = 100000000.0
+        sigma = self.sigma
         """
         import time
         s = time.time()
@@ -128,5 +129,6 @@ class VarianceReduction(QueryStrategy):
         #for x in X_pool:
         #    errors.append(self.E(Xlabeled, y, x, clf, label_count))
         #    print(errors[-1])
+        #print(errors.index(min(errors)))
 
         return [unlabeled_entry_ids[errors.index(min(errors))]]
