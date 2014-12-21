@@ -21,10 +21,10 @@ class UncertaintySampling(QueryStrategy):
         X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
 
         if self.method == 'lc':  # least confident
-            ask_id = np.argmax(1 - np.max(self.model.predict_proba(X_pool), 1))
+            ask_id = np.argmax(1 - np.max(self.model.predict_real(X_pool), 1))
 
         elif self.method == 'sm':  # smallest margin
-            prob = self.model.predict_proba(X_pool)
+            prob = self.model.predict_real(X_pool)
             min_margin = np.inf
             for j in range(len(prob)) :
                 m1_id = np.argmax(prob[j])
@@ -35,8 +35,9 @@ class UncertaintySampling(QueryStrategy):
                     ask_id = j
 
         elif self.method == 'le':  # default : label entropy (most commonly used)
-            ask_id = np.argmax(-np.sum(self.model.predict_proba(X_pool)
-                * self.model.predict_log_proba(X_pool), 1))
+            # XXX divide by zero?
+            ask_id = np.argmax(-np.sum(self.model.predict_real(X_pool)
+                * np.log(self.model.predict_real(X_pool)), 1))
 
         else:
             raise ValueError(

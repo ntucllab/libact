@@ -36,3 +36,11 @@ class Model(metaclass=ABCMeta):
     @abstractmethod
     def score(self, testing_dataset, *args, **kwargs):
         pass
+
+
+class ContinuousModel(Model):
+    #TODO: documentation
+
+    @abstractmethod
+    def predict_real(self, feature, *args, **kwargs):
+        pass
