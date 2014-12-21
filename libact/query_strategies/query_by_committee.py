@@ -1,4 +1,5 @@
 from libact.base.interfaces import QueryStrategy
+import libact.models
 import numpy as np
 from functools import cmp_to_key
 import math
@@ -8,9 +9,15 @@ class QueryByCommittee(QueryStrategy):
 
     def __init__(self, models):
         """
-        model: a list of initialized libact Model object for prediction.
+        model: a list of initialized libact Model instances, or class names of
+               libact Model classes for prediction.
         """
-        self.students = models
+        self.students = list()
+        for model in models:
+            if type(model) is str:
+                self.students.append(getattr(libact.models, model)())
+            else:
+                self.students.append(model)
         self.n_students = len(self.students)
 
     def disagreement(self, votes):
