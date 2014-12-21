@@ -5,11 +5,12 @@ import numpy as np
 
 class UncertaintySampling(QueryStrategy):
 
-    def __init__(self):
+    def __init__(self, method='le'):
         """Currently only LogisticRegression is supported."""
         self.model = LogisticRegression()
+        self.method = method
 
-    def make_query(self, dataset, n_queries=1, method='le'):
+    def make_query(self, dataset, n_queries=1):
         """
         Three choices for method (default 'le'):
         'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)
@@ -19,10 +20,10 @@ class UncertaintySampling(QueryStrategy):
         unlabeled_entry_ids = dataset.get_unlabeled()
         X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
 
-        if method == 'lc':  # least confident
+        if self.method == 'lc':  # least confident
             ask_id = np.argmax(1 - np.max(self.model.predict_proba(X_pool), 1))
 
-        elif method == 'sm':  # smallest margin
+        elif self.method == 'sm':  # smallest margin
             prob = self.model.predict_proba(X_pool)
             min_margin = np.inf
             for j in range(len(prob)) :
@@ -33,9 +34,15 @@ class UncertaintySampling(QueryStrategy):
                     min_margin = margin
                     ask_id = j
 
-        elif method == 'le':  # default : label entropy (most commonly used)
+        elif self.method == 'le':  # default : label entropy (most commonly used)
             ask_id = np.argmax(-np.sum(self.model.predict_proba(X_pool)
                 * self.model.predict_log_proba(X_pool), 1))
+
+        else:
+            raise ValueError(
+                "Invalid method '%s' (available choices: ('lc', 'sm', 'le')"
+                % self.method
+                )
 
         return unlabeled_entry_ids[ask_id]
 
