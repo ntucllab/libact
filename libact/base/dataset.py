@@ -31,6 +31,12 @@ class Dataset(object):
                 ret += 1
         return ret
 
+    def get_num_of_labels(self):
+        s = set()
+        for d in self.data:
+            s.add(d[1])
+        return (len(s)-1) #None is in this set
+
     def append(self, feature, label):
         """Add a (feature, label) entry into the dataset.
         A None label indicates an unlabeled entry.

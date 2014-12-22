@@ -44,7 +44,10 @@ class QueryByCommittee(QueryStrategy):
         # (bagging)
         # TODO exception on only one label is sampled.
         for student in self.students:
-            student.train(dataset.labeled_uniform_sample(int(dataset.len_labeled()), 100))
+            bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+            while bag.get_num_of_labels() != dataset.get_num_of_labels():
+                bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+            student.train(bag)
 
         # Let the trained students vote for unlabeled data
         for X in X_pool:
