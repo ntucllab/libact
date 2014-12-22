@@ -13,7 +13,7 @@ class Dataset(object):
 
     def __init__(self, X=[], y=[]):
         """Constructor with scikit-learn style (X, y) data"""
-        self.data = list(zip(X, y))
+        self.data = list(zip(np.array(X), y))
 
     def __getitem__(self, key):
         """Allow list-like access: dataset[key]"""
@@ -42,7 +42,7 @@ class Dataset(object):
         A None label indicates an unlabeled entry.
         Returns entry_id for updating labels.
         """
-        self.data.append((feature, label))
+        self.data.append((np.array(feature), label))
         return len(self.data) - 1
 
     def update(self, entry_id, label):
@@ -54,7 +54,7 @@ class Dataset(object):
         Unlabeled entries are ignored.
         """
         l = list(zip(*[entry for entry in self.data if entry[1] is not None]))
-        return (list(l[0]), list(l[1]))
+        return (np.array(list(l[0])), np.array(list(l[1])))
 
     def get_unlabeled(self):
         """Returns list of entry_ids of unlabeled features"""
