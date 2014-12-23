@@ -19,6 +19,7 @@ class Dataset(object):
                 self.unlabeled.append((feature, -1))
             else:
                 self.labeled.append((feature, label))
+        self.modified = True
 
     def __len__(self):
         """Return the number of all data entries in this object."""
@@ -48,6 +49,7 @@ class Dataset(object):
             return len(self.unlabeled) - 1
         else:
             self.labeled.append((feature, label))
+            self.modified = True
 
     def update(self, entry_id, label):
         """Updates an entry at entry_id with the given new label"""
@@ -57,13 +59,17 @@ class Dataset(object):
             self.unlabeled[entry_id] = (entry[0], len(self.labeled) - 1)
         else:  # update existing entry in labeled pool
             self.labeled[entry[1]] = (entry[0], label)
+        self.modified = True
 
     def format_sklearn(self):
         """Returns dataset in (X, y) format for use in scikit-learn.
         Unlabeled entries are ignored.
         """
-        l = list(zip(*self.labeled))
-        return (np.array(l[0]), np.array(l[1]))
+        if self.modified:
+            l = list(zip(*self.labeled))
+            self.cache = (np.array(l[0]), np.array(l[1]))
+            self.modified = False
+        return self.cache
 
     def get_unlabeled_entries(self):
         """Returns list of unlabeled features, along with their entry_ids
