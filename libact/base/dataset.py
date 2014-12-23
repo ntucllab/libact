@@ -13,53 +13,67 @@ class Dataset(object):
 
     def __init__(self, X=[], y=[]):
         """Constructor with scikit-learn style (X, y) data"""
-        self.data = list(zip(np.array(X), y))
-
-    def __getitem__(self, key):
-        """Allow list-like access: dataset[key]"""
-        return self.data[key]
+        self.labeled, self.unlabeled = [], []
+        for feature, label in zip(X, y):
+            if label is None:
+                self.unlabeled.append((feature, -1))
+            else:
+                self.labeled.append((feature, label))
 
     def __len__(self):
         """Return the number of all data entries in this object."""
-        return len(self.data)
+        return len(self.labeled) + len(self.unlabeled)
 
     def len_labeled(self):
         """Return the number of labeled data entries in this object."""
-        ret = 0
-        for ent in self.data:
-            if ent[1] != None:
-                ret += 1
-        return ret
+        return len(self.labeled)
+
+    def len_unlabeled(self):
+        """Return the number of unlabeled data entries in this object."""
+        return len(self.unlabeled)
 
     def get_num_of_labels(self):
         s = set()
-        for d in self.data:
+        for d in self.labeled:
             s.add(d[1])
-        return (len(s)-1) #None is in this set
+        return len(s)
 
-    def append(self, feature, label):
+    def append(self, feature, label=None):
         """Add a (feature, label) entry into the dataset.
         A None label indicates an unlabeled entry.
-        Returns entry_id for updating labels.
+        If an unlabeled entry in inserted, returns entry_id for updating labels.
         """
-        self.data.append((np.array(feature), label))
-        return len(self.data) - 1
+        if label is None:
+            self.unlabeled.append((feature, -1))
+            return len(self.unlabeled) - 1
+        else:
+            self.labeled.append((feature, label))
 
     def update(self, entry_id, label):
         """Updates an entry at entry_id with the given new label"""
-        self.data[entry_id] = (self.data[entry_id][0], label)
+        entry = self.unlabeled[entry_id]
+        if entry[1] == -1:  # not inserted yet
+            self.labeled.append((entry[0], label))
+            self.unlabeled[entry_id] = (entry[0], len(self.labeled) - 1)
+        else:  # update existing entry in labeled pool
+            self.labeled[entry[1]] = (entry[0], label)
 
     def format_sklearn(self):
         """Returns dataset in (X, y) format for use in scikit-learn.
         Unlabeled entries are ignored.
         """
-        l = list(zip(*[entry for entry in self.data if entry[1] is not None]))
-        return (np.array(list(l[0])), np.array(list(l[1])))
+        l = list(zip(*self.labeled))
+        return (np.array(l[0]), np.array(l[1]))
 
-    def get_unlabeled(self):
-        """Returns list of entry_ids of unlabeled features"""
-        return [entry_id for entry_id, entry in enumerate(self.data)
-            if entry[1] == None]
+    def get_unlabeled_entries(self):
+        """Returns list of unlabeled features, along with their entry_ids
+        Format: [(entry_id, feature), ...]
+        """
+        return [
+            (l[0], l[1][0])
+            for l in zip(range(len(self.unlabeled)), self.unlabeled)
+            if l[1][1] == -1
+            ]
 
     def labeled_uniform_sample(self, samplesize, replace=True):
         """Returns a Dataset object with labeled data only, which is
@@ -67,16 +81,13 @@ class Dataset(object):
         Parameter `replace` decides whether sampling with replacement or not.
         """
         ret = Dataset()
-        labeled_data_id = [entry_id for entry_id, entry in enumerate(self.data)
-            if entry[1] != None]
         if replace:
-            for i in range(samplesize):
-                ran = random.choice(labeled_data_id)
-                ret.append(self.data[ran][0], self.data[ran][1])
-            return ret
+            ret.labeled = [
+                random.choice(self.labeled) for _ in range(samplesize)
+                ]
         else:
-            ret.data = random.sample(self.data, samplesize)
-            return ret
+            ret.labeled = random.sample(self.labeled, samplesize)
+        return ret
 
 
 def import_libsvm_sparse(filename):

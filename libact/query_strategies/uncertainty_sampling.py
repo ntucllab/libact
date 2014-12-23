@@ -17,8 +17,7 @@ class UncertaintySampling(QueryStrategy):
         """
         self.model.train(dataset)
 
-        unlabeled_entry_ids = dataset.get_unlabeled()
-        X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
+        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
         if self.method == 'lc':  # least confident
             ask_id = np.argmax(1 - np.max(self.model.predict_real(X_pool), 1))

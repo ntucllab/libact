@@ -36,8 +36,7 @@ class QueryByCommittee(QueryStrategy):
         return ret
 
     def make_query(self, dataset):
-        unlabeled_entry_ids = dataset.get_unlabeled()
-        X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
+        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
         votes = []
 
         # Training models with labeled data using bootstrap aggregating
