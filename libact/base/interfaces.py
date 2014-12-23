@@ -10,7 +10,7 @@ class QueryStrategy(metaclass=ABCMeta):
     #TODO: documentation
 
     @abstractmethod
-    def make_query(self, dataset, n_queries=1):
+    def make_query(self, dataset):
         pass
 
 
@@ -35,4 +35,12 @@ class Model(metaclass=ABCMeta):
 
     @abstractmethod
     def score(self, testing_dataset, *args, **kwargs):
+        pass
+
+
+class ContinuousModel(Model):
+    #TODO: documentation
+
+    @abstractmethod
+    def predict_real(self, feature, *args, **kwargs):
         pass

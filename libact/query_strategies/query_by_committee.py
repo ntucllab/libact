@@ -1,4 +1,5 @@
 from libact.base.interfaces import QueryStrategy
+import libact.models
 import numpy as np
 from functools import cmp_to_key
 import math
@@ -8,9 +9,15 @@ class QueryByCommittee(QueryStrategy):
 
     def __init__(self, models):
         """
-        model: a list of initialized libact Model object for prediction.
+        model: a list of initialized libact Model instances, or class names of
+               libact Model classes for prediction.
         """
-        self.students = models
+        self.students = list()
+        for model in models:
+            if type(model) is str:
+                self.students.append(getattr(libact.models, model)())
+            else:
+                self.students.append(model)
         self.n_students = len(self.students)
 
     def disagreement(self, votes):
@@ -28,16 +35,18 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
-    def make_query(self, dataset, n_queries=1):
-        unlabeled_entry_ids = dataset.get_unlabeled()
-        X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
+    def make_query(self, dataset):
+        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
         votes = []
 
         # Training models with labeled data using bootstrap aggregating
         # (bagging)
         # TODO exception on only one label is sampled.
         for student in self.students:
-            student.train(dataset.labeled_uniform_sample(int(dataset.len_labeled()), 100))
+            bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+            while bag.get_num_of_labels() != dataset.get_num_of_labels():
+                bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+            student.train(bag)
 
         # Let the trained students vote for unlabeled data
         for X in X_pool:
@@ -51,6 +60,6 @@ class QueryByCommittee(QueryStrategy):
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
                 reverse=True)
-        ret = [i[0] for i in disagreement[:n_queries]]
+        ret = disagreement[0][0]
 
         return ret
