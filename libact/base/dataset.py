@@ -81,11 +81,6 @@ class Dataset(object):
             if l[1][1] == -1
             ]
 
-    def get_labeled(self):
-        """Returns list of entry_ids of labeled features"""
-        return [entry_id for entry_id, entry in enumerate(self.data)
-            if entry[1] != None]
-
     def labeled_uniform_sample(self, samplesize, replace=True):
         """Returns a Dataset object with labeled data only, which is
         resampled uniformly with given sample size.

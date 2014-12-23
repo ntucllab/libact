@@ -1,5 +1,6 @@
 from libact.base.interfaces import QueryStrategy
 from libact.base.dataset import Dataset
+import libact.models
 import copy
 import numpy as np
 import time
@@ -13,7 +14,10 @@ class VarianceReduction(QueryStrategy):
         optimality: string, 'trace', 'determinant' or 'eigenvalue'
         (default='trace')
         """
-        self.model = model
+        if type(model) is str:
+            self.model = getattr(libact.models, model)()
+        else:
+            self.model = model
         self.optimality = optimality
         self.sigma = sigma
 
@@ -99,23 +103,24 @@ class VarianceReduction(QueryStrategy):
 
 
     def E(self, X, y, qx, clf, label_count):
-        query_point = clf.predict_proba([qx])
+        query_point = clf.predict_real([qx])
         feature_count = len(X[0])
         ret = 0.0
         for i in range(label_count):
             clf = copy.copy(self.model)
             clf.train(Dataset(X+[qx], y+[i]))
-            pi = clf.predict_proba([qx])
+            pi = clf.predict_real([qx])
             ret += query_point[-1][i] * self.Phi(pi[-1], qx, label_count,
                     feature_count)
         return ret
 
     def make_query(self, dataset, n_queries=1):
-        labeled_entry_ids = dataset.get_labeled()
-        unlabeled_entry_ids = dataset.get_unlabeled()
-        Xlabeled = np.array([dataset[i][0] for i in labeled_entry_ids])
-        y = [dataset[i][1] for i in labeled_entry_ids]
-        X_pool = [dataset[i][0] for i in unlabeled_entry_ids]
+        labeled_entry_ids = range(len(dataset.labeled))
+        unlabeled_entries = dataset.get_unlabeled_entries()
+        unlabeled_entry_ids = [i[0] for i in unlabeled_entries]
+        Xlabeled = np.array([dataset.labeled[i][0] for i in labeled_entry_ids])
+        y = [dataset.labeled[i][1] for i in labeled_entry_ids]
+        X_pool = [dataset.unlabeled[i][0] for i in unlabeled_entry_ids]
         label_count = dataset.get_num_of_labels()
 
         clf = copy.copy(self.model)
@@ -131,4 +136,4 @@ class VarianceReduction(QueryStrategy):
         #    print(errors[-1])
         #print(errors.index(min(errors)))
 
-        return [unlabeled_entry_ids[errors.index(min(errors))]]
+        return unlabeled_entry_ids[errors.index(min(errors))]
