@@ -9,4 +9,9 @@ Some examples are available under the `examples` directory. Before running, use
 
 Available examples:
 
-  - `examples/plot.py`
+  - `examples/plot.py`: see example usage below
+  
+```
+$ examples/plot.py -m LogisticRegression -q UncertaintySampling --qs-params='{"method": "lc"}'
+$ examples/plot.py -m LogisticRegression -q QueryByCommittee --qs-params='{"models": "Perceptron", "Perceptron", "Perceptron"}'
+```
