@@ -71,6 +71,12 @@ class Dataset(object):
             self.modified = False
         return self.cache
 
+    def get_labeled_entries(self):
+        """Returns list of labeled features and their labels
+        Format: [(feature, label), ...]
+        """
+        return self.labeled
+
     def get_unlabeled_entries(self):
         """Returns list of unlabeled features, along with their entry_ids
         Format: [(entry_id, feature), ...]
