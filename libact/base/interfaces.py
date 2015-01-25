@@ -9,8 +9,20 @@ from abc import ABCMeta, abstractmethod
 class QueryStrategy(metaclass=ABCMeta):
     #TODO: documentation
 
+    def __init__(self, dataset, update_callback=True):
+        self._dataset = dataset
+        if update_callback:
+            dataset.on_update(self.update)
+
+    def get_dataset(self):
+        return self._dataset
+
     @abstractmethod
-    def make_query(self, dataset):
+    def update(self, entry_id, label):
+        pass
+
+    @abstractmethod
+    def make_query(self):
         pass
 
 

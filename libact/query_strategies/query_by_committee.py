@@ -7,11 +7,12 @@ import math
 
 class QueryByCommittee(QueryStrategy):
 
-    def __init__(self, models):
+    def __init__(self, dataset, models, update_callback=True):
         """
         model: a list of initialized libact Model instances, or class names of
                libact Model classes for prediction.
         """
+        QueryStrategy.__init__(self, dataset, update_callback)
         self.students = list()
         for model in models:
             if type(model) is str:
@@ -35,7 +36,12 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
-    def make_query(self, dataset):
+    def update(self, entry_id, label):
+        # TODO
+        pass
+
+    def make_query(self):
+        dataset = self.get_dataset()
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
         votes = []
 

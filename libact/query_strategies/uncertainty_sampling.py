@@ -5,16 +5,22 @@ import numpy as np
 
 class UncertaintySampling(QueryStrategy):
 
-    def __init__(self, method='le'):
+    def __init__(self, dataset, update_callback=True, method='le'):
         """Currently only LogisticRegression is supported."""
+        QueryStrategy.__init__(self, dataset, update_callback)
         self.model = LogisticRegression()
         self.method = method
 
-    def make_query(self, dataset):
+    def update(self, entry_id, label):
+        # TODO
+        pass
+
+    def make_query(self):
         """
         Three choices for method (default 'le'):
         'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)
         """
+        dataset = self.get_dataset()
         self.model.train(dataset)
 
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
