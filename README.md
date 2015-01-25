@@ -13,5 +13,5 @@ Available examples:
   
 ```
 $ examples/plot.py -m LogisticRegression -q UncertaintySampling --qs-params='{"method": "lc"}'
-$ examples/plot.py -m LogisticRegression -q QueryByCommittee --qs-params='{"models": "Perceptron", "Perceptron", "Perceptron"}'
+$ examples/plot.py -m LogisticRegression -q QueryByCommittee --qs-params='{"models": ["Perceptron", "Perceptron", "Perceptron"]}'
 ```
