@@ -93,21 +93,17 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
 	npy_intp dimensions[2];
 	dimensions[0] = dimensions[1] = labs * dims;
 
-	for(int p=0; p<labs; p++)
-		for(int i=0; i<dims; i++){
-			for(int q=0; q<labs; q++)
-				for(int j=0; j<dims; j++)
-					printf("%f ", retF[p*dims + i][q*dims + j]);
-			puts("");
-		}
+	for(int i=0; i<dims*labs; i++){
+		for(int j=0; j<dims*labs; j++)
+			printf("%f ", retF[i][j]);
+		puts("");
+	}
 	puts("XD");
-	for(int p=0; p<labs; p++)
-		for(int i=0; i<dims; i++){
-			for(int q=0; q<labs; q++)
-				for(int j=0; j<dims; j++)
-					printf("%f ", retA[p*dims + i][q*dims + j]);
-			puts("");
-		}
+	for(int i=0; i<dims*labs; i++){
+		for(int j=0; j<dims*labs; j++)
+			printf("%f ", retA[i][j]);
+		puts("");
+	}
 
 
 	PyObject *retF_obj = (PyObject*) PyArray_SimpleNewFromData(
@@ -128,7 +124,7 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
 	Py_DECREF(ePI_array);
 	Py_DECREF(eX_array);
 
-	PyObject* ret = Py_BuildValue("OO", retF_obj, retA_obj);
+	PyObject* ret = Py_BuildValue("(OO)", retF_obj, retA_obj);
 
 	for(int i=0; i<n_pool; i++){
 		free(PI[i]);
@@ -151,7 +147,7 @@ double** An(double *pi, double *x, int labs, int dims){
 	double **g = (double**) malloc(labs*dims * sizeof(double*));
 	for(int i=0; i<labs*dims; i++){
 		g[i] = (double*) malloc(labs * sizeof(double));
-		memset(g[i], 0, labs);
+		memset(g[i], 0, labs * sizeof(double));
 	}
 	
 	for(int p=0; p<labs; p++)
@@ -164,13 +160,14 @@ double** An(double *pi, double *x, int labs, int dims){
 	double **an = (double**) malloc(labs*dims * sizeof(double*));
 	for(int i=0; i<labs*dims; i++){
 		an[i] = (double*) malloc(labs*dims * sizeof(double));
-		memset(an[i], 0, labs*dims);
+		memset(an[i], 0, labs*dims * sizeof(double));
 	}
 	
 	for(int p=0; p<labs; p++)
 		for(int i=0; i<dims; i++)
 			for(int q=0; q<labs; q++)
 				for(int j=0; j<dims; j++){
+					/* inner product */
 					double tmp = 0.0;
 					for(int k=0; k<labs; k++){
 						tmp += g[p*dims + i][k] * g[q*dims + j][k];
@@ -189,12 +186,26 @@ double** A(double **PI, double **X, int labs, int dims, int n_pool){
 	double **ret = (double**) malloc(labs*dims * sizeof(double*));
 	for(int i=0; i<labs*dims; i++){
 		ret[i] = (double*) malloc(labs*dims * sizeof(double));
-		memset(ret[i], 0, labs*dims);
+		memset(ret[i], 0, labs*dims * sizeof(double));
 	}
+
+	for(int i=0; i<dims*labs; i++){
+		for(int j=0; j<dims*labs; j++)
+			printf("ret%f ", ret[i][j]);
+		puts("");
+	}
+	puts("");
 
 	for(int n=0; n<n_pool; n++){
 		double **an = An(PI[n], X[n], labs, dims);
-		printf("XD%f\n", an[0][0]);
+
+		for(int i=0; i<dims*labs; i++){
+			for(int j=0; j<dims*labs; j++)
+				printf("an%f ", an[i][j]);
+			puts("");
+		}
+		puts("");
+
 		for(int p=0; p<labs; p++)
 			for(int i=0; i<dims; i++)
 				for(int q=0; q<labs; q++)
@@ -212,7 +223,7 @@ double** Fisher(double *pi, double *x, double sigma, int labs, int dims){
 	double **ret = (double**) malloc(labs*dims * sizeof(double*));
 	for(int i=0; i<labs*dims; i++){
 		ret[i] = (double*) malloc(labs*dims * sizeof(double*));
-		memset(ret[i], 0, labs*dims);
+		memset(ret[i], 0, labs*dims * sizeof(double));
 	}
 
 	for(int p=0; p<labs; p++)
