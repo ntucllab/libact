@@ -76,12 +76,10 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
 	for(int i=0; i<n_pool; i++){
 		for(int j=0; j<labs; j++){
 			PI[i][j] = *(double*)PyArray_GETPTR2(PI_array, i, j);
-			//printf("%f ", PI[i][j]);
 		}
 		puts("");
 		for(int j=0; j<dims; j++){
 			X[i][j] = *(double*)PyArray_GETPTR2(X_array, i, j);
-			//printf("%f ", X[i][j]);
 		}
 		puts("");
 	}
@@ -93,38 +91,36 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
 	npy_intp dimensions[2];
 	dimensions[0] = dimensions[1] = labs * dims;
 
-	for(int i=0; i<dims*labs; i++){
-		for(int j=0; j<dims*labs; j++)
-			printf("%f ", retF[i][j]);
-		puts("");
-	}
-	puts("XD");
-	for(int i=0; i<dims*labs; i++){
-		for(int j=0; j<dims*labs; j++)
-			printf("%f ", retA[i][j]);
-		puts("");
-	}
-
-
-	PyObject *retF_obj = (PyObject*) PyArray_SimpleNewFromData(
+	PyObject *retF_obj = (PyObject*) PyArray_SimpleNew(
 					2,
 					dimensions,
-					NPY_DOUBLE,
-					retF
+					NPY_FLOAT64
 				);
-	PyObject *retA_obj = (PyObject*) PyArray_SimpleNewFromData(
+	PyArrayObject *retF_arr = (PyArrayObject*)PyArray_FROM_OT(retF_obj, NPY_FLOAT64);
+	for(int i=0; i<dims*labs; i++){
+		for(int j=0; j<dims*labs; j++){
+			*(double*)PyArray_GETPTR2(retF_arr, i, j) = retF[i][j];
+		}
+	}
+
+	PyObject *retA_obj = (PyObject*) PyArray_SimpleNew(
 					2,
 					dimensions,
-					NPY_DOUBLE,
-					retA
+					NPY_FLOAT64
 				);
+	PyArrayObject *retA_arr = (PyArrayObject*)PyArray_FROM_OT(retA_obj, NPY_FLOAT64);
+	for(int i=0; i<dims*labs; i++){
+		for(int j=0; j<dims*labs; j++){
+			*(double*)PyArray_GETPTR2(retA_arr, i, j) = retA[i][j];
+		}
+	}
 
 	Py_DECREF(PI_array);
 	Py_DECREF(X_array);
 	Py_DECREF(ePI_array);
 	Py_DECREF(eX_array);
 
-	PyObject* ret = Py_BuildValue("(OO)", retF_obj, retA_obj);
+	PyObject* ret = Py_BuildValue("(OO)", retF_arr, retA_arr);
 
 	for(int i=0; i<n_pool; i++){
 		free(PI[i]);
@@ -189,22 +185,8 @@ double** A(double **PI, double **X, int labs, int dims, int n_pool){
 		memset(ret[i], 0, labs*dims * sizeof(double));
 	}
 
-	for(int i=0; i<dims*labs; i++){
-		for(int j=0; j<dims*labs; j++)
-			printf("ret%f ", ret[i][j]);
-		puts("");
-	}
-	puts("");
-
 	for(int n=0; n<n_pool; n++){
 		double **an = An(PI[n], X[n], labs, dims);
-
-		for(int i=0; i<dims*labs; i++){
-			for(int j=0; j<dims*labs; j++)
-				printf("an%f ", an[i][j]);
-			puts("");
-		}
-		puts("");
 
 		for(int p=0; p<labs; p++)
 			for(int i=0; i<dims; i++)
