@@ -4,6 +4,7 @@ import libact.models
 import copy
 import numpy as np
 from joblib import Parallel, delayed
+import varRedu
 
 class VarianceReduction(QueryStrategy):
 
@@ -20,6 +21,7 @@ class VarianceReduction(QueryStrategy):
         self.optimality = optimality
         self.sigma = sigma
 
+    """
     def A(self, pi, c, x, label_count, feature_count):
         _pi = -1 * np.array(pi)
         _pi[c] += 1
@@ -54,6 +56,15 @@ class VarianceReduction(QueryStrategy):
             F = self.Fisher(pi, x, label_count, feature_count)
             ret += np.trace( np.dot(A, F) )
         return ret
+    """
+    
+    def Phi(self, PI, X, epi, ex, label_count, feature_count):
+        A, F = varRedu.estVar(0.000001, PI, X, epi, ex)
+        try:
+            ret = np.trace(np.dot(A, np.linalg.pinv(F)))
+        except:
+            print(F)
+        return ret
 
 
     def E(self, X, y, qx, clf, label_count):
@@ -63,12 +74,12 @@ class VarianceReduction(QueryStrategy):
         for i in range(label_count):
             clf = copy.copy(self.model)
             clf.train(Dataset(X+[qx], y+[i]))
-            pi = clf.predict_real([qx])
-            ret += query_point[-1][i] * self.Phi(pi[-1], qx, label_count,
-                    feature_count)
+            PI = clf.predict_real(X+[qx])
+            ret += query_point[-1][i] * self.Phi(PI[:-1], X, PI[-1], qx,
+                    label_count, feature_count)
         return ret
 
-    def make_query(self, dataset, n_queries=1):
+    def make_query(self, dataset, n_queries=1, n_jobs=1):
         labeled_entry_ids = range(len(dataset.labeled))
         unlabeled_entries = dataset.get_unlabeled_entries()
         unlabeled_entry_ids = [i[0] for i in unlabeled_entries]
@@ -80,7 +91,7 @@ class VarianceReduction(QueryStrategy):
         clf = copy.copy(self.model)
         clf.train(Dataset(Xlabeled, y))
 
-        errors = Parallel(n_jobs=20)(delayed(self.E)(Xlabeled, y, x, clf,
+        errors = Parallel(n_jobs=n_jobs)(delayed(self.E)(Xlabeled, y, x, clf,
             label_count) for x in X_pool)
 
         return unlabeled_entry_ids[errors.index(min(errors))]
