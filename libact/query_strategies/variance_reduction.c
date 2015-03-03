@@ -77,11 +77,9 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
 		for(int j=0; j<labs; j++){
 			PI[i][j] = *(double*)PyArray_GETPTR2(PI_array, i, j);
 		}
-		puts("");
 		for(int j=0; j<dims; j++){
 			X[i][j] = *(double*)PyArray_GETPTR2(X_array, i, j);
 		}
-		puts("");
 	}
 	double *ePI =  (double*) PyArray_DATA(ePI_array);
 	double *eX  =  (double*) PyArray_DATA(eX_array);
