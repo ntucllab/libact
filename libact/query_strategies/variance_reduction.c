@@ -3,6 +3,12 @@
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
+#include <lapacke.h>
+
+/* DGESVD prototype */
+extern void LAPACK_dgesvd( char* jobu, char* jobvt, int* m, int* n, double* a,
+					int* lda, double* s, double* u, int* ldu, double* vt, int* ldvt,
+					double* work, int* lwork, int* info );
 
 double** An(double *pi, double *x, int labs, int dims);
 double** A(double **PI, double **X, int labs, int dims, int n_pool);
@@ -40,6 +46,128 @@ PyMODINIT_FUNC PyInit_varRedu(void){
 	import_array();
 
 	return m;
+}
+
+double* matrix_mul(double* a, double* b, int m1, int n1, int m2, int n2){
+	double *ret = (double*) malloc(m1 * n2 * sizeof(double));
+	if(n1 != m2){
+		return NULL;
+	}
+	for(int i=0; i<m1; i++)
+		for(int j=0; j<n2; j++){
+			double temp = 0.0;
+			for(int p=0; p<n1; p++)
+				temp += a[i*n1 + p] * b[p*n2 + j];
+			ret[i*n2 + j] = temp;
+		}
+	return ret;
+}
+
+
+void pinv(double** X, int labs, int dims){
+	int m = labs*dims, n = labs*dims, lda = labs*dims, ldu = labs*dims, 
+		ldvt = labs*dims, lwork, info;
+	double wkopt;
+	double *work;
+	double *s  = (double*) malloc(labs*dims * sizeof(double));
+	double *u  = (double*) malloc(labs*dims * labs*dims * sizeof(double));
+	double *vt = (double*) malloc(labs*dims * labs*dims * sizeof(double));
+	double *a  = (double*) malloc(labs*dims * labs*dims * sizeof(double));
+
+	for(int i=0; i<m; i++)
+		for(int j=0; j<n; j++)
+			a[i*labs*dims + j] = X[i][j];
+
+	 /* Query and allocate the optimal workspace */
+	lwork = -1;
+	LAPACK_dgesvd("All", "All", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, &wkopt, &lwork,
+		&info);
+	lwork = (int)wkopt;
+	work = (double*)malloc( lwork*sizeof(double) );
+	/* Compute SVD */
+	LAPACK_dgesvd("All", "All", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork,
+		&info);
+	/* Check for convergence */
+	if(info > 0) {
+		printf("The algorithm computing SVD failed to converge.\n");
+		exit(1);
+	}
+
+	int numSigular = 0;
+	double *si  = (double*) malloc(labs*dims * labs*dims * sizeof(double));
+	memset(si, 0, labs*dims * labs*dims * sizeof(double));
+	for(int i=0; i<m; i++)
+		printf("%lf ", s[i]);
+	puts("=");
+
+	for(int i=0; i<ldu; i++){
+		if(s[i] > 1e-30){
+			si[i*ldu + i] = 1.0 / s[i];
+			numSigular += 1;
+		}else{
+			si[i+ldu + i] = 0.0;
+		}
+	}
+	puts("=");
+
+	/* calculating transpose */
+	double *ut  = (double*) malloc(labs*dims * labs*dims * sizeof(double));
+	for(int i=0; i<numSigular; i++){
+		for(int j=0; j<ldu; j++){
+			ut[j*numSigular + i] =  u[i*ldu + j];
+		}
+	}
+	for(int i=0; i<m; i++){
+		for(int j=0; j<m; j++){
+			printf("%f ", u[i*m + j]);
+		}
+		puts("");
+	}
+
+
+	double *vtt = (double*) malloc(labs*dims * labs*dims * sizeof(double));
+	for(int i=0; i<m; i++){
+		for(int j=0; j<ldu; j++){
+			vtt[j*m + i] = vt[i*ldu + j];
+		}
+	}
+
+	for(int i=0; i<m; i++){
+		for(int j=0; j<ldu; j++)
+			printf("%f ", vt[i*ldu + j]);
+		puts("");
+	}
+	puts("===");
+
+	/*
+	for(int i=0; i<m; i++){
+		for(int j=0; j<ldu; j++)
+			printf("%f ", vtt[i*ldu + j]);
+		puts("");
+	}
+	*/
+
+	double *ret = matrix_mul(vtt, si, labs*dims, numSigular, numSigular, numSigular);
+	double *ret_pinv = matrix_mul(ret, ut, labs*dims, numSigular, numSigular, labs*dims);
+
+	for(int i=0; i<m; i++)
+		for(int j=0; j<n; j++)
+			X[i][j] = ret_pinv[i*n + j];
+
+	free(ret);
+
+	free(work);
+
+	free(a);
+	free(s);
+	free(vt);
+	free(u);
+
+	free(si);
+	free(vtt);
+	free(ut);
+
+	return;
 }
 
 static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
@@ -86,6 +214,22 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
 	
 	double **retF = Fisher(ePI, eX, sigma, dims, labs);
 	double **retA = A(PI, X, dims, labs, n_pool);
+
+	/*
+	printf("[");
+	for(int i=0; i<dims*labs; i++){
+		printf("[");
+		for(int j=0; j<dims*labs; j++){
+			printf("%f, ", retF[i][j]);
+		}
+		printf("],");
+		puts("");
+	}
+	printf("]");
+	*/
+
+	pinv(retF, labs, dims);
+
 	npy_intp dimensions[2];
 	dimensions[0] = dimensions[1] = labs * dims;
 
