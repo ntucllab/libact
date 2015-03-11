@@ -5,11 +5,11 @@ import numpy as np
 
 class UncertaintySampling(QueryStrategy):
 
-    def __init__(self, dataset, update_callback=True, method='le'):
+    def __init__(self, *args, **kwargs):
         """Currently only LogisticRegression is supported."""
-        QueryStrategy.__init__(self, dataset, update_callback)
+        super(UncertaintySampling, self).__init__(*args, **kwargs)
         self.model = LogisticRegression()
-        self.method = method
+        self.method = kwargs.pop('method', 'le')
 
     def update(self, entry_id, label):
         # TODO

@@ -9,8 +9,9 @@ from abc import ABCMeta, abstractmethod
 class QueryStrategy(metaclass=ABCMeta):
     #TODO: documentation
 
-    def __init__(self, dataset, update_callback=True):
+    def __init__(self, dataset, **kwargs):
         self._dataset = dataset
+        update_callback = kwargs.pop('update_callback', True)
         if update_callback:
             dataset.on_update(self.update)
 
