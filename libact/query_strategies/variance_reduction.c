@@ -115,14 +115,11 @@ void pinv(double** X, int labs, int dims){
             X[i][j] = ret_pinv[i*n + j];
 
     free(ret);
-
     free(work);
-
     free(a);
     free(s);
     free(vt);
     free(u);
-
     free(si);
 
     return;
@@ -182,41 +179,13 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
             score += retA[i][k] * retF[k][i];
         }
     }
-    printf("score: %f\n", score);
-
-    npy_intp dimensions[2];
-    dimensions[0] = dimensions[1] = labs * dims;
-
-    PyObject *retF_obj = (PyObject*) PyArray_SimpleNew(
-                    2,
-                    dimensions,
-                    NPY_FLOAT64
-                );
-    PyArrayObject *retF_arr = (PyArrayObject*)PyArray_FROM_OT(retF_obj, NPY_FLOAT64);
-    for(int i=0; i<dims*labs; i++){
-        for(int j=0; j<dims*labs; j++){
-            *(double*)PyArray_GETPTR2(retF_arr, i, j) = retF[i][j];
-        }
-    }
-
-    PyObject *retA_obj = (PyObject*) PyArray_SimpleNew(
-                    2,
-                    dimensions,
-                    NPY_FLOAT64
-                );
-    PyArrayObject *retA_arr = (PyArrayObject*)PyArray_FROM_OT(retA_obj, NPY_FLOAT64);
-    for(int i=0; i<dims*labs; i++){
-        for(int j=0; j<dims*labs; j++){
-            *(double*)PyArray_GETPTR2(retA_arr, i, j) = retA[i][j];
-        }
-    }
 
     Py_DECREF(PI_array);
     Py_DECREF(X_array);
     Py_DECREF(ePI_array);
     Py_DECREF(eX_array);
 
-    PyObject* ret = Py_BuildValue("(OO)", retF_arr, retA_arr);
+    PyObject* ret = Py_BuildValue("d", score);
 
     for(int i=0; i<n_pool; i++){
         free(PI[i]);
