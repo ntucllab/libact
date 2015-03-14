@@ -96,9 +96,6 @@ void pinv(double** X, int labs, int dims){
     int numSigular = 0;
     double *si  = (double*) malloc(labs*dims * labs*dims * sizeof(double));
     memset(si, 0, labs*dims * labs*dims * sizeof(double));
-    for(int i=0; i<m; i++)
-        printf("%lf ", s[i]);
-    puts("=");
 
     for(int i=0; i<ldu; i++){
         if(s[i] > 1e-30){
@@ -108,47 +105,10 @@ void pinv(double** X, int labs, int dims){
             si[i+ldu + i] = 0.0;
         }
     }
-    puts("=");
 
     /* calculating transpose */
-    double *ut  = (double*) malloc(labs*dims * labs*dims * sizeof(double));
-    for(int i=0; i<numSigular; i++){
-        for(int j=0; j<ldu; j++){
-            ut[j*numSigular + i] =  u[i*ldu + j];
-        }
-    }
-    for(int i=0; i<m; i++){
-        for(int j=0; j<m; j++){
-            printf("%f ", u[i*m + j]);
-        }
-        puts("");
-    }
-
-
-    double *vtt = (double*) malloc(labs*dims * labs*dims * sizeof(double));
-    for(int i=0; i<m; i++){
-        for(int j=0; j<ldu; j++){
-            vtt[j*m + i] = vt[i*ldu + j];
-        }
-    }
-
-    for(int i=0; i<m; i++){
-        for(int j=0; j<ldu; j++)
-            printf("%f ", vt[i*ldu + j]);
-        puts("");
-    }
-    puts("===");
-
-    /*
-    for(int i=0; i<m; i++){
-        for(int j=0; j<ldu; j++)
-            printf("%f ", vtt[i*ldu + j]);
-        puts("");
-    }
-    */
-
-    double *ret = matrix_mul(vtt, si, labs*dims, numSigular, numSigular, numSigular);
-    double *ret_pinv = matrix_mul(ret, ut, labs*dims, numSigular, numSigular, labs*dims);
+    double *ret = matrix_mul(vt, si, labs*dims, numSigular, numSigular, numSigular);
+    double *ret_pinv = matrix_mul(ret, u, labs*dims, numSigular, numSigular, labs*dims);
 
     for(int i=0; i<m; i++)
         for(int j=0; j<n; j++)
@@ -164,8 +124,6 @@ void pinv(double** X, int labs, int dims){
     free(u);
 
     free(si);
-    free(vtt);
-    free(ut);
 
     return;
 }
