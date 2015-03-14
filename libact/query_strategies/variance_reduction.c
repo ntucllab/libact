@@ -173,20 +173,16 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
     double **retF = Fisher(ePI, eX, sigma, dims, labs);
     double **retA = A(PI, X, dims, labs, n_pool);
 
-    /*
-    printf("[");
-    for(int i=0; i<dims*labs; i++){
-        printf("[");
-        for(int j=0; j<dims*labs; j++){
-            printf("%f, ", retF[i][j]);
-        }
-        printf("],");
-        puts("");
-    }
-    printf("]");
-    */
-
     pinv(retF, labs, dims);
+
+    /* calculates the trace of the multiply of pinv(F) and A  */
+    double score = 0.0;
+    for(int i=0; i<dims*labs; i++){
+        for(int k=0; k<dims*labs; k++){
+            score += retA[i][k] * retF[k][i];
+        }
+    }
+    printf("score: %f\n", score);
 
     npy_intp dimensions[2];
     dimensions[0] = dimensions[1] = labs * dims;
