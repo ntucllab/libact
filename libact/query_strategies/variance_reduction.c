@@ -87,10 +87,12 @@ void pinv(double** X, int labs, int dims){
     /* Compute SVD */
     LAPACK_dgesvd("All", "All", &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork,
         &info);
-    /* Check for convergence */
+    /* Check for convergence  */
     if(info > 0) {
-        printf("The algorithm computing SVD failed to converge.\n");
-        exit(1);
+        printf("The algorithm computing SVD failed to converge. %d\n", info);
+    }
+    if(info < 0) {
+        printf("Has illegal value. %d\n", info);
     }
 
     int numSigular = 0;
@@ -164,11 +166,13 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
             X[i][j] = *(double*)PyArray_GETPTR2(X_array, i, j);
         }
     }
+    //puts("===================================");
+    //puts("===================================");
     double *ePI =  (double*) PyArray_DATA(ePI_array);
     double *eX  =  (double*) PyArray_DATA(eX_array);
     
-    double **retF = Fisher(ePI, eX, sigma, dims, labs);
-    double **retA = A(PI, X, dims, labs, n_pool);
+    double **retF = Fisher(ePI, eX, sigma, labs, dims);
+    double **retA = A(PI, X, labs, dims, n_pool);
 
     pinv(retF, labs, dims);
 
@@ -276,13 +280,14 @@ double** Fisher(double *pi, double *x, double sigma, int labs, int dims){
     for(int p=0; p<labs; p++)
         for(int i=0; i<dims; i++)
             for(int q=0; q<labs; q++)
-                for(int j=0; j<dims; j++)
+                for(int j=0; j<dims; j++){
                     if(p == q && i == j)
                         ret[p*dims + i][q*dims + j] = x[i]*x[i]*pi[p]*(1.0-pi[p]) + 1.0/sigma*sigma;
                     else if(p == q && i != j)
                         ret[p*dims + i][q*dims + j] = x[i]*x[j]*pi[p]*(1.0-pi[p]);
                     else
                         ret[p*dims + i][q*dims + j] = x[i]*x[j]*pi[p]*pi[q];
+                }
     return ret;
 }
 

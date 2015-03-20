@@ -5,6 +5,7 @@ import copy
 import numpy as np
 from joblib import Parallel, delayed
 import varRedu
+from multiprocessing import Pool
 
 class VarianceReduction(QueryStrategy):
 
@@ -59,15 +60,19 @@ class VarianceReduction(QueryStrategy):
     """
     
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
-        A, F = varRedu.estVar(0.000001, PI, X, epi, ex)
+        ret = varRedu.estVar(0.000001, PI, X, epi, ex)
+        """
         try:
             ret = np.trace(np.dot(A, np.linalg.pinv(F)))
         except:
-            print(F)
+            print(varRedu.estVar(0.000001, PI, X, epi, ex))
+            ret = np.trace(np.dot(A, np.linalg.pinv(F)))
+        """
         return ret
 
 
-    def E(self, X, y, qx, clf, label_count):
+    def E(self, args):
+        X, y, qx, clf, label_count = args
         query_point = clf.predict_real([qx])
         feature_count = len(X[0])
         ret = 0.0
@@ -79,7 +84,7 @@ class VarianceReduction(QueryStrategy):
                     label_count, feature_count)
         return ret
 
-    def make_query(self, dataset, n_queries=1, n_jobs=1):
+    def make_query(self, dataset, n_queries=1, n_jobs=12):
         labeled_entry_ids = range(len(dataset.labeled))
         unlabeled_entries = dataset.get_unlabeled_entries()
         unlabeled_entry_ids = [i[0] for i in unlabeled_entries]
@@ -91,7 +96,18 @@ class VarianceReduction(QueryStrategy):
         clf = copy.copy(self.model)
         clf.train(Dataset(Xlabeled, y))
 
-        errors = Parallel(n_jobs=n_jobs)(delayed(self.E)(Xlabeled, y, x, clf,
-            label_count) for x in X_pool)
-
+        p = Pool(n_jobs)
+        
+        import time
+        start = time.time()
+        #errors = Parallel(n_jobs=n_jobs)(delayed(self.E)(Xlabeled, y, x, clf,
+        #    label_count) for x in X_pool)
+        #errors = []
+        #for x in X_pool:
+        #    errors.append(self.E((Xlabeled, y, x, clf, label_count)))
+        errors = p.map(self.E, [(Xlabeled, y, x, clf, label_count) for x in\
+            X_pool])
+        #print(errors)
+        end = time.time()
+        print(end-start)
         return unlabeled_entry_ids[errors.index(min(errors))]
