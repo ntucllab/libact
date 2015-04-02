@@ -3,7 +3,6 @@ from libact.base.dataset import Dataset
 import libact.models
 import copy
 import numpy as np
-from joblib import Parallel, delayed
 import varRedu
 from multiprocessing import Pool
 
@@ -84,7 +83,7 @@ class VarianceReduction(QueryStrategy):
                     label_count, feature_count)
         return ret
 
-    def make_query(self, dataset, n_queries=1, n_jobs=12):
+    def make_query(self, dataset, n_queries=1, n_jobs=20):
         labeled_entry_ids = range(len(dataset.labeled))
         unlabeled_entries = dataset.get_unlabeled_entries()
         unlabeled_entry_ids = [i[0] for i in unlabeled_entries]
@@ -100,14 +99,9 @@ class VarianceReduction(QueryStrategy):
         
         import time
         start = time.time()
-        #errors = Parallel(n_jobs=n_jobs)(delayed(self.E)(Xlabeled, y, x, clf,
-        #    label_count) for x in X_pool)
-        #errors = []
-        #for x in X_pool:
-        #    errors.append(self.E((Xlabeled, y, x, clf, label_count)))
         errors = p.map(self.E, [(Xlabeled, y, x, clf, label_count) for x in\
             X_pool])
-        #print(errors)
+        p.terminate()
         end = time.time()
         print(end-start)
         return unlabeled_entry_ids[errors.index(min(errors))]
