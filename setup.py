@@ -27,7 +27,7 @@ setup(
         Extension(
             "_varRedu",
             ["libact/query_strategies/variance_reduction.c"],
-            extra_link_args=['-llapacke'],
+            extra_link_args=['-llapacke -llapack -lblas'],
             extra_compile_args=['-std=c11'],
             include_dirs=numpy.distutils.misc_util.get_numpy_include_dirs(),
             ),
