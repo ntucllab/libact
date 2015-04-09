@@ -3,7 +3,7 @@ from libact.base.dataset import Dataset
 import libact.models
 import copy
 import numpy as np
-import _varRedu
+from libact.query_strategies import _variance_reduction
 from multiprocessing import Pool
 
 class VarianceReduction(QueryStrategy):
@@ -59,7 +59,7 @@ class VarianceReduction(QueryStrategy):
     """
     
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
-        ret = _varRedu.estVar(0.000001, PI, X, epi, ex)
+        ret = _variance_reduction.estVar(0.000001, PI, X, epi, ex)
         """
         try:
             ret = np.trace(np.dot(A, np.linalg.pinv(F)))

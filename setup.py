@@ -25,7 +25,7 @@ setup(
         },
     ext_modules=[
         Extension(
-            "_varRedu",
+            "libact.query_strategies._variance_reduction",
             ["libact/query_strategies/variance_reduction.c"],
             extra_link_args=['-llapacke -llapack -lblas'],
             extra_compile_args=['-std=c11'],

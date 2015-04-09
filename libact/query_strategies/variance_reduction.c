@@ -26,7 +26,7 @@ static PyMethodDef module_methods[] = {
 
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
-    "_varRedu",          /* m_name */
+    "_variance_reduction",  /* m_name */
     "This module provides calculate A and Fisher matrix using C.",  /* m_doc */
     -1,                  /* m_size */
     module_methods,      /* m_methods */
@@ -36,7 +36,7 @@ static struct PyModuleDef moduledef = {
     NULL,                /* m_free */
 };
 
-PyMODINIT_FUNC PyInit__varRedu(void){
+PyMODINIT_FUNC PyInit__variance_reduction(void){
     PyObject *m = PyModule_Create(&moduledef);
     if(m==NULL){
         return NULL;
