@@ -5,24 +5,38 @@ import numpy as np
 
 class UncertaintySampling(QueryStrategy):
 
-    def __init__(self, method='le'):
+    def __init__(self, *args, **kwargs):
         """Currently only LogisticRegression is supported."""
+        super(UncertaintySampling, self).__init__(*args, **kwargs)
         self.model = LogisticRegression()
-        self.method = method
+        self.method = kwargs.pop('method', 'le')
 
-    def make_query(self, dataset):
+    def update(self, entry_id, label):
+        # TODO
+        pass
+
+    def make_query(self):
         """
         Three choices for method (default 'le'):
         'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)
         """
+        dataset = self.get_dataset()
         self.model.train(dataset)
 
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
         if self.method == 'lc':  # least confident
+            # time complexity analysis:
+            # self.model.predict_real(X_pool) -> O(NK)
+            # np.max(..., axis=1) -> O(NK)
+            # 1 - np.max(..., axis=1) -> O(NK)
+            # np.argmax(...) -> O(N)
+            # therefore, total time complexity is O(NK) + O(NK) + O(NK) + O(N) = O(NK)
             ask_id = np.argmax(1 - np.max(self.model.predict_real(X_pool), 1))
 
         elif self.method == 'sm':  # smallest margin
+            # time complexity analysis:
+            # O(NK) + O(N)
             prob = self.model.predict_real(X_pool)
             min_margin = np.inf
             for j in range(len(prob)) :
@@ -35,8 +49,17 @@ class UncertaintySampling(QueryStrategy):
 
         elif self.method == 'le':  # default : label entropy (most commonly used)
             # XXX divide by zero?
-            ask_id = np.argmax(-np.sum(self.model.predict_real(X_pool)
-                * np.log(self.model.predict_real(X_pool)), 1))
+            # time complexity analysis:
+            # prob = self.model.predict_real(X_pool) -> O(NK)
+            # np.log(prob) -> O(NK)
+            # prob * np.log(prob) -> O(NK)
+            # -np.sum(..., axis=1) -> O(NK)
+            # np.argmax(...) -> O(N)
+            # therefore, total time complexity = O(NK)
+            prob = self.model.predict_real(X_pool)
+            ask_id = np.argmax(-np.sum(prob * np.log(prob), 1))
+            # ask_id = np.argmax(-np.sum(self.model.predict_real(X_pool)
+            #     * np.log(self.model.predict_real(X_pool)), 1))
 
         else:
             raise ValueError(

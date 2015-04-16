@@ -7,12 +7,20 @@ import math
 
 class QueryByCommittee(QueryStrategy):
 
-    def __init__(self, models):
+    def __init__(self, *args, **kwargs):
         """
         model: a list of initialized libact Model instances, or class names of
                libact Model classes for prediction.
         """
+        super(QueryByCommittee, self).__init__(*args, **kwargs)
         self.students = list()
+        models = kwargs.pop('models', None)
+        if models is None:
+            raise TypeError(
+                "__init__() missing required keyword-only argument: 'models'"
+                )
+        elif not models:
+            raise ValueError("models list is empty")
         for model in models:
             if type(model) is str:
                 self.students.append(getattr(libact.models, model)())
@@ -35,7 +43,12 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
-    def make_query(self, dataset):
+    def update(self, entry_id, label):
+        # TODO
+        pass
+
+    def make_query(self):
+        dataset = self.get_dataset()
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
         votes = []
 

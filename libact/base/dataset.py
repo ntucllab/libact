@@ -20,6 +20,7 @@ class Dataset(object):
             else:
                 self.labeled.append((feature, label))
         self.modified = True
+        self._update_callback = set()
 
     def __len__(self):
         """Return the number of all data entries in this object."""
@@ -60,6 +61,11 @@ class Dataset(object):
         else:  # update existing entry in labeled pool
             self.labeled[entry[1]] = (entry[0], label)
         self.modified = True
+        for callback in self._update_callback:
+            callback(entry_id, label)
+
+    def on_update(self, callback):
+        self._update_callback.add(callback)
 
     def format_sklearn(self):
         """Returns dataset in (X, y) format for use in scikit-learn.
