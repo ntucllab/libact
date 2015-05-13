@@ -15,7 +15,8 @@ class QueryStrategy(metaclass=ABCMeta):
         if update_callback:
             dataset.on_update(self.update)
 
-    def get_dataset(self):
+    @property
+    def dataset(self):
         return self._dataset
 
     @abstractmethod
