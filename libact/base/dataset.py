@@ -58,7 +58,8 @@ class Dataset(object):
         """Returns dataset in (X, y) format for use in scikit-learn.
         Unlabeled entries are ignored.
         """
-        return tuple(zip(*self.get_labeled_entries()))
+        X, y = zip(*self.get_labeled_entries())
+        return np.array(X), np.array(y)
 
     def get_labeled_entries(self):
         """Returns list of labeled features and their labels
