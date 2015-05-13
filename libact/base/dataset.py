@@ -117,3 +117,15 @@ def import_libsvm_sparse(filename):
                 vec[n_component] = entry[n_component]
         dataset.append(vec, entry['label'])
     return dataset
+
+
+def import_scipy_mat(filename):
+    from scipy.io import loadmat
+    data = loadmat(filename)
+    X = data['X']
+    y = data['y']
+    zipper = list(zip(X, y))
+    np.random.shuffle(zipper)
+    X, y = zip(*zipper)
+    X, y = np.array(X), np.array(y).reshape(-1)
+    return Dataset(X, y)
