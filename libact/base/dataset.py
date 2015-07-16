@@ -61,6 +61,9 @@ class Dataset(object):
         X, y = zip(*self.get_labeled_entries())
         return np.array(X), np.array(y)
 
+    def get_entries(self):
+        return self.data
+
     def get_labeled_entries(self):
         """Returns list of labeled features and their labels
         Format: [(feature, label), ...]
@@ -114,3 +117,15 @@ def import_libsvm_sparse(filename):
                 vec[n_component] = entry[n_component]
         dataset.append(vec, entry['label'])
     return dataset
+
+
+def import_scipy_mat(filename):
+    from scipy.io import loadmat
+    data = loadmat(filename)
+    X = data['X']
+    y = data['y']
+    zipper = list(zip(X, y))
+    np.random.shuffle(zipper)
+    X, y = zip(*zipper)
+    X, y = np.array(X), np.array(y).reshape(-1)
+    return Dataset(X, y)
