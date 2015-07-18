@@ -16,10 +16,12 @@ class HintSVM(QueryStrategy):
                libact Model classes for prediction.
         """
         super(HintSVM, self).__init__(*args, **kwargs)
-        self.cl = 0.1 # Weight on labeled data's classification error
-        self.ch = 0.1 # Weight on hinted data's classification error
-        self.p = 0.5  # Prabability of sampling a data from unlabeled pool to
-                      # hinted pool
+        # Weight on labeled data's classification error
+        self.cl = kwargs.pop('Cl', 0.1)
+        # Weight on hinted data's classification error
+        self.ch = kwargs.pop('Ch', 0.1)
+        # Prabability of sampling a data from unlabeled pool to hinted pool
+        self.p = kwargs.pop('p', 0.5)
 
     def update(self, entry_id, label):
         # TODO
@@ -51,7 +53,6 @@ class HintSVM(QueryStrategy):
         p_label, p_acc, p_val = svmutil.svm_predict(y, [x.tolist()\
                 for x in unlabeled_pool], m)
 
-        #TODO not sure to have abs or not
         p_val = [abs(val[0]) for val in p_val]
         idx = np.argmax(p_val)
         return unlabeled_entry_ids[idx]
