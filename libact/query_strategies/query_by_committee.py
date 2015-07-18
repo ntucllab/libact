@@ -62,11 +62,9 @@ class QueryByCommittee(QueryStrategy):
             student.train(bag)
 
         # Let the trained students vote for unlabeled data
-        for X in X_pool:
-            vote = []
-            for student in self.students:
-                vote.append(student.predict(X)[0])
-            votes.append(vote)
+        votes = np.zeros((len(X_pool), len(self.students)))
+        for i, student in enumerate(self.students):
+            votes[:, i] = student.predict(X_pool)
 
         id_disagreement = [(i, dis) for i, dis in
                 zip(unlabeled_entry_ids, self.disagreement(votes))]
