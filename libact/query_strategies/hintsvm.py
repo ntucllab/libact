@@ -3,10 +3,8 @@ import libact.models
 import numpy as np
 from functools import cmp_to_key
 import math
-import svmutil
+import hintsvmutil
 import ctypes
-
-print(svmutil.__file__)
 
 class HintSVM(QueryStrategy):
 
@@ -44,13 +42,13 @@ class HintSVM(QueryStrategy):
         X = [x.tolist() for x in labeled_pool] +\
                 [x.tolist() for x in hint_pool]
 
-        prob  = svmutil.svm_problem(weight, y, X)
-        param = svmutil.svm_parameter('-s 5 -t 0 -b 0 -c %f -q' % cl)
-        m = svmutil.svm_train(prob, param)
+        prob  = hintsvmutil.svm_problem(weight, y, X)
+        param = hintsvmutil.svm_parameter('-s 5 -t 0 -b 0 -c %f -q' % cl)
+        m = hintsvmutil.svm_train(prob, param)
 
         #TODO need only p_val
         y = np.zeros((len(unlabeled_pool), ))
-        p_label, p_acc, p_val = svmutil.svm_predict(y, [x.tolist()\
+        p_label, p_acc, p_val = hintsvmutil.svm_predict(y, [x.tolist()\
                 for x in unlabeled_pool], m)
 
         p_val = [abs(val[0]) for val in p_val]
