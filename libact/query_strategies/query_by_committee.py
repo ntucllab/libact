@@ -1,3 +1,8 @@
+"""Query by committee
+
+This module contains a class that implements Query by committee active learning
+algorithm.
+"""
 from libact.base.interfaces import QueryStrategy
 import libact.models
 import numpy as np
@@ -6,6 +11,26 @@ import math
 
 
 class QueryByCommittee(QueryStrategy):
+    """Query by committee
+
+    Parameters
+    ----------
+    models : list of libact.models
+        models to be included in the committee to vote for each instance.
+
+
+    Attributes
+    ----------
+    students : list, shape = [len(models)]
+        A list of model instances created from models.
+
+
+    References
+    ----------
+    Seung, H. Sebastian, Manfred Opper, and Haim Sompolinsky. "Query by
+    committee." Proceedings of the fifth annual workshop on Computational
+    learning theory. ACM, 1992.
+        """
 
     def __init__(self, *args, **kwargs):
         """
