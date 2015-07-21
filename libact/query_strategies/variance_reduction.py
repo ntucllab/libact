@@ -1,25 +1,56 @@
+"""Variance Reduction"""
+
 from libact.base.interfaces import QueryStrategy
 from libact.base.dataset import Dataset
+from libact.query_strategies import _variance_reduction
 import libact.models
 import copy
 import numpy as np
-from libact.query_strategies import _variance_reduction
 from multiprocessing import Pool
 
 class VarianceReduction(QueryStrategy):
+    """Variance Reduction
 
-    def __init__(self, model, sigma=100000000.0, optimality='trace'):
-        """
-        model: a list of initialized libact Model object for prediction.
-        optimality: string, 'trace', 'determinant' or 'eigenvalue'
-        (default='trace')
-        """
+    This class implements Variance Reduction active learning algorithm [1]_.
+
+    Parameters
+    ----------
+    model: {libact.model.LogisticRegression instance, 'LogisticRegression'}
+        The model use for variance reduction to evaluate the variance.
+        Only Logistic regression are supported now.
+
+    sigma: float, >0, optional (default=100.0)
+        The regularization term to be added to the diagonal of Fisher
+        information matrix. 1/sigma will be added to the matrix.
+
+    optimality : {'trace', 'determinant', 'eigenvalue'}, optional (default='trace')
+        Choosing what to optimize. These options optimize the trace,
+        determinant, and maximum eigenvalue of the inverse Fisher information
+        matrix.
+        Only 'trace' are supported now.
+
+
+    Attributes
+    ----------
+
+
+    References
+    ----------
+
+    .. [1] Schein, Andrew I., and Lyle H. Ungar. "Active learning for logistic
+           regression: an evaluation." Machine Learning 68.3 (2007): 235-265.
+
+    .. [2] Settles, Burr. "Active learning literature survey." University of
+           Wisconsin, Madison 52.55-66 (2010): 11.
+    """
+
+    def __init__(self,  *args, **kwargs):
         if type(model) is str:
             self.model = getattr(libact.models, model)()
         else:
             self.model = model
-        self.optimality = optimality
-        self.sigma = sigma
+        self.optimality = kwargs.pop('optimality', 'trace')
+        self.sigma = kwargs.pop('sigma', 100.0)
 
     """
     def A(self, pi, c, x, label_count, feature_count):
@@ -40,7 +71,7 @@ class VarianceReduction(QueryStrategy):
         _pi = np.tile(_pi_l2, (label_count*feature_count, 1))
         for i in range(label_count):
             _pi[i*feature_count:(i+1)*feature_count,
-                i*feature_count:(i+1)*feature_count] = 1 - pi[i] 
+                i*feature_count:(i+1)*feature_count] = 1 - pi[i]
         fisher =\
             np.tile(np.array([x]).T, (label_count, label_count*feature_count)) *\
             np.tile(np.array([x]), (label_count*feature_count, label_count)) *\
@@ -57,7 +88,7 @@ class VarianceReduction(QueryStrategy):
             ret += np.trace( np.dot(A, F) )
         return ret
     """
-    
+
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
         ret = _variance_reduction.estVar(0.000001, PI, X, epi, ex)
         """
@@ -96,7 +127,7 @@ class VarianceReduction(QueryStrategy):
         clf.train(Dataset(Xlabeled, y))
 
         p = Pool(n_jobs)
-        
+
         import time
         start = time.time()
         errors = p.map(self.E, [(Xlabeled, y, x, clf, label_count) for x in\
