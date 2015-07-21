@@ -48,8 +48,7 @@ def train_and_plot(model_class, model_params, qs_class, qs_params):
 
     # ==========================================================================
 
-    y_query = y_train[10:]
-    dataset = Dataset(X_train, np.concatenate([y_train[:10], [None] * len(y_query)]))
+    dataset = Dataset(X_train, np.concatenate([y_train[:10], [None] * (len(y_train) - 10)]))
     quota = N - 10  # the student can only ask [quota] questions, otherwise the teacher will get unpatient
 
     # now, the student start asking questions
@@ -57,7 +56,7 @@ def train_and_plot(model_class, model_params, qs_class, qs_params):
     for i in range(quota) :
         # the student asks the teacher the most confusing question and learns it
         ask_id = qs.make_query()
-        dataset.update(ask_id, y_query[ask_id])
+        dataset.update(ask_id, y_train[ask_id])
 
         # the student redo the exam and see the result
         model.train(dataset)
