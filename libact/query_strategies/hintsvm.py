@@ -1,18 +1,48 @@
+"""Hinted Support Vector Machine
+
+This module contains a class that implements Hinted Support Vector Machine, an 
+active learning algorithm.
+
+To use this module, it is required to install the following package:
+
+https://github.com/yangarbiter/hintsvm
+"""
 from libact.base.interfaces import QueryStrategy
 import libact.models
 import numpy as np
 from functools import cmp_to_key
 import math
-import hintsvmutil
+import hintsvmutil # from hinsvm package
 import ctypes
 
 class HintSVM(QueryStrategy):
+    """Hinted Support Vector Machine
+
+    Hinted Support Vector Machine is an active learning algorithm within the
+    hined sampling framework with an extended support vector machine.
+
+    Parameters
+    ----------
+    Cl : float, >0
+        The weight of the classification error on labeled pool.
+
+    Ch : float, >0
+        The weight of the hint error on hint pool.
+
+    p : float, >=0 and <=1
+        The probability to select an instance from unlabeld pool to hint pool.
+
+    Attributes
+    ----------
+
+
+    References
+    ----------
+    Li, Chun-Liang, Chun-Sung Ferng, and Hsuan-Tien Lin. "Active Learning with
+    Hinted Support Vector Machine." ACML. 2012.
+    """
 
     def __init__(self, *args, **kwargs):
-        """
-        model: a list of initialized libact Model instances, or class names of
-               libact Model classes for prediction.
-        """
         super(HintSVM, self).__init__(*args, **kwargs)
         # Weight on labeled data's classification error
         self.cl = kwargs.pop('Cl', 0.1)
