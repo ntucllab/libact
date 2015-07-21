@@ -29,7 +29,7 @@ class HintSVM(QueryStrategy):
     Ch : float, >0
         The weight of the hint error on hint pool.
 
-    p : float, >=0 and <=1
+    p : float, >0 and <=1
         The probability to select an instance from unlabeld pool to hint pool.
 
     Attributes
@@ -46,10 +46,18 @@ class HintSVM(QueryStrategy):
         super(HintSVM, self).__init__(*args, **kwargs)
         # Weight on labeled data's classification error
         self.cl = kwargs.pop('Cl', 0.1)
+        if self.cl <= 0:
+            raise ValueError('Parameter Cl should be greater than 0.')
         # Weight on hinted data's classification error
         self.ch = kwargs.pop('Ch', 0.1)
+        if self.ch <= 0:
+            raise ValueError('Parameter Cl should be greater than 0.')
         # Prabability of sampling a data from unlabeled pool to hinted pool
         self.p = kwargs.pop('p', 0.5)
+        if self.p > 1.0 or self.p <= 0.0:
+            raise ValueError(
+                'Parameter p should be greater than 0 and smaller or eaual than 1.'
+                )
 
     def update(self, entry_id, label):
         # TODO
@@ -63,6 +71,11 @@ class HintSVM(QueryStrategy):
         cl = self.cl
         ch = self.ch
         p = self.p
+        if int(len(unlabeled_pool)*p) <= 0:
+            raise ValueError(
+                'unlabeled_pool is too small with current parameter p that the'
+                'hint pool will have no instances.'
+                )
         hint_pool_idx = np.random.choice(len(unlabeled_pool), int(len(unlabeled_pool)*p))
         hint_pool = np.array(unlabeled_pool)[hint_pool_idx]
 
