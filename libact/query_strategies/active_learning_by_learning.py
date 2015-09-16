@@ -275,7 +275,7 @@ class Exp4P():
         vhat = np.zeros((self.N,))
         while self.t < self.T:
             advice = np.zeros((self.N, self.K))
-            for i, expert in enumerate(self.experts):
+            for i, expert in enumerate(self.experts_):
             #TODO probabilistic active learning algorithm
                 advice[i][self.invert_id_idx[expert.make_query()]] = 1
             W = np.sum(self.w)
