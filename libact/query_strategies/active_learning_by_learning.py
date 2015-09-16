@@ -35,11 +35,10 @@ class ActiveLearningByLearning(QueryStrategy):
                     delta = self.delta,
                     K = self.dataset.len_unlabeled(),
                     invert_id_idx = self.invert_id_idx,
-                    idx_id = self.unlabeled_entry_ids
                 )
         self.budget_used = 0
 
-        # Classifier instance
+        # classifier instance
         self.clf = kwargs.pop('clf', None)
         if self.clf is None:
             raise TypeError(
@@ -83,7 +82,6 @@ class ActiveLearningByLearning(QueryStrategy):
                         self.queried_hist[-1],
                         self.dataset.data[self.queried_hist[-1]][1]
                         )
-            p = p/np.sum(p)
             ask_idx = np.random.choice(np.arange(self.exp4p.K), size=1, p=p)[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
 
@@ -134,11 +132,6 @@ class Exp4P():
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'invert_id_idx'"
                 )
-        self.idx_id = kwargs.pop('idx_id')
-        if not self.idx_id:
-            raise TypeError(
-                "__init__() missing required keyword-only argument: 'idx_id'"
-                )
 
     # Python3 compatibility
     def __next__(self, reward, ask_id, lbl):
@@ -158,7 +151,6 @@ class Exp4P():
             expert.update(qid, lbl)
 
     def exp4p(self):
-        #TODO probabilistic active learning algorithm
         self.t = 0
 
         rhat = np.zeros((self.K,))
@@ -167,12 +159,13 @@ class Exp4P():
         while self.t < self.T:
             advice = np.zeros((self.N, self.K))
             for i, expert in enumerate(self.experts):
+            #TODO probabilistic active learning algorithm
                 advice[i][self.invert_id_idx[expert.make_query()]] = 1
             W = np.sum(self.w)
 
-            # shape = (self.N, )
+            # shape = (self.K, )
             p = (1 - self.K * self.pmin) * \
-                    np.sum(np.tile(self.w, (self.K, 1)).T * advice, axis=0) + \
+                    np.sum(np.tile(self.w, (self.K, 1)).T * advice, axis=0) / W + \
                     self.pmin
 
             reward, ask_id, lbl = yield p
@@ -180,15 +173,22 @@ class Exp4P():
             ask_idx = self.invert_id_idx[ask_id]
 
             rhat[ask_idx] = reward / p[ask_idx]
-            for i in range(self.N):
-                yhat[i] = np.dot(advice[i], rhat)
-                vhat[i] = np.sum(advice[i] / p)
+            #for i in range(self.N):
+            #    yhat[i] = np.dot(advice[i], rhat)
+            #    vhat[i] = np.sum(advice[i] / p)
 
-                self.w[i] = self.w[i] * np.exp(
-                        self.pmin / 2 * (yhat[i] + vhat[i]*np.sqrt(
-                            np.log(self.N/self.delta) / self.K / self.T)
-                            )
+            #    self.w[i] = self.w[i] * np.exp(
+            #            self.pmin / 2 * (yhat[i] + vhat[i]*np.sqrt(
+            #                np.log(self.N/self.delta) / self.K / self.T)
+            #                )
+            #            )
+            yhat = np.dot(advice, rhat)
+            vhat = np.sum(advice / np.tile(p, (self.N, 1)), axis=1)
+            self.w = self.w * np.exp(
+                    self.pmin / 2 * (yhat + vhat*np.sqrt(
+                        np.log(self.N/self.delta) / self.K / self.T)
                         )
+                    )
 
             self.t += 1
 
