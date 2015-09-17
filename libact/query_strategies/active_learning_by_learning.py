@@ -80,7 +80,7 @@ class ActiveLearningByLearning(QueryStrategy):
 
         self.exp4p_ = Exp4P(
                     experts = self.models_,
-                    T = self.T,
+                    T = self.T * 3,
                     delta = self.delta,
                     K = self.dataset.len_unlabeled(),
                     invert_id_idx = self.invert_id_idx,
@@ -130,11 +130,15 @@ class ActiveLearningByLearning(QueryStrategy):
             if self.reward == -1.:
                 p = self.exp4p_.next(self.reward, None, None)
             else:
-                p = self.exp4p_.next(
-                        self.reward,
-                        self.queried_hist_[-1],
-                        self.dataset.data[self.queried_hist_[-1]][1]
-                        )
+                try:
+                    p = self.exp4p_.next(
+                            self.reward,
+                            self.queried_hist_[-1],
+                            self.dataset.data[self.queried_hist_[-1]][1]
+                            )
+                except StopIteration:
+                    # out of budget for Exp4.P
+                    pass
             ask_idx = np.random.choice(np.arange(self.exp4p_.K), size=1, p=p)[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
 
