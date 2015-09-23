@@ -31,6 +31,9 @@ class ActiveLearningByLearning(QueryStrategy):
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the unlabeled data).
 
+    uniform_expert: {True, False}, optional (default=Truee)
+        Determining whether to include uniform random sample as one of expert.
+
     T: integer, optional (default=100)
         Total query budget.
 
@@ -67,8 +70,8 @@ class ActiveLearningByLearning(QueryStrategy):
 
         # parameters for Exp4.p
         self.delta = kwargs.pop('delta', 1.)
-        self.pmin = kwargs.pop('pmin', 0.05)
-        if self.pmin >= 1. or self.pmin <= 0:
+        self.pmin = kwargs.pop('pmin', None)
+        if self.pmin and (self.pmin >= 1. or self.pmin <= 0):
             raise ValueError("pmin should be 0 < pmin < 1")
         # query budget
         self.T = kwargs.pop('T', 100)
@@ -78,12 +81,13 @@ class ActiveLearningByLearning(QueryStrategy):
         for i, entry in enumerate(self.dataset.get_unlabeled_entries()):
             self.invert_id_idx[entry[0]] = i
 
+        self.uniform_expert = kwargs.pop('uniform_expert', True)
         self.exp4p_ = Exp4P(
                     experts = self.models_,
                     T = self.T * 3,
                     delta = self.delta,
-                    K = self.dataset.len_unlabeled(),
                     invert_id_idx = self.invert_id_idx,
+                    uniform_expert = self.uniform_expert
                 )
         self.budget_used = 0
 
@@ -137,7 +141,7 @@ class ActiveLearningByLearning(QueryStrategy):
                             self.dataset.data[self.queried_hist_[-1]][1]
                             )
                 except StopIteration:
-                    # out of budget for Exp4.P
+                    # early stop, out of budget for Exp4.P
                     pass
             ask_idx = np.random.choice(np.arange(self.exp4p_.K), size=1, p=p)[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
@@ -166,7 +170,7 @@ class Exp4P():
     delta: float, >0, optional (default=1.)
         A parameter.
 
-    pmin: float, 0<pmin<1, optional (default=0.05)
+    pmin: float, 0<pmin<1, optional (default=:math:`\frac{√{log(N)}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data).
 
@@ -175,6 +179,9 @@ class Exp4P():
 
     K: integer
         The number of arms (number of unlabel data).
+
+    uniform_expert: {True, False}, optional (default=Truee)
+        Determining whether to include uniform random sample as one of expert.
 
 
     Attributes
@@ -212,13 +219,11 @@ class Exp4P():
         self.T = kwargs.pop('T', 100)
         # delta > 0
         self.delta = kwargs.pop('delta', 1.0)
+        # whether to include uniform random sample as one of expert
+        self.uniform_expert = kwargs.pop('uniform_expert', True)
 
         # n_arms --> n_unlabeled_data
-        self.K = kwargs.pop('K', None)
-        if not self.K:
-            raise TypeError(
-                "__init__() missing required keyword-only argument: 'K'"
-                )
+        self.K = len(self.experts_)
 
         # p_min in [0, 1/n_arms]
         self.pmin = kwargs.pop('pmin', np.sqrt(np.log(self.N) / self.K / self.T))
@@ -278,18 +283,28 @@ class Exp4P():
         yhat = np.zeros((self.N,))
         vhat = np.zeros((self.N,))
         while self.t < self.T:
-            advice = np.zeros((self.N, self.K))
-            for i, expert in enumerate(self.experts_):
+
             #TODO probabilistic active learning algorithm
+            if self.uniform_expert:
+                advice = np.zeros((self.N+1, self.K))
+                advice[-1, :] = 1. / self.K
+            else
+                advice = np.zeros((self.N+1, self.K))
+            for i, expert in enumerate(self.experts_):
                 advice[i][self.invert_id_idx[expert.make_query()]] = 1
             W = np.sum(self.w)
 
-            # shape = (self.K, )
-            p = (1 - self.K * self.pmin) * \
-                    np.sum(np.tile(self.w, (self.K, 1)).T * advice, axis=0) / W + \
-                    self.pmin
+            # choice vector, shape = (self.K, )
+            #p = (1 - self.K * self.pmin) * \
+            #        np.sum(np.tile(self.w, (self.K, 1)).T * advice, axis=0) / W + \
+            #        self.pmin
+            p = (1 - self.K * self.pmin) * self.w / W + self.pmin
 
-            reward, ask_id, lbl = yield p
+
+            # query vector, shape= = (self.n_unlabeled, )
+            q = np.dot(p, advice)
+
+            reward, ask_id, lbl = yield q
             self.update_experts(ask_id, lbl)
             ask_idx = self.invert_id_idx[ask_id]
 
