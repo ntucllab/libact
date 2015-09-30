@@ -143,7 +143,9 @@ class ActiveLearningByLearning(QueryStrategy):
                 except StopIteration:
                     # early stop, out of budget for Exp4.P
                     pass
-            ask_idx = np.random.choice(np.arange(self.exp4p_.K), size=1, p=p)[0]
+            ask_idx = np.random.choice(
+                        np.arange(len(self.invert_id_idx)), size=1, p=p
+                    )[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
 
             self.W.append(1./p[ask_idx])
@@ -212,18 +214,26 @@ class Exp4P():
         elif not self.experts_:
             raise ValueError("experts list is empty")
 
-        self.N = len(self.experts_)
-        # weight vector to each experts, shape = (N, )
-        self.w = np.array([1. for i in range(self.N)])
-        # max iters
-        self.T = kwargs.pop('T', 100)
-        # delta > 0
-        self.delta = kwargs.pop('delta', 1.0)
         # whether to include uniform random sample as one of expert
         self.uniform_expert = kwargs.pop('uniform_expert', True)
 
-        # n_arms --> n_unlabeled_data
-        self.K = len(self.experts_)
+        # n_experts
+        if self.uniform_expert:
+            self.N = len(self.experts_) + 1
+        else:
+            self.N = len(self.experts_)
+
+        # weight vector to each experts, shape = (N, )
+        self.w = np.array([1. for i in range(self.N)])
+
+        # max iters
+        self.T = kwargs.pop('T', 100)
+
+        # delta > 0
+        self.delta = kwargs.pop('delta', 1.0)
+
+        # n_arms --> n_experts (n_query_algorithms)
+        self.K = self.N
 
         # p_min in [0, 1/n_arms]
         self.pmin = kwargs.pop('pmin', np.sqrt(np.log(self.N) / self.K / self.T))
@@ -279,47 +289,33 @@ class Exp4P():
 
         self.t = 0
 
-        rhat = np.zeros((self.K,))
-        yhat = np.zeros((self.N,))
-        vhat = np.zeros((self.N,))
         while self.t < self.T:
-
             #TODO probabilistic active learning algorithm
+            # len(self.invert_id_idx) is the number of unlabeled data
+            query = np.zeros((self.N, len(self.invert_id_idx)))
             if self.uniform_expert:
-                advice = np.zeros((self.N+1, self.K))
-                advice[-1, :] = 1. / self.K
-            else
-                advice = np.zeros((self.N+1, self.K))
+                query[-1, :] = 1. / len(self.invert_id_idx)
             for i, expert in enumerate(self.experts_):
-                advice[i][self.invert_id_idx[expert.make_query()]] = 1
-            W = np.sum(self.w)
+                query[i][self.invert_id_idx[expert.make_query()]] = 1
 
             # choice vector, shape = (self.K, )
-            #p = (1 - self.K * self.pmin) * \
-            #        np.sum(np.tile(self.w, (self.K, 1)).T * advice, axis=0) / W + \
-            #        self.pmin
+            W = np.sum(self.w)
             p = (1 - self.K * self.pmin) * self.w / W + self.pmin
 
-
             # query vector, shape= = (self.n_unlabeled, )
-            q = np.dot(p, advice)
+            q = np.dot(p, query)
 
             reward, ask_id, lbl = yield q
             self.update_experts(ask_id, lbl)
             ask_idx = self.invert_id_idx[ask_id]
 
-            rhat[ask_idx] = reward / p[ask_idx]
-            #for i in range(self.N):
-            #    yhat[i] = np.dot(advice[i], rhat)
-            #    vhat[i] = np.sum(advice[i] / p)
+            rhat = reward * query[:, ask_idx] / q[ask_idx]
 
-            #    self.w[i] = self.w[i] * np.exp(
-            #            self.pmin / 2 * (yhat[i] + vhat[i]*np.sqrt(
-            #                np.log(self.N/self.delta) / self.K / self.T)
-            #                )
-            #            )
-            yhat = np.dot(advice, rhat)
-            vhat = np.sum(advice / np.tile(p, (self.N, 1)), axis=1)
+            # The original advice vector in Exp4.P in ALBL is a identity matrix
+            #yhat = np.dot(advice, rhat)
+            yhat = rhat
+            #vhat = np.sum(advice / np.tile(p, (self.N, 1)), axis=1)
+            vhat = 1 / p
             self.w = self.w * np.exp(
                     self.pmin / 2 * (yhat + vhat*np.sqrt(
                         np.log(self.N/self.delta) / self.K / self.T)

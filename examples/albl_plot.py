@@ -5,6 +5,7 @@
 import os, sys
 import getopt
 import json
+import copy
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +22,7 @@ from libact.models import LogisticRegression
 
 
 def train_and_plot():
-    X, y = import_libsvm_sparse(BASE_DIR + '/examples/segment.txt').format_sklearn()
+    X, y = import_libsvm_sparse(BASE_DIR + '/examples/diabetes_scale').format_sklearn()
 
     # shuffle the data
     zipper = list(zip(X, y))
@@ -29,12 +30,13 @@ def train_and_plot():
     X, y = zip(*zipper)
     X, y = np.array(X), np.array(y)
 
-    N = int(1 * len(X) / 5)  # control the number of training and testing examples
+    N = int(1 * len(X) / 2)  # control the number of training and testing examples
     X_train, y_train = X[ : N], y[ : N]  # training examples, which will then be splitted into two pieces
     X_test, y_test = X[N : ], y[N : ]    # testing examples used for calculating E_out
 
     #model = model_class(**model_params)
     model = LogisticRegression()
+    model2 = LogisticRegression()
 
     E_in_1, E_out_1 = [], []
     E_in_2, E_out_2 = [], []
@@ -51,10 +53,12 @@ def train_and_plot():
     # ==========================================================================
 
     dataset = Dataset(X_train, np.concatenate([y_train[:10], [None] * (len(y_train) - 10)]))
+    dataset2 = Dataset(X_train, np.concatenate([y_train[:10], [None] * (len(y_train) - 10)]))
     quota = N - 10  # the student can only ask [quota] questions, otherwise the teacher will get unpatient
 
     # now, the student start asking questions
     #qs = qs_class(dataset, **qs_params)
+
     qs = ActiveLearningByLearning(dataset, 
             clf=LogisticRegression(),
             T=N*2,
@@ -71,37 +75,59 @@ def train_and_plot():
                     dataset,
                     method='lc'
                     ),
-                UncertaintySampling(
+                HintSVM(
                     dataset,
                     )
                 ],
+            )
+    #qs  = HintSVM(
+    #        dataset,
+    #    )
+
+    E_in_3, E_out_3 = [], []
+    qs2 = UncertaintySampling(
+            dataset2,
             )
 
     for i in range(quota) :
         # the student asks the teacher the most confusing question and learns it
         ask_id = qs.make_query()
-        print(ask_id, y_train[ask_id])
         dataset.update(ask_id, y_train[ask_id])
+        ask_id2 = qs2.make_query()
+        dataset2.update(ask_id2, y_train[ask_id2])
 
         # the student redo the exam and see the result
         model.train(dataset)
+        model2.train(dataset2)
         E_in_2 = np.append(E_in_2, 1 - model.score(dataset))
         E_out_2 = np.append(E_out_2, 1 - model.score(Dataset(X_test, y_test)))
-        print(E_in_1[i], E_out_1[i], E_in_2[i], E_out_2[i])
+        E_in_3 = np.append(E_in_3, 1 - model2.score(dataset2))
+        E_out_3 = np.append(E_out_3, 1 - model2.score(Dataset(X_test, y_test)))
+        print(E_in_1[i], E_out_1[i], E_in_2[i], E_out_2[i], E_in_3[i], E_out_3[i])
 
     print('< Scenario 2 > The student chooses which question to ask :')
     print('After wisely asking %d questions, (E_in, E_out) = (%f, %f)' % (quota, E_in_2[-1], E_out_2[-1]))
 
     # now let's plot the result
     query_num = np.arange(1, quota + 1)
-    plt.plot(query_num, E_in_1, 'b')    # the blue curve
-    plt.plot(query_num, E_in_2, 'r')    # the red curve
-    plt.plot(query_num, E_out_1, 'g')   # the green curve
-    plt.plot(query_num, E_out_2, 'k')   # the black curve
+    plt.plot(query_num, E_in_1, 'b', label='random')    # the blue curve
+    plt.plot(query_num, E_in_2, 'r', label='albl')    # the red curve
+    plt.plot(query_num, E_in_3, 'g', label='hintSVM')
     plt.xlabel('Number of Queries')
     plt.ylabel('Error')
     plt.title('< Experiment Result >')
+    plt.legend(bbox_to_anchor=(1, 0), loc=4, borderaxespad=0.)
     plt.show()
+
+    plt.plot(query_num, E_out_1, 'b', label='random')   # the green curve
+    plt.plot(query_num, E_out_2, 'r', label='albl')   # the black curve
+    plt.plot(query_num, E_out_3, 'g', label='hintSVM')
+    plt.xlabel('Number of Queries')
+    plt.ylabel('Error')
+    plt.title('< Experiment Result >')
+    plt.legend(bbox_to_anchor=(1, 0), loc=4, borderaxespad=0.)
+    plt.show()
+
 
 
 def usage():
@@ -168,5 +194,5 @@ def main():
 
 
 if __name__ == '__main__':
-    np.random.seed(1)
+    #np.random.seed(1)
     main()
