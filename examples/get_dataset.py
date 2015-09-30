@@ -1,59 +1,72 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 #
-# This script is used for downloading the datasets used by the examples.
-# The datasets used in examples are: iris, glass, and segment.
-# The following table describes some informations related to the three datasets.
-
-# === data ==== N ==== K ==== D ==
-# |  iris   |  150  |  3  |   4  |
-# ================================
-# |  glass  |  214  |  6  |   9  |
-# ================================
-# | segment |  2310 |  7  |  19  |
-# ================================
-
-# Note: N is the number of examples, including both training and testing set;
-#       K is the number of classes;
-#       D is the input feature dimension, i.e. the length of feature vector.
+# The script is used for downloading the three datasets used by the examples.
+#
+# All three datasets come from LIBSVM website, and are stored in LIBSVM format.
+# For more details, please refer to the following link: 
+# https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html
+#
+# Besides, all three datasets are for binary classification, since most of the
+# state-of-the-arts active learning algorithms (query strategies) are only
+# suitable for binary classification.
+#
+# The following table describes some informations about
+# the three datasets: australian, diabetes, and heart.
+#
+# +------------+-----+----+
+# |   dataset  |  N  |  D |
+# +============+=====+====+
+# | australian | 690 | 14 |
+# +------------+-----+----+
+# |  diabetes  | 768 |  8 |
+# +------------+-----+----+
+# |    heart   | 270 | 13 |
+# +------------+-----+----+
+#
+# N is the number of samples, and D is the dimension of the input feature.
+# labels y \in {-1, +1}
 
 import os
 import urllib.request
 import random
 
 
-IRIS_URL = 'http://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass/iris.scale'
-IRIS_SIZE = 150
+AUS_URL = 'https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/australian_scale'
+AUS_SIZE = 690
 
-GLASS_URL = 'http://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass/glass.scale'
-GLASS_SIZE = 214
+DB_URL = 'https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/diabetes_scale'
+DB_SIZE = 768
 
-SEGMENT_URL = 'http://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/multiclass/segment.scale'
-SEGMENT_SIZE = 2310
+HT_URL = 'https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/heart_scale'
+HT_SIZE = 270
 
 TARGET_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def main():
-    print('downloading iris ...')
-    rows = list(urllib.request.urlopen(IRIS_URL))
-    selected = random.sample(rows, IRIS_SIZE)
-    with open(TARGET_PATH + '/iris.txt', 'wb') as f:
+    print('downloading australian ...')
+    rows = list(urllib.request.urlopen(AUS_URL))
+    selected = random.sample(rows, AUS_SIZE)
+    with open(TARGET_PATH + '/australian.txt', 'wb') as f:
         for row in selected:
             f.write(row)
+    print('australian downloaded successfully !\n')
 
-    print('downloading glass ...')
-    rows = list(urllib.request.urlopen(GLASS_URL))
-    selected = random.sample(rows, GLASS_SIZE)
-    with open(TARGET_PATH + '/glass.txt', 'wb') as f:
+    print('downloading diabetes ...')
+    rows = list(urllib.request.urlopen(DB_URL))
+    selected = random.sample(rows, DB_SIZE)
+    with open(TARGET_PATH + '/diabetes.txt', 'wb') as f:
         for row in selected:
             f.write(row)
+    print('diabetes downloaded successfully !\n')
 
-    print('downloading segment ...')
-    rows = list(urllib.request.urlopen(SEGMENT_URL))
-    selected = random.sample(rows, SEGMENT_SIZE)
-    with open(TARGET_PATH + '/segment.txt', 'wb') as f:
+    print('downloading heart ...')
+    rows = list(urllib.request.urlopen(HT_URL))
+    selected = random.sample(rows, HT_SIZE)
+    with open(TARGET_PATH + '/heart.txt', 'wb') as f:
         for row in selected:
             f.write(row)
+    print('heart downloaded successfully !')
 
 
 if __name__ == '__main__':
