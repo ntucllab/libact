@@ -98,11 +98,11 @@ class ActiveLearningByLearning(QueryStrategy):
                 "__init__() missing required keyword-only argument: 'models'"
                 )
 
-        self.reward = -1.
         self.W = []
         self.queried_hist_ = []
 
-    def calc_reward_fn_and_query(self):
+
+    def calc_reward_fn(self):
         """Calculate the reward value"""
         clf = copy.copy(self.clf)
         clf.train(self.dataset)
@@ -115,42 +115,56 @@ class ActiveLearningByLearning(QueryStrategy):
                  self.dataset.data[self.queried_hist_[i]][1])
         reward /= (self.dataset.len_labeled() + self.dataset.len_unlabeled())
         reward /= self.T
+        return reward
 
-        try:
-            self.q = self.exp4p_.next(
-                    reward,
-                    self.queried_hist_[-1],
-                    self.dataset.data[self.queried_hist_[-1]][1]
-                    )
-        except StopIteration:
-            # early stop, out of budget for Exp4.P
-            pass
-
-    def update(self, entry_id, label):
-        """Caluculate the reward value after updated the question asked with
-        answer"""
-        self.calc_reward_fn_and_query()
-
-    def make_query(self):
-        """ """
+    def calc_query(self):
         dataset = self.dataset
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        try:
+            unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        except ValueError:
+            # might be no more unlabeled data left
+            return
 
         while self.budget_used < self.T:
-            if self.queried_hist_ == []:
-                # First query
-                self.q = self.exp4p_.next(-1, None, None)
+            try:
+                q = self.exp4p_.next(
+                        self.calc_reward_fn(),
+                        self.queried_hist_[-1],
+                        self.dataset.data[self.queried_hist_[-1]][1]
+                        )
+            except StopIteration:
+                # early stop, out of budget for Exp4.P
+                pass
             ask_idx = np.random.choice(
-                        np.arange(len(self.invert_id_idx)), size=1, p=self.q
+                        np.arange(len(self.invert_id_idx)), size=1, p=q
                     )[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
-            self.W.append(1./self.q[ask_idx])
+            self.W.append(1./q[ask_idx])
             self.queried_hist_.append(ask_id)
+
             if ask_id in unlabeled_entry_ids:
                 self.budget_used += 1
                 return ask_id
-            else:
-                self.calc_reward_fn_and_query()
+
+    def update(self, entry_id, label):
+        """Caluculate the next query after updated the question asked with
+        answer."""
+        self.calc_query()
+
+    def make_query(self):
+        """Except for the initial query, it return the id of the data albl wants
+        to query."""
+        if self.queried_hist_ == []:
+            # initial query
+            q = self.exp4p_.next(-1, None, None)
+            ask_idx = np.random.choice(
+                        np.arange(len(self.invert_id_idx)), size=1, p=q
+                    )[0]
+            ask_id = self.unlabeled_entry_ids[ask_idx]
+            self.W.append(1./q[ask_idx])
+            self.queried_hist_.append(ask_id)
+        return self.queried_hist_[-1]
+
 
 
 class Exp4P():
