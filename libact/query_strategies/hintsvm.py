@@ -1,21 +1,21 @@
 """Hinted Support Vector Machine
 
-This module contains a class that implements Hinted Support Vector Machine, an 
+This module contains a class that implements Hinted Support Vector Machine, an
 active learning algorithm.
 
 To use this module, it is required to install the following package:
 
 https://github.com/yangarbiter/hintsvm
 """
-from libact.base.interfaces import QueryStrategy
-import libact.models
+
+import hintsvmutil  # from hinsvm package
 import numpy as np
-from functools import cmp_to_key
-import math
-import hintsvmutil # from hinsvm package
-import ctypes
+
+from libact.base.interfaces import QueryStrategy
+
 
 class HintSVM(QueryStrategy):
+
     """Hinted Support Vector Machine
 
     Hinted Support Vector Machine is an active learning algorithm within the
@@ -56,16 +56,17 @@ class HintSVM(QueryStrategy):
         self.p = kwargs.pop('p', 0.5)
         if self.p > 1.0 or self.p <= 0.0:
             raise ValueError(
-                'Parameter p should be greater than 0 and smaller or eaual than 1.'
+                'Parameter p should be greater than 0 and smaller or eaual'
+                'than 1.'
                 )
 
     def update(self, entry_id, label):
-        # TODO
         pass
 
     def make_query(self):
         dataset = self.dataset
-        unlabeled_entry_ids, unlabeled_pool = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, unlabeled_pool = zip(
+            *dataset.get_unlabeled_entries())
         labeled_pool, y = zip(*dataset.get_labeled_entries())
 
         cl = self.cl
@@ -76,23 +77,25 @@ class HintSVM(QueryStrategy):
                 'unlabeled_pool is too small with current parameter p that the'
                 'hint pool will have no instances.'
                 )
-        hint_pool_idx = np.random.choice(len(unlabeled_pool), int(len(unlabeled_pool)*p))
+        hint_pool_idx = np.random.choice(
+            len(unlabeled_pool), int(
+                len(unlabeled_pool)*p))
         hint_pool = np.array(unlabeled_pool)[hint_pool_idx]
 
-        weight = [1.0 for i in range(len(labeled_pool))] +\
+        weight = [1.0 for _ in range(len(labeled_pool))] +\
                  [(ch/cl) for i in range(len(hint_pool))]
         y = list(y) + [0 for i in range(len(hint_pool))]
         X = [x.tolist() for x in labeled_pool] +\
-                [x.tolist() for x in hint_pool]
+            [x.tolist() for x in hint_pool]
 
-        prob  = hintsvmutil.svm_problem(weight, y, X)
+        prob = hintsvmutil.svm_problem(weight, y, X)
         param = hintsvmutil.svm_parameter('-s 5 -t 0 -b 0 -c %f -q' % cl)
         m = hintsvmutil.svm_train(prob, param)
 
-        #TODO need only p_val
+        # TODO need only p_val
         y = np.zeros((len(unlabeled_pool), ))
-        p_label, p_acc, p_val = hintsvmutil.svm_predict(y, [x.tolist()\
-                for x in unlabeled_pool], m)
+        p_label, p_acc, p_val = hintsvmutil.svm_predict(
+            y, [x.tolist() for x in unlabeled_pool], m)
 
         p_val = [abs(val[0]) for val in p_val]
         idx = np.argmax(p_val)
