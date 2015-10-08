@@ -1,4 +1,3 @@
-
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <Python.h>
@@ -166,8 +165,6 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
             X[i][j] = *(double*)PyArray_GETPTR2(X_array, i, j);
         }
     }
-    //puts("===================================");
-    //puts("===================================");
     double *ePI =  (double*) PyArray_DATA(ePI_array);
     double *eX  =  (double*) PyArray_DATA(eX_array);
     
@@ -281,7 +278,6 @@ double** A(double **PI, double **X, int labs, int dims, int n_pool){
     return ret;
 }
 
-
 double** Fisher(double *pi, double *x, double sigma, int labs, int dims){
     double **ret = (double**) malloc(labs*dims * sizeof(double*));
     for(int i=0; i<labs*dims; i++){
@@ -302,4 +298,3 @@ double** Fisher(double *pi, double *x, double sigma, int labs, int dims){
                 }
     return ret;
 }
-

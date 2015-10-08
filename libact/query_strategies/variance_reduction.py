@@ -1,12 +1,15 @@
 """Variance Reduction"""
 
+import copy
+from multiprocessing import Pool
+
+import numpy as np
+
 from libact.base.interfaces import QueryStrategy
 from libact.base.dataset import Dataset
-from libact.query_strategies import _variance_reduction
 import libact.models
-import copy
-import numpy as np
-from multiprocessing import Pool
+from libact.query_strategies import _variance_reduction
+
 
 class VarianceReduction(QueryStrategy):
     """Variance Reduction
@@ -45,6 +48,7 @@ class VarianceReduction(QueryStrategy):
     """
 
     def __init__(self,  *args, **kwargs):
+        model = kwargs.pop('model', None)
         if type(model) is str:
             self.model = getattr(libact.models, model)()
         else:
@@ -52,54 +56,9 @@ class VarianceReduction(QueryStrategy):
         self.optimality = kwargs.pop('optimality', 'trace')
         self.sigma = kwargs.pop('sigma', 100.0)
 
-    """
-    def A(self, pi, c, x, label_count, feature_count):
-        _pi = -1 * np.array(pi)
-        _pi[c] += 1
-        grad = pi[c] * np.tile(np.array([x]).T, (1, label_count)) *\
-                        np.tile(np.array([_pi]), (feature_count, 1))
-        grad = grad.reshape((feature_count*label_count))
-
-        return np.dot(grad.T, grad)
-
-    def Fisher(self, pi, x, label_count, feature_count):
-        sigma = self.sigma
-        _pi_l2 = np.ones((1, feature_count*label_count))
-        for i in range(label_count):
-            _pi_l2[0, i*feature_count:(i+1)*feature_count] = pi[i]
-
-        _pi = np.tile(_pi_l2, (label_count*feature_count, 1))
-        for i in range(label_count):
-            _pi[i*feature_count:(i+1)*feature_count,
-                i*feature_count:(i+1)*feature_count] = 1 - pi[i]
-        fisher =\
-            np.tile(np.array([x]).T, (label_count, label_count*feature_count)) *\
-            np.tile(np.array([x]), (label_count*feature_count, label_count)) *\
-            np.tile(_pi_l2.T, (1, label_count*feature_count)) *\
-            _pi
-        fisher += (1.0/sigma) * np.eye(feature_count*label_count)
-        return np.linalg.pinv(np.array(fisher))
-
-    def Phi(self, pi, x, label_count, feature_count):
-        ret = 0.0
-        for i in range(label_count):
-            A = self.A(pi, i, x, label_count, feature_count)
-            F = self.Fisher(pi, x, label_count, feature_count)
-            ret += np.trace( np.dot(A, F) )
-        return ret
-    """
-
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
         ret = _variance_reduction.estVar(0.000001, PI, X, epi, ex)
-        """
-        try:
-            ret = np.trace(np.dot(A, np.linalg.pinv(F)))
-        except:
-            print(varRedu.estVar(0.000001, PI, X, epi, ex))
-            ret = np.trace(np.dot(A, np.linalg.pinv(F)))
-        """
         return ret
-
 
     def E(self, args):
         X, y, qx, clf, label_count = args
@@ -128,11 +87,7 @@ class VarianceReduction(QueryStrategy):
 
         p = Pool(n_jobs)
 
-        import time
-        start = time.time()
-        errors = p.map(self.E, [(Xlabeled, y, x, clf, label_count) for x in\
-            X_pool])
+        errors = p.map(self.E, [(Xlabeled, y, x, clf, label_count) for x in
+                                X_pool])
         p.terminate()
-        end = time.time()
-        print(end-start)
         return unlabeled_entry_ids[errors.index(min(errors))]
