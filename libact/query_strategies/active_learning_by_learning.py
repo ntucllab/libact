@@ -81,7 +81,8 @@ class ActiveLearningByLearning(QueryStrategy):
             self.unlabeled_invert_id_idx[entry[0]] = i
 
         self.uniform_expert = kwargs.pop('uniform_expert', True)
-        if type(self.uniform_expert) != 'bool':
+        print(type(self.uniform_expert))
+        if type(self.uniform_expert) != type(True):
             raise ValueError("'uniform_expert' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
@@ -173,7 +174,6 @@ class ActiveLearningByLearning(QueryStrategy):
             self.W.append(1./q[ask_idx])
             self.queried_hist_.append(ask_id)
         return self.queried_hist_[-1]
-
 
 
 class Exp4P():
