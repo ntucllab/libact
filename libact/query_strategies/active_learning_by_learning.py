@@ -24,7 +24,7 @@ class ActiveLearningByLearning(QueryStrategy):
         The active learning algorithms used in ALBL, which will be both the
         experts and the arms in the multi-armed bandit algorithm Exp4.P.
 
-    delta: float, optional (default=1.)
+    delta: float, optional (default=0.1)
         Parameter for Exp4.P.
 
     pmin: float, 0<pmin<len(n_active_algorithm), optional (default=0.05)
@@ -69,7 +69,7 @@ class ActiveLearningByLearning(QueryStrategy):
             raise ValueError("models list is empty")
 
         # parameters for Exp4.p
-        self.delta = kwargs.pop('delta', 1.)
+        self.delta = kwargs.pop('delta', 0.1)
 
         # query budget
         self.T = kwargs.pop('T', 100)
@@ -95,6 +95,7 @@ class ActiveLearningByLearning(QueryStrategy):
             experts=self.models_,
             T=self.T * 3,
             delta=self.delta,
+            pmin=self.pmin,
             unlabeled_invert_id_idx=self.unlabeled_invert_id_idx,
             uniform_expert=self.uniform_expert
         )
@@ -191,7 +192,7 @@ class Exp4P():
         A look up table for the correspondance of entry_id to the index of the
         unlabeled data.
 
-    delta: float, >0, optional (default=1.)
+    delta: float, >0, optional (default=0.1)
         A parameter.
 
     pmin: float, 0<pmin<1/len(experts), optional (default=:math:`\frac{√{log(N)}{KT}`)
@@ -234,7 +235,8 @@ class Exp4P():
         elif not self.experts_:
             raise ValueError("experts list is empty")
 
-        # whether to include uniform random sample as one of expert
+        # whether to include uniform random sampler as one of underlying active
+        # learning algorithms
         self.uniform_expert = kwargs.pop('uniform_expert', True)
 
         # n_experts
@@ -250,14 +252,15 @@ class Exp4P():
         self.T = kwargs.pop('T', 100)
 
         # delta > 0
-        self.delta = kwargs.pop('delta', 1.0)
+        self.delta = kwargs.pop('delta', 0.1)
 
         # n_arms = n_experts (n_query_algorithms) in ALBL
         self.K = self.N
 
         # p_min in [0, 1/n_arms]
-        self.pmin = kwargs.pop('pmin',
-                               np.sqrt(np.log(self.N) / self.K / self.T))
+        self.pmin = kwargs.pop('pmin', None)
+        if self.pmin == None:
+            self.pmin = np.sqrt(np.log(self.N) / self.K / self.T)
 
         self.exp4p_gen = self.exp4p()
 
