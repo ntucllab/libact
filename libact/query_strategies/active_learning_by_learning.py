@@ -22,7 +22,7 @@ class ActiveLearningByLearning(QueryStrategy):
     ----------
     models: list of libact.query_strategies.* object instance
         The active learning algorithms used in ALBL, which will be both the
-        experts and the arms in the multi-armed bandit algorithm Exp4.P.
+        the arms in the multi-armed bandit algorithm Exp4.P.
 
     delta: float, optional (default=0.1)
         Parameter for Exp4.P.
@@ -31,8 +31,8 @@ class ActiveLearningByLearning(QueryStrategy):
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms).
 
-    uniform_expert: {True, False}, optional (default=Truee)
-        Determining whether to include uniform random sample as one of experts.
+    uniform_sampler: {True, False}, optional (default=Truee)
+        Determining whether to include uniform random sample as one of arms.
 
     T: integer, optional (default=100)
         Query budget, the maximal number of queries to be made.
@@ -59,6 +59,7 @@ class ActiveLearningByLearning(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
+        print("XD")
         super(ActiveLearningByLearning, self).__init__(*args, **kwargs)
         self.models_ = kwargs.pop('models', None)
         if self.models_ is None:
@@ -80,24 +81,23 @@ class ActiveLearningByLearning(QueryStrategy):
         for i, entry in enumerate(self.dataset.get_unlabeled_entries()):
             self.unlabeled_invert_id_idx[entry[0]] = i
 
-        self.uniform_expert = kwargs.pop('uniform_expert', True)
-        print(type(self.uniform_expert))
-        if type(self.uniform_expert) != type(True):
-            raise ValueError("'uniform_expert' should be {True, False}")
+        self.uniform_sampler = kwargs.pop('uniform_sampler', True)
+        if type(self.uniform_sampler) != type(True):
+            raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin and (self.pmin >= len(self.models_)+self.uniform_expert
+        if self.pmin and (self.pmin >= len(self.models_)+self.uniform_sampler
                           or self.pmin <= 0):
             raise ValueError("'pmin' should be 0 < pmin < "
                              "len(n_active_algorithm)")
 
         self.exp4p_ = Exp4P(
-            experts=self.models_,
+            query_models=self.models_,
             T=self.T * 3,
             delta=self.delta,
             pmin=self.pmin,
             unlabeled_invert_id_idx=self.unlabeled_invert_id_idx,
-            uniform_expert=self.uniform_expert
+            uniform_sampler=self.uniform_sampler
         )
         self.budget_used = 0
 
@@ -180,13 +180,15 @@ class ActiveLearningByLearning(QueryStrategy):
 class Exp4P():
     """A multi-armed bandit algorithm Exp4.P.
 
-    For the Exp4.P used in ALBL, the number of arms and number of experts are
-    equal to the number of active learning algorithms wanted to use.
+    For the Exp4.P used in ALBL, the number of arms (actions) and number of
+    experts are equal to the number of active learning algorithms wanted to
+    use.
 
     Parameters
     ----------
-    experts: QueryStrategy instances
-        The active learning algorithms wanted to use.
+    query_models: QueryStrategy instances
+        The active learning algorithms wanted to use, it is equivalent to
+        actions or arms in original Exp4.P.
 
     unlabeled_invert_id_idx: dictionary
         A look up table for the correspondance of entry_id to the index of the
@@ -195,14 +197,14 @@ class Exp4P():
     delta: float, >0, optional (default=0.1)
         A parameter.
 
-    pmin: float, 0<pmin<1/len(experts), optional (default=:math:`\frac{√{log(N)}{KT}`)
+    pmin: float, 0<pmin<1/len(query_models), optional (default=:math:`\frac{√{log(N)}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data).
 
     T: integer, optional (default=100)
         The maximum number of rounds.
 
-    uniform_expert: {True, False}, optional (default=Truee)
+    uniform_sampler: {True, False}, optional (default=Truee)
         Determining whether to include uniform random sampler as one of the
         underlying active learning algorithms.
 
@@ -213,7 +215,10 @@ class Exp4P():
         The current round this instance is at.
 
     N: integer
-        The number of experts in this exp4.p instance.
+        The number of arms (actions) in this exp4.p instance.
+
+    quert_models_: list of libact.query_strategies.* object instance
+        The underlying active learning algorithm instances.
 
 
     Reference
@@ -227,25 +232,25 @@ class Exp4P():
     def __init__(self, *args, **kwargs):
         """ """
         # QueryStrategy class object instances
-        self.experts_ = kwargs.pop('experts', None)
-        if self.experts_ is None:
+        self.query_models_ = kwargs.pop('query_models', None)
+        if self.query_models_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'experts'"
+                "__init__() missing required keyword-only argument: 'query_models'"
                 )
-        elif not self.experts_:
-            raise ValueError("experts list is empty")
+        elif not self.query_models_:
+            raise ValueError("query_models list is empty")
 
         # whether to include uniform random sampler as one of underlying active
         # learning algorithms
-        self.uniform_expert = kwargs.pop('uniform_expert', True)
+        self.uniform_sampler = kwargs.pop('uniform_sampler', True)
 
-        # n_experts
-        if self.uniform_expert:
-            self.N = len(self.experts_) + 1
+        # n_armss
+        if self.uniform_sampler:
+            self.N = len(self.query_models_) + 1
         else:
-            self.N = len(self.experts_)
+            self.N = len(self.query_models_)
 
-        # weight vector to each experts, shape = (N, )
+        # weight vector to each query_models, shape = (N, )
         self.w = np.array([1. for i in range(self.N)])
 
         # max iters
@@ -254,7 +259,7 @@ class Exp4P():
         # delta > 0
         self.delta = kwargs.pop('delta', 0.1)
 
-        # n_arms = n_experts (n_query_algorithms) in ALBL
+        # n_arms = n_models (n_query_algorithms) in ALBL
         self.K = self.N
 
         # p_min in [0, 1/n_arms]
@@ -288,10 +293,10 @@ class Exp4P():
         # TODO exception on reward in [0, 1]
             return self.exp4p_gen.send((reward, ask_id, lbl))
 
-    def update_experts(self, qid, lbl):
-        """Update expert's dataset after making a query."""
-        for expert in self.experts_:
-            expert.update(qid, lbl)
+    def update_query_models(self, qid, lbl):
+        """Update model's dataset after making a query."""
+        for model in self.query_models_:
+            model.update(qid, lbl)
 
     def exp4p(self):
         """The generator which implements the main part of Exp4.P.
@@ -318,10 +323,10 @@ class Exp4P():
             #TODO probabilistic active learning algorithm
             # len(self.unlabeled_invert_id_idx) is the number of unlabeled data
             query = np.zeros((self.N, len(self.unlabeled_invert_id_idx)))
-            if self.uniform_expert:
+            if self.uniform_sampler:
                 query[-1, :] = 1. / len(self.unlabeled_invert_id_idx)
-            for i, expert in enumerate(self.experts_):
-                query[i][self.unlabeled_invert_id_idx[expert.make_query()]] = 1
+            for i, model in enumerate(self.query_models_):
+                query[i][self.unlabeled_invert_id_idx[model.make_query()]] = 1
 
             # choice vector, shape = (self.K, )
             W = np.sum(self.w)
@@ -331,7 +336,7 @@ class Exp4P():
             q = np.dot(p, query)
 
             reward, ask_id, lbl = yield q
-            self.update_experts(ask_id, lbl)
+            self.update_query_models(ask_id, lbl)
             ask_idx = self.unlabeled_invert_id_idx[ask_id]
 
             rhat = reward * query[:, ask_idx] / q[ask_idx]
