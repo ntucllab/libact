@@ -182,7 +182,10 @@ class Exp4P():
 
     For the Exp4.P used in ALBL, the number of arms (actions) and number of
     experts are equal to the number of active learning algorithms wanted to
-    use.
+    use. The arms (actions) are the active learning algorithms, where is
+    inputed from parameter 'query_models'. There is no need for the input of
+    experts, the advice of the kth expert are always equal e_k, where e_k is
+    the kth column of the identity matrix.
 
     Parameters
     ----------
