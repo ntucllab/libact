@@ -93,7 +93,7 @@ class ActiveLearningByLearning(QueryStrategy):
 
         self.exp4p_ = Exp4P(
             query_models=self.models_,
-            T=self.T * 3,
+            T=self.T,
             delta=self.delta,
             pmin=self.pmin,
             unlabeled_invert_id_idx=self.unlabeled_invert_id_idx,
@@ -136,15 +136,11 @@ class ActiveLearningByLearning(QueryStrategy):
             return
 
         while self.budget_used < self.T:
-            try:
-                q = self.exp4p_.next(
-                    self.calc_reward_fn(),
-                    self.queried_hist_[-1],
-                    self.dataset.data[self.queried_hist_[-1]][1]
-                )
-            except StopIteration:
-                # early stop, out of budget for Exp4.P
-                pass
+            q = self.exp4p_.next(
+                self.calc_reward_fn(),
+                self.queried_hist_[-1],
+                self.dataset.data[self.queried_hist_[-1]][1]
+            )
             ask_idx = np.random.choice(
                         np.arange(
                             len(self.unlabeled_invert_id_idx)), size=1, p=q
@@ -272,9 +268,6 @@ class Exp4P():
 
         self.exp4p_gen = self.exp4p()
 
-        # t_th round starting from 0
-        self.t = 0
-
         self.unlabeled_invert_id_idx = kwargs.pop('unlabeled_invert_id_idx')
         if not self.unlabeled_invert_id_idx:
             raise TypeError(
@@ -322,7 +315,7 @@ class Exp4P():
         lbl: integer
             The answer received from asking the entry_id ask_id.
         """
-        while self.t < self.T:
+        while True:
             #TODO probabilistic active learning algorithm
             # len(self.unlabeled_invert_id_idx) is the number of unlabeled data
             query = np.zeros((self.N, len(self.unlabeled_invert_id_idx)))
@@ -354,7 +347,5 @@ class Exp4P():
                         np.log(self.N/self.delta) / self.K / self.T)
                         )
                     )
-
-            self.t += 1
 
         raise StopIteration
