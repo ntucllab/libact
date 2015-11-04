@@ -32,6 +32,7 @@ import shlex
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
     'numpydoc',
@@ -303,3 +304,8 @@ def skip_private_member(app, what, name, obj, skip, options):
 
 def setup(app):
     app.connect('autodoc-skip-member', skip_private_member)
+
+
+# Fix numpydoc conflict with autosummary
+# Ref: http://stackoverflow.com/questions/12206334
+numpydoc_show_class_members = False
