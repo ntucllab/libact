@@ -64,7 +64,7 @@ class SVM(Model):
 
     def train(self, dataset, *args, **kwargs):
         X, y = zip(*dataset.get_labeled_entries())
-        prob = svmutil.svm_problem([], y, [x.tolist() for x in X])
+        prob = svmutil.svm_problem(y, [x.tolist() for x in X])
         self.m = svmutil.svm_train(prob, self.param)
         return self.m
 
