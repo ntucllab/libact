@@ -59,9 +59,9 @@ def train_and_plot():
     # now, the student start asking questions
     #qs = qs_class(dataset, **qs_params)
 
-    qs = ActiveLearningByLearning(dataset, 
+    qs = ActiveLearningByLearning(dataset,
             clf=LogisticRegression(),
-            T=N*2,
+            T=N,
             models=[
                 QueryByCommittee(
                     dataset,
@@ -75,9 +75,6 @@ def train_and_plot():
                     dataset,
                     method='lc'
                     ),
-                HintSVM(
-                    dataset,
-                    )
                 ],
             )
     #qs  = HintSVM(
