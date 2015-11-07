@@ -40,6 +40,9 @@ class HintSVM(QueryStrategy):
     ----------
     Li, Chun-Liang, Chun-Sung Ferng, and Hsuan-Tien Lin. "Active Learning with
     Hinted Support Vector Machine." ACML. 2012.
+
+    Chun-Liang Li, Chun-Sung Ferng, and Hsuan-Tien Lin. Active learning using
+    hint information. Neural Computation, 27(8):1738--1765, August 2015.
     """
 
     def __init__(self, *args, **kwargs):
@@ -54,10 +57,10 @@ class HintSVM(QueryStrategy):
             raise ValueError('Parameter Cl should be greater than 0.')
         # Prabability of sampling a data from unlabeled pool to hinted pool
         self.p = kwargs.pop('p', 0.5)
-        if self.p > 1.0 or self.p <= 0.0:
+        if self.p > 1.0 or self.p < 0.0:
             raise ValueError(
-                'Parameter p should be greater than 0 and smaller or eaual'
-                'than 1.'
+                'Parameter p should be greater or equal than 0 and smaller'
+                'or equal than 1.'
                 )
 
     def update(self, entry_id, label):
@@ -72,11 +75,6 @@ class HintSVM(QueryStrategy):
         cl = self.cl
         ch = self.ch
         p = self.p
-        if int(len(unlabeled_pool)*p) <= 0:
-            raise ValueError(
-                'unlabeled_pool is too small with current parameter p that the'
-                'hint pool will have no instances.'
-                )
         hint_pool_idx = np.random.choice(
             len(unlabeled_pool), int(
                 len(unlabeled_pool)*p))
