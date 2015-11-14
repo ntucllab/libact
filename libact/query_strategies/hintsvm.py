@@ -59,8 +59,8 @@ class HintSVM(QueryStrategy):
         self.p = kwargs.pop('p', 0.5)
         if self.p > 1.0 or self.p < 0.0:
             raise ValueError(
-                'Parameter p should be greater or equal than 0 and smaller'
-                'or equal than 1.'
+                'Parameter p should be greater than or equal to 0 and less '
+                'than or equal to 1.'
                 )
 
     def update(self, entry_id, label):
