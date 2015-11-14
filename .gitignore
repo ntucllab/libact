@@ -54,4 +54,6 @@ docs/_build/
 target/
 
 # dataset for examples (use script to download)
-examples/dataset.txt
+examples/australian.txt
+examples/diabetes.txt
+examples/heart.txt
