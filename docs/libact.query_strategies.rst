@@ -4,6 +4,14 @@ libact.query_strategies package
 Submodules
 ----------
 
+libact.query_strategies.hintsvm module
+-------------------------------------------------
+
+.. automodule:: libact.query_strategies.hintsvm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.query_by_committee module
 -------------------------------------------------
 
