@@ -1,9 +1,9 @@
-# !/usr/bin/env python3
+#!/usr/bin/env python3
 #
 # The script is used for downloading the three datasets used by the examples.
 #
 # All three datasets come from LIBSVM website, and are stored in LIBSVM format.
-# For more details, please refer to the following link: 
+# For more details, please refer to the following link:
 # https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html
 #
 # Besides, all three datasets are for binary classification, since most of the
@@ -47,7 +47,7 @@ def main():
     print('downloading australian ...')
     rows = list(urllib.request.urlopen(AUS_URL))
     selected = random.sample(rows, AUS_SIZE)
-    with open(TARGET_PATH + '/australian.txt', 'wb') as f:
+    with open(os.path.join(TARGET_PATH, 'australian.txt'), 'wb') as f:
         for row in selected:
             f.write(row)
     print('australian downloaded successfully !\n')
@@ -55,7 +55,7 @@ def main():
     print('downloading diabetes ...')
     rows = list(urllib.request.urlopen(DB_URL))
     selected = random.sample(rows, DB_SIZE)
-    with open(TARGET_PATH + '/diabetes.txt', 'wb') as f:
+    with open(os.path.join(TARGET_PATH, 'diabetes.txt'), 'wb') as f:
         for row in selected:
             f.write(row)
     print('diabetes downloaded successfully !\n')
@@ -63,7 +63,7 @@ def main():
     print('downloading heart ...')
     rows = list(urllib.request.urlopen(HT_URL))
     selected = random.sample(rows, HT_SIZE)
-    with open(TARGET_PATH + '/heart.txt', 'wb') as f:
+    with open(os.path.join(TARGET_PATH, 'heart.txt'), 'wb') as f:
         for row in selected:
             f.write(row)
     print('heart downloaded successfully !')
