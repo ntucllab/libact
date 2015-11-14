@@ -1,0 +1,30 @@
+libact.models package
+=====================
+
+Submodules
+----------
+
+libact.models.logistic_regression module
+----------------------------------------
+
+.. automodule:: libact.models.logistic_regression
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libact.models.perceptron module
+-------------------------------
+
+.. automodule:: libact.models.perceptron
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: libact.models
+    :members:
+    :undoc-members:
+    :show-inheritance:
