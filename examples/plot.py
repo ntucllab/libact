@@ -77,16 +77,29 @@ def train_and_plot(model_class, model_params, qs_class, qs_params):
     print('After wisely asking %d questions, (E_in, E_out) = (%f, %f)' % (quota, E_in_2[-1], E_out_2[-1]))
 
     # now let's plot the result
-    query_num = np.arange(1, quota + 1)
-    plt.plot(query_num, E_in_1, 'b')    # the blue curve
-    plt.plot(query_num, E_in_2, 'r')    # the red curve
-    plt.plot(query_num, E_out_1, 'g')   # the green curve
-    plt.plot(query_num, E_out_2, 'k')   # the black curve
-    plt.xlabel('Number of Queries')
-    plt.ylabel('Error')
-    plt.title('< Experiment Result >')
-    plt.show()
+    # query_num = np.arange(1, quota + 1)
+    # plt.plot(query_num, E_in_1, 'b')    # the blue curve
+    # plt.plot(query_num, E_in_2, 'r')    # the red curve
+    # plt.plot(query_num, E_out_1, 'g')   # the green curve
+    # plt.plot(query_num, E_out_2, 'k')   # the black curve
+    # plt.xlabel('Number of Queries')
+    # plt.ylabel('Error')
+    # plt.title('< Experiment Result >')
+    # plt.show()
 
+    # now let's plot the result
+    query_num = np.arange(1, quota + 1)
+    plt.figure(1)
+    plt.subplot(211)
+    plt.title('Experiment Result')
+    plt.xlabel('#(queries)')
+    plt.ylabel('error')
+    plt.plot(query_num, E_out_1, 'r', label='random')
+    plt.plot(query_num, E_out_2, 'g', lanel='yours')
+    # plt.legend(loc='lower right')
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
+    # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.show()
 
 def usage():
     print("Usage: %s [options]" % sys.argv[0])
