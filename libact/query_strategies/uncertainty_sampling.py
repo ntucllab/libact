@@ -4,6 +4,33 @@ import numpy as np
 
 
 class UncertaintySampling(QueryStrategy):
+    """Uncertainty Sampling
+
+    This class implements Uncertainty Sampling active learning algorithm [1]_.
+
+    Parameters
+    ----------
+    model: {libact.model.LogisticRegression instance, 'LogisticRegression'}
+        The based model used for training.
+        Only Logistic regression are supported now.
+
+    method: {'lc', 'sm', 'le'}
+        lc stands for least confidence, it queries the instance whose posterior
+        probability of being positive is nearest 0.5 (for binary classification);
+        sm stands for smallest margin, it queries the instance whose posterior
+        probability gap between the most and the second probable labels is minimal;
+        le stands for the common entropy approach.
+
+    Attributes
+    ----------
+
+
+    References
+    ----------
+
+    .. [1] Settles, Burr. "Active learning literature survey." University of
+           Wisconsin, Madison 52.55-66 (2010): 11.
+    """
 
     def __init__(self, *args, **kwargs):
         """Currently only LogisticRegression is supported."""
