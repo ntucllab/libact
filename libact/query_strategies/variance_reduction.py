@@ -19,7 +19,7 @@ class VarianceReduction(QueryStrategy):
     Parameters
     ----------
     model: {libact.model.LogisticRegression instance, 'LogisticRegression'}
-        The model use for variance reduction to evaluate the variance.
+        The model used for variance reduction to evaluate the variance.
         Only Logistic regression are supported now.
 
     sigma: float, >0, optional (default=100.0)
