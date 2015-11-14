@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 #
-# TODO: description
+# The script helps guide the users to quickly understand how to use
+# libact by going through a simple active learning task with clear
+# descriptions.
 
 import os, sys
 import getopt
@@ -20,7 +22,15 @@ import libact.query_strategies
 
 
 def train_and_plot(model_class, model_params, qs_class, qs_params):
-    X, y = import_libsvm_sparse(BASE_DIR + '/examples/dataset.txt').format_sklearn()
+    # Before running this script, you need to make sure you have
+    # your dataset under directory libact-root/examples/.
+    #
+    # You can run libact-root/examples/get_datasets.py to
+    # download demo datasets (see get_datasets.py for more details).
+    #
+    # For now, we assume that you have dataset `heart` under
+    # libact-root/examples/.
+    X, y = import_libsvm_sparse(os.path.join(BASE_DIR, 'examples/heart.txt')).format_sklearn()
 
     # shuffle the data
     zipper = list(zip(X, y))
@@ -37,7 +47,7 @@ def train_and_plot(model_class, model_params, qs_class, qs_params):
     E_in_1, E_out_1 = [], []
     E_in_2, E_out_2 = [], []
 
-    # simulate the scenario when student don't choose which question to ask
+    # simulate the scenario when the student randomly picks questions to ask
     for i in range(10, N) :
         model.train(Dataset(X_train[ : i + 1], y_train[ : i + 1]))
         E_in_1 = np.append(E_in_1, 1 - model.score(Dataset(X_train[ : i + 1], y_train[ : i + 1])))
@@ -63,7 +73,7 @@ def train_and_plot(model_class, model_params, qs_class, qs_params):
         E_in_2 = np.append(E_in_2, 1 - model.score(dataset))
         E_out_2 = np.append(E_out_2, 1 - model.score(Dataset(X_test, y_test)))
 
-    print('< Scenario 2 > The student chooses which question to ask :')
+    print('< Scenario 2 > The student wisely picks question to ask :')
     print('After wisely asking %d questions, (E_in, E_out) = (%f, %f)' % (quota, E_in_2[-1], E_out_2[-1]))
 
     # now let's plot the result
