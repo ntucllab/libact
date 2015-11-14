@@ -297,8 +297,8 @@ class Exp4P():
     def exp4p(self):
         """The generator which implements the main part of Exp4.P.
 
-        Yield
-        -------
+        Yields
+        ------
         p: array-like, shape = [K]
             The query vector which tells ALBL what kind of distribution if
             should sample from the unlabeled pool.
