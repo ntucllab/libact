@@ -95,7 +95,7 @@ def train_and_plot(model_class, model_params, qs_class, qs_params):
     plt.xlabel('#(queries)')
     plt.ylabel('error')
     plt.plot(query_num, E_out_1, 'r', label='random')
-    plt.plot(query_num, E_out_2, 'g', lanel='yours')
+    plt.plot(query_num, E_out_2, 'g', label='yours')
     # plt.legend(loc='lower right')
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
     # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
