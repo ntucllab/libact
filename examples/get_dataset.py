@@ -1,9 +1,9 @@
-# !/usr/bin/env python3
+#!/usr/bin/env python3
 #
 # The script is used for downloading the three datasets used by the examples.
 #
 # All three datasets come from LIBSVM website, and are stored in LIBSVM format.
-# For more details, please refer to the following link: 
+# For more details, please refer to the following link:
 # https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html
 #
 # Besides, all three datasets are for binary classification, since most of the
