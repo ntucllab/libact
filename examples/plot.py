@@ -64,7 +64,7 @@ def main():
     plt.plot(query_num, E_out_2, 'k', label='qs Eout')
     plt.xlabel('Number of Queries')
     plt.ylabel('Error')
-    plt.title('< Experiment Result >')
+    plt.title('Experiment Result')
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
     plt.show()
 
