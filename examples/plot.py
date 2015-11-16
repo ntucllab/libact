@@ -31,7 +31,7 @@ def run(trn_ds, tst_ds, y_train, model, qs, quota):
 
 
 def split_train_test():
-    X, y = import_libsvm_sparse('./examples/diabetes').format_sklearn()
+    X, y = import_libsvm_sparse('./examples/diabetes.txt').format_sklearn()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
 
