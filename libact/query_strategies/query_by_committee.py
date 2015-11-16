@@ -65,10 +65,6 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
-    def update(self, entry_id, label):
-        # TODO
-        pass
-
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())

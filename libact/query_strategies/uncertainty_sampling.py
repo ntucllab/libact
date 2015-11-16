@@ -38,10 +38,6 @@ class UncertaintySampling(QueryStrategy):
         self.model = LogisticRegression()
         self.method = kwargs.pop('method', 'le')
 
-    def update(self, entry_id, label):
-        # TODO
-        pass
-
     def make_query(self):
         """
         Three choices for method (default 'le'):

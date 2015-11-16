@@ -13,9 +13,6 @@ class RandomSampling(QueryStrategy):
     def __init__(self, dataset, **kwargs):
         super(RandomSampling, self).__init__(dataset, **kwargs)
 
-    def update(self, entry_id, label):
-        pass
-
     def make_query(self):
         entry_id, feature = random.choice(self.dataset.get_unlabeled_entries())
         return entry_id
