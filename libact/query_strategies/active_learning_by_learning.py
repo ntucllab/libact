@@ -20,16 +20,12 @@ class ActiveLearningByLearning(QueryStrategy):
 
     Parameters
     ----------
-    models: list of libact.query_strategies.* object instance
+    query_models: list of libact.query_strategies.* object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
 
     delta: float, optional (default=0.1)
         Parameter for Exp4.P.
-
-    pmin: float, 0<pmin<len(n_active_algorithm), optional (default=0.05)
-        Parameter for Exp4.P. The minimal probability for random selection of
-        the arms (aka the underlying active learning algorithms).
 
     uniform_sampler: {True, False}, optional (default=Truee)
         Determining whether to include uniform random sample as one of arms.
@@ -37,13 +33,18 @@ class ActiveLearningByLearning(QueryStrategy):
     T: integer, optional (default=100)
         Query budget, the maximal number of queries to be made.
 
+    pmin: float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
+        Parameter for Exp4.P. The minimal probability for random selection of
+        the arms (aka the underlying active learning algorithms). N = K =
+        number of query_models, T is the number of query budgets.
+
     clf: libact.model.* object instance
         The learning model used for the task.
 
 
     Attributes
     ----------
-    models_: list of libact.query_strategies.* object instance
+    query_models_: list of libact.query_strategies.* object instance
 
     exp4p_: instance of Exp4P object
 
@@ -59,15 +60,14 @@ class ActiveLearningByLearning(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        print("XD")
         super(ActiveLearningByLearning, self).__init__(*args, **kwargs)
-        self.models_ = kwargs.pop('models', None)
-        if self.models_ is None:
+        self.query_models_ = kwargs.pop('query_models', None)
+        if self.query_models_ is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'models'"
                 )
-        elif not self.models_:
-            raise ValueError("models list is empty")
+        elif not self.query_models_:
+            raise ValueError("query_models list is empty")
 
         # parameters for Exp4.p
         self.delta = kwargs.pop('delta', 0.1)
@@ -86,13 +86,12 @@ class ActiveLearningByLearning(QueryStrategy):
             raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin and (self.pmin >= len(self.models_)+self.uniform_sampler
-                          or self.pmin <= 0):
+        if (self.pmin < 1./(len(self.query_models_)+self.uniform_sampler) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
-                             "len(n_active_algorithm)")
+                             "1/len(n_active_algorithm)")
 
         self.exp4p_ = Exp4P(
-            query_models=self.models_,
+            query_models=self.query_models_,
             T=self.T,
             delta=self.delta,
             pmin=self.pmin,
@@ -198,7 +197,8 @@ class Exp4P():
 
     pmin: float, 0<pmin<1/len(query_models), optional (default=:math:`\frac{√{log(N)}{KT}`)
         The minimal probability for random selection of the arms (aka the
-        unlabeled data).
+        unlabeled data), N = K = number of query_models, T is the maximum
+        number of rounds.
 
     T: integer, optional (default=100)
         The maximum number of rounds.
