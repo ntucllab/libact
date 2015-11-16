@@ -14,7 +14,7 @@ from libact.base.interfaces import QueryStrategy
 class QUIRE(QueryStrategy):
 
     def __init__(self, *args, **kwargs):
-        kwargs['update_callback'] = True
+        kwargs.setdefault('update_callback', True)
         super(QUIRE, self).__init__(*args, **kwargs)
         self.Uindex = [
             idx for idx, feature in self.dataset.get_unlabeled_entries()
