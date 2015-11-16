@@ -290,10 +290,6 @@ class Exp4P():
         # TODO exception on reward in [0, 1]
             return self.exp4p_gen.send((reward, ask_id, lbl))
 
-    def update_query_models(self, qid, lbl):
-        """Update model's dataset after making a query."""
-        for model in self.query_models_:
-            model.update(qid, lbl)
 
     def exp4p(self):
         """The generator which implements the main part of Exp4.P.
@@ -333,7 +329,6 @@ class Exp4P():
             q = np.dot(p, query)
 
             reward, ask_id, lbl = yield q
-            self.update_query_models(ask_id, lbl)
             ask_idx = self.unlabeled_invert_id_idx[ask_id]
 
             rhat = reward * query[:, ask_idx] / q[ask_idx]
