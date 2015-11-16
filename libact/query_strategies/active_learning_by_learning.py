@@ -60,6 +60,7 @@ class ActiveLearningByLearning(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
+        kwargs.setdefault('update_callback', True)
         super(ActiveLearningByLearning, self).__init__(*args, **kwargs)
         self.query_models_ = kwargs.pop('query_models', None)
         if self.query_models_ is None:
@@ -86,7 +87,7 @@ class ActiveLearningByLearning(QueryStrategy):
             raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if (self.pmin < 1./(len(self.query_models_)+self.uniform_sampler) or self.pmin < 0):
+        if self.pmin and (self.pmin < 1./(len(self.query_models_)+self.uniform_sampler) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
                              "1/len(n_active_algorithm)")
 
