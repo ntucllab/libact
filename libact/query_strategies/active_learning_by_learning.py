@@ -20,14 +20,14 @@ class ActiveLearningByLearning(QueryStrategy):
 
     Parameters
     ----------
-    query_models: list of libact.query_strategies.* object instance
+    query_strategies: list of libact.query_strategies.* object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
 
     delta: float, optional (default=0.1)
         Parameter for Exp4.P.
 
-    uniform_sampler: {True, False}, optional (default=Truee)
+    uniform_sampler: {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
 
     T: integer, optional (default=100)
@@ -36,15 +36,15 @@ class ActiveLearningByLearning(QueryStrategy):
     pmin: float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms). N = K =
-        number of query_models, T is the number of query budgets.
+        number of query_strategies, T is the number of query budgets.
 
-    clf: libact.model.* object instance
+    model: libact.model.* object instance
         The learning model used for the task.
 
 
     Attributes
     ----------
-    query_models_: list of libact.query_strategies.* object instance
+    query_strategies_: list of libact.query_strategies.* object instance
 
     exp4p_: instance of Exp4P object
 
@@ -62,13 +62,13 @@ class ActiveLearningByLearning(QueryStrategy):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('update_callback', True)
         super(ActiveLearningByLearning, self).__init__(*args, **kwargs)
-        self.query_models_ = kwargs.pop('query_models', None)
-        if self.query_models_ is None:
+        self.query_strategies_ = kwargs.pop('query_strategies', None)
+        if self.query_strategies_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'models'"
+                "__init__() missing required keyword-only argument: 'query_strategies'"
                 )
-        elif not self.query_models_:
-            raise ValueError("query_models list is empty")
+        elif not self.query_strategies_:
+            raise ValueError("query_strategies list is empty")
 
         # parameters for Exp4.p
         self.delta = kwargs.pop('delta', 0.1)
@@ -87,12 +87,12 @@ class ActiveLearningByLearning(QueryStrategy):
             raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin and (self.pmin < 1./(len(self.query_models_)+self.uniform_sampler) or self.pmin < 0):
+        if self.pmin and (self.pmin < 1./(len(self.query_strategies_)+self.uniform_sampler) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
                              "1/len(n_active_algorithm)")
 
         self.exp4p_ = Exp4P(
-            query_models=self.query_models_,
+            query_strategies=self.query_strategies_,
             T=self.T,
             delta=self.delta,
             pmin=self.pmin,
@@ -102,10 +102,10 @@ class ActiveLearningByLearning(QueryStrategy):
         self.budget_used = 0
 
         # classifier instance
-        self.clf = kwargs.pop('clf', None)
-        if self.clf is None:
+        self.model = kwargs.pop('model', None)
+        if self.model is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'models'"
+                "__init__() missing required keyword-only argument: 'model'"
                 )
 
         self.W = []
@@ -113,14 +113,14 @@ class ActiveLearningByLearning(QueryStrategy):
 
     def calc_reward_fn(self):
         """Calculate the reward value"""
-        clf = copy.copy(self.clf)
-        clf.train(self.dataset)
+        model = copy.copy(self.model)
+        model.train(self.dataset)
 
         # reward function: Importance-Weighted-Accuracy (IW-ACC) (tau, f)
         reward = 0.
         for i in range(len(self.queried_hist_)):
             reward += self.W[i] *\
-                (clf.predict(self.dataset.data[self.queried_hist_[i]][0])[0] ==
+                (model.predict(self.dataset.data[self.queried_hist_[i]][0])[0] ==
                  self.dataset.data[self.queried_hist_[i]][1])
         reward /= (self.dataset.len_labeled() + self.dataset.len_unlabeled())
         reward /= self.T
@@ -179,13 +179,13 @@ class Exp4P():
     For the Exp4.P used in ALBL, the number of arms (actions) and number of
     experts are equal to the number of active learning algorithms wanted to
     use. The arms (actions) are the active learning algorithms, where is
-    inputed from parameter 'query_models'. There is no need for the input of
+    inputed from parameter 'query_strategies'. There is no need for the input of
     experts, the advice of the kth expert are always equal e_k, where e_k is
     the kth column of the identity matrix.
 
     Parameters
     ----------
-    query_models: QueryStrategy instances
+    query_strategies: QueryStrategy instances
         The active learning algorithms wanted to use, it is equivalent to
         actions or arms in original Exp4.P.
 
@@ -196,9 +196,9 @@ class Exp4P():
     delta: float, >0, optional (default=0.1)
         A parameter.
 
-    pmin: float, 0<pmin<1/len(query_models), optional (default=:math:`\frac{√{log(N)}{KT}`)
+    pmin: float, 0<pmin<1/len(query_strategies), optional (default=:math:`\frac{√{log(N)}{KT}`)
         The minimal probability for random selection of the arms (aka the
-        unlabeled data), N = K = number of query_models, T is the maximum
+        unlabeled data), N = K = number of query_strategies, T is the maximum
         number of rounds.
 
     T: integer, optional (default=100)
@@ -232,13 +232,13 @@ class Exp4P():
     def __init__(self, *args, **kwargs):
         """ """
         # QueryStrategy class object instances
-        self.query_models_ = kwargs.pop('query_models', None)
-        if self.query_models_ is None:
+        self.query_strategies_ = kwargs.pop('query_strategies', None)
+        if self.query_strategies_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'query_models'"
+                "__init__() missing required keyword-only argument: 'query_strategies'"
                 )
-        elif not self.query_models_:
-            raise ValueError("query_models list is empty")
+        elif not self.query_strategies_:
+            raise ValueError("query_strategies list is empty")
 
         # whether to include uniform random sampler as one of underlying active
         # learning algorithms
@@ -246,11 +246,11 @@ class Exp4P():
 
         # n_armss
         if self.uniform_sampler:
-            self.N = len(self.query_models_) + 1
+            self.N = len(self.query_strategies_) + 1
         else:
-            self.N = len(self.query_models_)
+            self.N = len(self.query_strategies_)
 
-        # weight vector to each query_models, shape = (N, )
+        # weight vector to each query_strategies, shape = (N, )
         self.w = np.array([1. for i in range(self.N)])
 
         # max iters
@@ -318,7 +318,7 @@ class Exp4P():
             query = np.zeros((self.N, len(self.unlabeled_invert_id_idx)))
             if self.uniform_sampler:
                 query[-1, :] = 1. / len(self.unlabeled_invert_id_idx)
-            for i, model in enumerate(self.query_models_):
+            for i, model in enumerate(self.query_strategies_):
                 query[i][self.unlabeled_invert_id_idx[model.make_query()]] = 1
 
             # choice vector, shape = (self.K, )
