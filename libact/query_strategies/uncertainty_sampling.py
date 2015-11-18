@@ -10,11 +10,10 @@ class UncertaintySampling(QueryStrategy):
 
     Parameters
     ----------
-    model: {libact.model.LogisticRegression instance, 'LogisticRegression'}
-        The based model used for training.
-        Only Logistic regression are supported now.
+    model: libact.model.* object instance
+        The base model used for trainin, this model should support predict_real.
 
-    method: {'lc', 'sm', 'le'}
+    method: {'lc', 'sm', 'le'}, optional (default='le')
         lc stands for least confidence, it queries the instance whose posterior
         probability of being positive is nearest 0.5 (for binary classification);
         sm stands for smallest margin, it queries the instance whose posterior
@@ -35,7 +34,12 @@ class UncertaintySampling(QueryStrategy):
     def __init__(self, *args, **kwargs):
         """Currently only LogisticRegression is supported."""
         super(UncertaintySampling, self).__init__(*args, **kwargs)
-        self.model = LogisticRegression()
+        self.model = kwargs.pop('model', None)
+        if self.model is None:
+            raise TypeError(
+                "__init__() missing required keyword-only argument: 'model'"
+                )
+
         self.method = kwargs.pop('method', 'le')
 
     def make_query(self):
