@@ -1,5 +1,8 @@
+"""Uncertainty Sampling
+
+
+"""
 from libact.base.interfaces import QueryStrategy
-from libact.models import LogisticRegression
 import numpy as np
 
 
@@ -39,7 +42,6 @@ class UncertaintySampling(QueryStrategy):
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
                 )
-
         self.method = kwargs.pop('method', 'le')
 
     def make_query(self):
@@ -66,11 +68,11 @@ class UncertaintySampling(QueryStrategy):
             # O(NK) + O(N)
             prob = self.model.predict_real(X_pool)
             min_margin = np.inf
-            for j in range(len(prob)) :
+            for j in range(len(prob)):
                 m1_id = np.argmax(prob[j])
                 m2_id = np.argmax(np.delete(prob[j], m1_id))
                 margin = prob[j][m1_id] - prob[j][m2_id]
-                if margin < min_margin :
+                if margin < min_margin:
                     min_margin = margin
                     ask_id = j
 
