@@ -36,7 +36,6 @@ class QUIRE(QueryStrategy):
         self.y[entry_id] = label
 
     def make_query(self):
-        #print("in quire_make_query")
         L = self.L
         K = self.K
         Lindex = self.Lindex
@@ -54,9 +53,8 @@ class QUIRE(QueryStrategy):
         M2 =  np.dot( M3, self.K[Lindex, :][:, Uindex] )
         M1 = self.lmbda * np.eye(len_Uindex) + self.K[Uindex, :][:, Uindex]
         inv_Laa = M1 - M2
-        i = -1
-        iList = [j for j in range(len_Uindex)]
-        for each_index in Uindex:            
+        iList = list( range(len_Uindex) )
+        for i, each_index in enumerate(Uindex):
             """go through all unlabeled instances and compute their evaluation
             values one by one
             """
@@ -69,7 +67,6 @@ class QUIRE(QueryStrategy):
             Luu = L[Uindex_r, :][:, Uindex_r]
             """efficient computation of inv(Luu)
             """
-            i = i + 1
             iList_r = iList[:]
             iList_r.remove(i)
             a = inv_Laa[i, i]
