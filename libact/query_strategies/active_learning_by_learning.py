@@ -70,6 +70,12 @@ class ActiveLearningByLearning(QueryStrategy):
         elif not self.query_strategies_:
             raise ValueError("query_strategies list is empty")
 
+        # check if query_strategies share the same dataset with albl
+        for qs in self.query_strategies_:
+            if qs.dataset != self.dataset:
+                raise ValueError("query_strategies should share the same"
+                                 "dataset instance with albl")
+
         # parameters for Exp4.p
         self.delta = kwargs.pop('delta', 0.1)
 
