@@ -108,6 +108,9 @@ class ActiveLearningByLearning(QueryStrategy):
                 "__init__() missing required keyword-only argument: 'model'"
                 )
 
+        # initial query
+        self.query_dist = self.exp4p_.next(-1, None, None)
+
         self.W = []
         self.queried_hist_ = []
 
@@ -127,7 +130,25 @@ class ActiveLearningByLearning(QueryStrategy):
         return reward
 
     def calc_query(self):
-        """Calculate which point to query"""
+        """Calculate the sampling query distribution"""
+        self.q = self.exp4p_.next(
+            self.calc_reward_fn(),
+            self.queried_hist_[-1],
+            self.dataset.data[self.queried_hist_[-1]][1]
+        )
+        return
+
+    def update(self, entry_id, label):
+        """Calculate the next query after updating the question asked with an
+        answer."""
+        ask_idx = self.unlabeled_invert_id_idx[entry_id]
+        self.W.append(1./self.q[ask_idx])
+        self.queried_hist_.append(entry_id)
+        self.calc_query()
+
+    def make_query(self):
+        """Except for the initial query, it returns the id of the data albl
+        wants to query."""
         dataset = self.dataset
         try:
             unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
@@ -136,41 +157,19 @@ class ActiveLearningByLearning(QueryStrategy):
             return
 
         while self.budget_used < self.T:
-            q = self.exp4p_.next(
-                self.calc_reward_fn(),
-                self.queried_hist_[-1],
-                self.dataset.data[self.queried_hist_[-1]][1]
-            )
-            ask_idx = np.random.choice(
-                        np.arange(
-                            len(self.unlabeled_invert_id_idx)), size=1, p=q
-                    )[0]
-            ask_id = self.unlabeled_entry_ids[ask_idx]
-            self.W.append(1./q[ask_idx])
-            self.queried_hist_.append(ask_id)
-
-            if ask_id in unlabeled_entry_ids:
-                self.budget_used += 1
-                return
-
-    def update(self, entry_id, label):
-        """Calculate the next query after updating the question asked with an
-        answer."""
-        self.calc_query()
-
-    def make_query(self):
-        """Except for the initial query, it returns the id of the data albl
-        wants to query."""
-        if self.queried_hist_ == []:
-            # initial query
-            q = self.exp4p_.next(-1, None, None)
             ask_idx = np.random.choice(
                         np.arange(len(self.unlabeled_invert_id_idx)), size=1, p=q
                     )[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
-            self.W.append(1./q[ask_idx])
-            self.queried_hist_.append(ask_id)
-        return self.queried_hist_[-1]
+
+            if ask_id in unlabeled_entry_ids:
+                self.budget_used += 1
+                return ask_id
+            else:
+                self.update(ask_id, dataset.data[ask_id][1])
+
+
+        raise ValueError("Out of query budget")
 
 
 class Exp4P():
