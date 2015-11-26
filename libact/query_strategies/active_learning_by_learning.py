@@ -23,6 +23,8 @@ class ActiveLearningByLearning(QueryStrategy):
     query_strategies: list of libact.query_strategies.* object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
+        Note that these query_strategies should share the same dataset
+        instance with ActiveLearningByLearning instance.
 
     delta: float, optional (default=0.1)
         Parameter for Exp4.P.
