@@ -61,6 +61,13 @@ class Dataset(object):
         X, y = zip(*self.get_labeled_entries())
         return np.array(X), np.array(y)
 
+    def format_libsvm(self):
+        """Returns dataset in (X, y) format for use in scikit-learn.
+        Unlabeled entries are ignored.
+        """
+        X, y = zip(*self.get_labeled_entries())
+        return X, y
+
     def get_entries(self):
         return self.data
 
