@@ -1,5 +1,5 @@
 from libact.base.interfaces import QueryStrategy
-from libact.models import LogisticRegression
+from libact.models import LogisticRegression, SVM
 import numpy as np
 
 
@@ -35,7 +35,7 @@ class UncertaintySampling(QueryStrategy):
     def __init__(self, *args, **kwargs):
         """Currently only LogisticRegression is supported."""
         super(UncertaintySampling, self).__init__(*args, **kwargs)
-        self.model = LogisticRegression()
+        self.model = kwargs.pop('model', SVM())
         self.method = kwargs.pop('method', 'le')
 
     def make_query(self):
