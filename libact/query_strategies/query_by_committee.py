@@ -78,7 +78,8 @@ class QueryByCommittee(QueryStrategy):
             bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
                 bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
-                logging.warning('There is student receiving only one label,'
+                logger = logging.getLogger(__name__)
+                logger.warning('There is student receiving only one label,'
                                 'resample the bag.')
             student.train(bag)
 
