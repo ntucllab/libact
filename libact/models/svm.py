@@ -5,6 +5,7 @@ class SVM(ContinuousModel):
 
 
     def __init__(self, *args, **kwargs):
+        self.model = None
         self.svm_train_params = kwargs.pop('svm_train_params', '-q -b 1')
         self.svm_pred_params = kwargs.pop('svm_pred_params', '-q -b 1')
 
@@ -25,8 +26,10 @@ class SVM(ContinuousModel):
         return p_val
 
     def score(self, testing_dataset, *args, **kwargs):
+        if self.m == None:
+            raise ValueError('you need to train the model before using score method')
         X, y = zip(*testing_dataset.get_labeled_entries())
         svm_pred_params = kwargs.pop('svm_pred_params', self.svm_pred_params)
         p_label, p_acc, p_val = svmutil.svm_predict(y, X, self.model, svm_pred_params)
-        return p_acc[0]/100
+        return p_acc[0] / 100.
 
