@@ -10,6 +10,8 @@ from functools import cmp_to_key
 import math
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 class QueryByCommittee(QueryStrategy):
     """Query by committee
@@ -78,7 +80,6 @@ class QueryByCommittee(QueryStrategy):
             bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
                 bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
-                logger = logging.getLogger(__name__)
                 logger.warning('There is student receiving only one label,'
                                 'resample the bag.')
             student.train(bag)
