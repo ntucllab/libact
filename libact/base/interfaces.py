@@ -11,7 +11,7 @@ class QueryStrategy(metaclass=ABCMeta):
 
     def __init__(self, dataset, **kwargs):
         self._dataset = dataset
-        update_callback = kwargs.pop('update_callback', True)
+        update_callback = kwargs.pop('update_callback', False)
         if update_callback:
             dataset.on_update(self.update)
 
@@ -19,7 +19,6 @@ class QueryStrategy(metaclass=ABCMeta):
     def dataset(self):
         return self._dataset
 
-    @abstractmethod
     def update(self, entry_id, label):
         pass
 

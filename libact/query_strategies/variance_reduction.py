@@ -48,6 +48,7 @@ class VarianceReduction(QueryStrategy):
     """
 
     def __init__(self,  *args, **kwargs):
+        super(VarianceReduction, self).__init__(*args, **kwargs)
         model = kwargs.pop('model', None)
         if type(model) is str:
             self.model = getattr(libact.models, model)()
@@ -73,14 +74,16 @@ class VarianceReduction(QueryStrategy):
                     label_count, feature_count)
         return ret
 
-    def make_query(self, dataset, n_queries=1, n_jobs=20):
-        labeled_entry_ids = range(len(dataset.labeled))
-        unlabeled_entries = dataset.get_unlabeled_entries()
-        unlabeled_entry_ids = [i[0] for i in unlabeled_entries]
-        Xlabeled = np.array([dataset.labeled[i][0] for i in labeled_entry_ids])
-        y = [dataset.labeled[i][1] for i in labeled_entry_ids]
-        X_pool = [dataset.unlabeled[i][0] for i in unlabeled_entry_ids]
-        label_count = dataset.get_num_of_labels()
+    def make_query(self, n_queries=1, n_jobs=20):
+        labeled_entries = self.dataset.get_labeled_entries()
+        Xlabeled, y = zip(*labeled_entries)
+        Xlabeled = np.array(Xlabeled)
+        y = list(y)
+
+        unlabeled_entries = self.dataset.get_unlabeled_entries()
+        unlabeled_entry_ids, X_pool = zip(*unlabeled_entries)
+
+        label_count = self.dataset.get_num_of_labels()
 
         clf = copy.copy(self.model)
         clf.train(Dataset(Xlabeled, y))

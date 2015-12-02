@@ -28,6 +28,14 @@ libact.query_strategies.quire module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.random_sampling module
+------------------------------------
+
+.. automodule:: libact.query_strategies.random_sampling
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.uncertainty_sampling module
 ---------------------------------------------------
 

@@ -20,30 +20,33 @@ class ActiveLearningByLearning(QueryStrategy):
 
     Parameters
     ----------
-    models: list of libact.query_strategies.* object instance
+    query_strategies: list of libact.query_strategies.* object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
+        Note that these query_strategies should share the same dataset
+        instance with ActiveLearningByLearning instance.
 
     delta: float, optional (default=0.1)
         Parameter for Exp4.P.
 
-    pmin: float, 0<pmin<len(n_active_algorithm), optional (default=0.05)
-        Parameter for Exp4.P. The minimal probability for random selection of
-        the arms (aka the underlying active learning algorithms).
-
-    uniform_sampler: {True, False}, optional (default=Truee)
+    uniform_sampler: {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
 
     T: integer, optional (default=100)
         Query budget, the maximal number of queries to be made.
 
-    clf: libact.model.* object instance
+    pmin: float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
+        Parameter for Exp4.P. The minimal probability for random selection of
+        the arms (aka the underlying active learning algorithms). N = K =
+        number of query_strategies, T is the number of query budgets.
+
+    model: libact.model.* object instance
         The learning model used for the task.
 
 
     Attributes
     ----------
-    models_: list of libact.query_strategies.* object instance
+    query_strategies_: list of libact.query_strategies.* object instance
 
     exp4p_: instance of Exp4P object
 
@@ -59,15 +62,21 @@ class ActiveLearningByLearning(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        print("XD")
+        kwargs.setdefault('update_callback', True)
         super(ActiveLearningByLearning, self).__init__(*args, **kwargs)
-        self.models_ = kwargs.pop('models', None)
-        if self.models_ is None:
+        self.query_strategies_ = kwargs.pop('query_strategies', None)
+        if self.query_strategies_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'models'"
+                "__init__() missing required keyword-only argument: 'query_strategies'"
                 )
-        elif not self.models_:
-            raise ValueError("models list is empty")
+        elif not self.query_strategies_:
+            raise ValueError("query_strategies list is empty")
+
+        # check if query_strategies share the same dataset with albl
+        for qs in self.query_strategies_:
+            if qs.dataset != self.dataset:
+                raise ValueError("query_strategies should share the same"
+                                 "dataset instance with albl")
 
         # parameters for Exp4.p
         self.delta = kwargs.pop('delta', 0.1)
@@ -86,13 +95,12 @@ class ActiveLearningByLearning(QueryStrategy):
             raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin and (self.pmin >= len(self.models_)+self.uniform_sampler
-                          or self.pmin <= 0):
+        if self.pmin and (self.pmin < 1./(len(self.query_strategies_)+self.uniform_sampler) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
-                             "len(n_active_algorithm)")
+                             "1/len(n_active_algorithm)")
 
         self.exp4p_ = Exp4P(
-            query_models=self.models_,
+            query_strategies=self.query_strategies_,
             T=self.T,
             delta=self.delta,
             pmin=self.pmin,
@@ -102,32 +110,53 @@ class ActiveLearningByLearning(QueryStrategy):
         self.budget_used = 0
 
         # classifier instance
-        self.clf = kwargs.pop('clf', None)
-        if self.clf is None:
+        self.model = kwargs.pop('model', None)
+        if self.model is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'models'"
+                "__init__() missing required keyword-only argument: 'model'"
                 )
+
+        # initial query
+        self.query_dist = self.exp4p_.next(-1, None, None)
 
         self.W = []
         self.queried_hist_ = []
 
     def calc_reward_fn(self):
         """Calculate the reward value"""
-        clf = copy.copy(self.clf)
-        clf.train(self.dataset)
+        model = copy.copy(self.model)
+        model.train(self.dataset)
 
         # reward function: Importance-Weighted-Accuracy (IW-ACC) (tau, f)
         reward = 0.
         for i in range(len(self.queried_hist_)):
             reward += self.W[i] *\
-                (clf.predict(self.dataset.data[self.queried_hist_[i]][0])[0] ==
+                (model.predict(self.dataset.data[self.queried_hist_[i]][0])[0] ==
                  self.dataset.data[self.queried_hist_[i]][1])
         reward /= (self.dataset.len_labeled() + self.dataset.len_unlabeled())
         reward /= self.T
         return reward
 
     def calc_query(self):
-        """Calculate which point to query"""
+        """Calculate the sampling query distribution"""
+        self.q = self.exp4p_.next(
+            self.calc_reward_fn(),
+            self.queried_hist_[-1],
+            self.dataset.data[self.queried_hist_[-1]][1]
+        )
+        return
+
+    def update(self, entry_id, label):
+        """Calculate the next query after updating the question asked with an
+        answer."""
+        ask_idx = self.unlabeled_invert_id_idx[entry_id]
+        self.W.append(1./self.q[ask_idx])
+        self.queried_hist_.append(entry_id)
+        self.calc_query()
+
+    def make_query(self):
+        """Except for the initial query, it returns the id of the data albl
+        wants to query."""
         dataset = self.dataset
         try:
             unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
@@ -136,41 +165,19 @@ class ActiveLearningByLearning(QueryStrategy):
             return
 
         while self.budget_used < self.T:
-            q = self.exp4p_.next(
-                self.calc_reward_fn(),
-                self.queried_hist_[-1],
-                self.dataset.data[self.queried_hist_[-1]][1]
-            )
-            ask_idx = np.random.choice(
-                        np.arange(
-                            len(self.unlabeled_invert_id_idx)), size=1, p=q
-                    )[0]
-            ask_id = self.unlabeled_entry_ids[ask_idx]
-            self.W.append(1./q[ask_idx])
-            self.queried_hist_.append(ask_id)
-
-            if ask_id in unlabeled_entry_ids:
-                self.budget_used += 1
-                return
-
-    def update(self, entry_id, label):
-        """Calculate the next query after updating the question asked with an
-        answer."""
-        self.calc_query()
-
-    def make_query(self):
-        """Except for the initial query, it returns the id of the data albl
-        wants to query."""
-        if self.queried_hist_ == []:
-            # initial query
-            q = self.exp4p_.next(-1, None, None)
             ask_idx = np.random.choice(
                         np.arange(len(self.unlabeled_invert_id_idx)), size=1, p=q
                     )[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
-            self.W.append(1./q[ask_idx])
-            self.queried_hist_.append(ask_id)
-        return self.queried_hist_[-1]
+
+            if ask_id in unlabeled_entry_ids:
+                self.budget_used += 1
+                return ask_id
+            else:
+                self.update(ask_id, dataset.data[ask_id][1])
+
+
+        raise ValueError("Out of query budget")
 
 
 class Exp4P():
@@ -179,13 +186,13 @@ class Exp4P():
     For the Exp4.P used in ALBL, the number of arms (actions) and number of
     experts are equal to the number of active learning algorithms wanted to
     use. The arms (actions) are the active learning algorithms, where is
-    inputed from parameter 'query_models'. There is no need for the input of
+    inputed from parameter 'query_strategies'. There is no need for the input of
     experts, the advice of the kth expert are always equal e_k, where e_k is
     the kth column of the identity matrix.
 
     Parameters
     ----------
-    query_models: QueryStrategy instances
+    query_strategies: QueryStrategy instances
         The active learning algorithms wanted to use, it is equivalent to
         actions or arms in original Exp4.P.
 
@@ -196,9 +203,10 @@ class Exp4P():
     delta: float, >0, optional (default=0.1)
         A parameter.
 
-    pmin: float, 0<pmin<1/len(query_models), optional (default=:math:`\frac{√{log(N)}{KT}`)
+    pmin: float, 0<pmin<1/len(query_strategies), optional (default=:math:`\frac{√{log(N)}{KT}`)
         The minimal probability for random selection of the arms (aka the
-        unlabeled data).
+        unlabeled data), N = K = number of query_strategies, T is the maximum
+        number of rounds.
 
     T: integer, optional (default=100)
         The maximum number of rounds.
@@ -231,13 +239,13 @@ class Exp4P():
     def __init__(self, *args, **kwargs):
         """ """
         # QueryStrategy class object instances
-        self.query_models_ = kwargs.pop('query_models', None)
-        if self.query_models_ is None:
+        self.query_strategies_ = kwargs.pop('query_strategies', None)
+        if self.query_strategies_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'query_models'"
+                "__init__() missing required keyword-only argument: 'query_strategies'"
                 )
-        elif not self.query_models_:
-            raise ValueError("query_models list is empty")
+        elif not self.query_strategies_:
+            raise ValueError("query_strategies list is empty")
 
         # whether to include uniform random sampler as one of underlying active
         # learning algorithms
@@ -245,11 +253,11 @@ class Exp4P():
 
         # n_armss
         if self.uniform_sampler:
-            self.N = len(self.query_models_) + 1
+            self.N = len(self.query_strategies_) + 1
         else:
-            self.N = len(self.query_models_)
+            self.N = len(self.query_strategies_)
 
-        # weight vector to each query_models, shape = (N, )
+        # weight vector to each query_strategies, shape = (N, )
         self.w = np.array([1. for i in range(self.N)])
 
         # max iters
@@ -289,16 +297,12 @@ class Exp4P():
         # TODO exception on reward in [0, 1]
             return self.exp4p_gen.send((reward, ask_id, lbl))
 
-    def update_query_models(self, qid, lbl):
-        """Update model's dataset after making a query."""
-        for model in self.query_models_:
-            model.update(qid, lbl)
 
     def exp4p(self):
         """The generator which implements the main part of Exp4.P.
 
-        Yield
-        -------
+        Yields
+        ------
         p: array-like, shape = [K]
             The query vector which tells ALBL what kind of distribution if
             should sample from the unlabeled pool.
@@ -321,7 +325,7 @@ class Exp4P():
             query = np.zeros((self.N, len(self.unlabeled_invert_id_idx)))
             if self.uniform_sampler:
                 query[-1, :] = 1. / len(self.unlabeled_invert_id_idx)
-            for i, model in enumerate(self.query_models_):
+            for i, model in enumerate(self.query_strategies_):
                 query[i][self.unlabeled_invert_id_idx[model.make_query()]] = 1
 
             # choice vector, shape = (self.K, )
@@ -332,7 +336,6 @@ class Exp4P():
             q = np.dot(p, query)
 
             reward, ask_id, lbl = yield q
-            self.update_query_models(ask_id, lbl)
             ask_idx = self.unlabeled_invert_id_idx[ask_id]
 
             rhat = reward * query[:, ask_idx] / q[ask_idx]
