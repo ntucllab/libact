@@ -62,7 +62,6 @@ class ActiveLearningByLearning(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('update_callback', True)
         super(ActiveLearningByLearning, self).__init__(*args, **kwargs)
         self.query_strategies_ = kwargs.pop('query_strategies', None)
         if self.query_strategies_ is None:

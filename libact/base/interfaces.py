@@ -11,9 +11,7 @@ class QueryStrategy(metaclass=ABCMeta):
 
     def __init__(self, dataset, **kwargs):
         self._dataset = dataset
-        update_callback = kwargs.pop('update_callback', False)
-        if update_callback:
-            dataset.on_update(self.update)
+        dataset.on_update(self.update)
 
     @property
     def dataset(self):
