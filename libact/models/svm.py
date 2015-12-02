@@ -48,7 +48,7 @@ class SVM(Model):
     Attributes
     ----------
     m : libsvm model instance
-        Befroe training, m = None.
+        Before training, m = None.
         After training, m = the return value from svmutil.svm_train.
 
     References
