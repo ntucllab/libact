@@ -69,13 +69,15 @@ class SVM(Model):
         return self.m
 
     def predict(self, feature, *args, **kwargs):
+        if self.m == None:
+            raise RuntimeError('Model not trained')
         #TODO need only p_label
         p_label, p_acc, p_val = svmutil.svm_predict(None, feature, self.m)
         return p_label
 
     def score(self, testing_dataset, *args, **kwargs):
         if self.m == None:
-            pass
+            raise RuntimeError('Model not trained')
         X, y = zip(*testing_dataset.get_labeled_entries())
         p_label, p_acc, p_val = svmutil.svm_predict(y, [x.tolist() for x in X],
                 self.m)
