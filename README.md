@@ -54,5 +54,7 @@ $ examples/plot.py -m LogisticRegression -q QueryByCommittee --qs-params='{"mode
 For HintSVM, you would have to install package from https://github.com/yangarbiter/hintsvm
 
 Before running, you need to make sure the path to hintsvm's library and
-python code are set. (set them up by setting the environment variable
-LD_LIBRARY_PATH=PATH_TO_HINTSVM PYTHONPATH=PATH_TO_HINTSVM/python/)
+python code are set. Set them up by setting environment variables:
+
+    export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
+    export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
