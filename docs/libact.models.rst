@@ -20,6 +20,14 @@ libact.models.perceptron module
     :undoc-members:
     :show-inheritance:
 
+libact.models.svm module
+-------------------------------
+
+.. automodule:: libact.models.svm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
