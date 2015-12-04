@@ -42,6 +42,7 @@ class UncertaintySampling(QueryStrategy):
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
                 )
+        self.model.train(self.dataset)
 
         self.method = kwargs.pop('method', 'lc')
         if self.method not in ['lc', 'sm']:
@@ -50,15 +51,15 @@ class UncertaintySampling(QueryStrategy):
                 self.method
                 )
 
+    def update(self, entry_id, label):
+        self.model.train(self.dataset)
+
     def make_query(self):
         """
         Choices for method (default 'lc'):
         'lc' (Least Confident), 'sm' (Smallest Margin)
         """
-        dataset = self.dataset
-        self.model.train(dataset)
-
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, X_pool = zip(*self.dataset.get_unlabeled_entries())
 
         if self.method == 'lc':  # least confident
             # time complexity analysis:
