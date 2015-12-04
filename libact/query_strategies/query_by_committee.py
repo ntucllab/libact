@@ -3,12 +3,14 @@
 This module contains a class that implements Query by committee active learning
 algorithm.
 """
+from functools import cmp_to_key
+import logging
+import math
+
+import numpy as np
+
 from libact.base.interfaces import QueryStrategy
 import libact.models
-import numpy as np
-from functools import cmp_to_key
-import math
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +69,9 @@ class QueryByCommittee(QueryStrategy):
                             math.log(float(lab_count[lab])/self.n_students)
 
         return ret
+
+    def update(self, entry_id, label):
+        pass
 
     def make_query(self):
         dataset = self.dataset
