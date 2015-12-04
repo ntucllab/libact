@@ -54,6 +54,7 @@ class QueryByCommittee(QueryStrategy):
             else:
                 self.students.append(model)
         self.n_students = len(self.students)
+        self.teach_students()
 
     def disagreement(self, votes):
         ret = []
@@ -70,17 +71,10 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
-    def update(self, entry_id, label):
-        pass
-
-    def make_query(self):
+    def teach_students(self):
         dataset = self.dataset
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
-        votes = []
-
         # Training models with labeled data using bootstrap aggregating
         # (bagging)
-        # TODO exception on only one label is sampled.
         for student in self.students:
             bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
@@ -88,6 +82,13 @@ class QueryByCommittee(QueryStrategy):
                 logger.warning('There is student receiving only one label,'
                                'resample the bag.')
             student.train(bag)
+
+    def update(self, entry_id, label):
+        self.teach_students()
+
+    def make_query(self):
+        dataset = self.dataset
+        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
         # Let the trained students vote for unlabeled data
         votes = np.zeros((len(X_pool), len(self.students)))
