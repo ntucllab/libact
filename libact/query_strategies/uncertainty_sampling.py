@@ -16,12 +16,11 @@ class UncertaintySampling(QueryStrategy):
     model: libact.model.* object instance
         The base model used for trainin, this model should support predict_real.
 
-    method: {'lc', 'sm', 'le'}, optional (default='le')
-        lc stands for least confidence, it queries the instance whose posterior
+    method: {'lc', 'sm'}, optional (default='lc')
+        least confidence (lc), it queries the instance whose posterior
         probability of being positive is nearest 0.5 (for binary classification);
-        sm stands for smallest margin, it queries the instance whose posterior
+        smallest margin (sm), it queries the instance whose posterior
         probability gap between the most and the second probable labels is minimal;
-        le stands for the common entropy approach.
 
     Attributes
     ----------
@@ -37,17 +36,24 @@ class UncertaintySampling(QueryStrategy):
     def __init__(self, *args, **kwargs):
         """Currently only LogisticRegression is supported."""
         super(UncertaintySampling, self).__init__(*args, **kwargs)
+
         self.model = kwargs.pop('model', None)
         if self.model is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
                 )
-        self.method = kwargs.pop('method', 'le')
+
+        self.method = kwargs.pop('method', 'lc')
+        if self.method not in ['lc', 'sm']:
+            raise TypeError(
+                "supported methods are ['lc', 'sm'], the given one is: " + \
+                self.method
+                )
 
     def make_query(self):
         """
-        Three choices for method (default 'le'):
-        'lc' (Least Confident), 'sm' (Smallest Margin), 'le' (Label Entropy)
+        Choices for method (default 'lc'):
+        'lc' (Least Confident), 'sm' (Smallest Margin)
         """
         dataset = self.dataset
         self.model.train(dataset)
@@ -75,20 +81,6 @@ class UncertaintySampling(QueryStrategy):
                 if margin < min_margin:
                     min_margin = margin
                     ask_id = j
-
-        elif self.method == 'le':  # default : label entropy (most commonly used)
-            # XXX divide by zero?
-            # time complexity analysis:
-            # prob = self.model.predict_real(X_pool) -> O(NK)
-            # np.log(prob) -> O(NK)
-            # prob * np.log(prob) -> O(NK)
-            # -np.sum(..., axis=1) -> O(NK)
-            # np.argmax(...) -> O(N)
-            # therefore, total time complexity = O(NK)
-            prob = self.model.predict_real(X_pool)
-            ask_id = np.argmax(-np.sum(prob * np.log(prob), 1))
-            # ask_id = np.argmax(-np.sum(self.model.predict_real(X_pool)
-            #     * np.log(self.model.predict_real(X_pool)), 1))
 
         else:
             raise ValueError(
