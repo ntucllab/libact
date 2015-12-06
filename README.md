@@ -2,8 +2,6 @@
 
 libact - a pool-based active learning package
 
-[![build status](https://gitlab.lv6.tw/ci/projects/1/status.png?ref=master)](https://gitlab.lv6.tw/ci/projects/1?ref=master)
-
 # Dependencies
 
 Python3 dependencies
