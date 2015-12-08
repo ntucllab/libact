@@ -40,12 +40,21 @@ Some examples are available under the `examples` directory. Before running, use
 
 Available examples:
 
-  - `examples/plot.py`: see example usage below
+  - `examples/plot.py`: This example performs basic usage of libact. It splits
+    an supervised learning dataset and remove some label from dataset to simulate
+    an active learning scenario. Each query of an unlabeled dataset is simply putting
+    the label back to dataset.
+
+    The main libact usage part is below:
+    ```python
+    qs = UncertaintySampling(trn_ds, method='lc') # query strategy instance
+    
+    ask_id = qs.make_query() # let the specified query strategy suggest a data to query
+    trn_ds.update(ask_id, y_train[ask_id]) # update the dataset with newly queried data
+    ```
   
-```
-$ examples/plot.py -m LogisticRegression -q UncertaintySampling --qs-params='{"method": "lc"}'
-$ examples/plot.py -m LogisticRegression -q QueryByCommittee --qs-params='{"models": ["Perceptron", "Perceptron", "Perceptron"]}'
-```
+  
+
 
 ## HintSVM
 
