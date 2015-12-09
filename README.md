@@ -16,6 +16,7 @@ sudo apt-get install liblapacke-dev
 
 MacOS
 ```
+brew tap homebrew/science
 brew install openblas
 ```
 
