@@ -6,7 +6,7 @@ libact - a pool-based active learning package
 
 Python3 dependencies
 ```
-pip3 install numpy scikit-learn
+pip3 install -r requirements.txt
 ```
 
 Debian/Ubuntu
