@@ -11,7 +11,20 @@ from libact.base.interfaces import QueryStrategy
 
 
 class QUIRE(QueryStrategy):
-    """
+    """Querying Informative and Representative Examples (QUIRE) query strategy
+
+
+    Parameters
+    ----------
+    lmbda: float, optional (default=1.0)
+
+
+    gamma: float, optional (default=1.0)
+
+
+    Attributes
+    ----------
+
 
     Reference
     ---------
@@ -28,8 +41,8 @@ class QUIRE(QueryStrategy):
         self.Lindex = [
             idx for idx in range(len(self.dataset)) if idx not in self.Uindex
             ]
-        self.lmbda = kwargs.pop('lmbda', 1)
-        self.gamma = kwargs.pop('gamma', 1)
+        self.lmbda = kwargs.pop('lmbda', 1.)
+        self.gamma = kwargs.pop('gamma', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
         K = rbf_kernel(X=X, Y=X, gamma=self.gamma)
