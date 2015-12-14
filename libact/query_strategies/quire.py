@@ -1,10 +1,9 @@
-""" ===== Reference =====
-[1] S.-J. Huang, R. Jin, and Z.-H. Zhou. Active learning by querying informative and representative examples.
+""" Active Learning by Querying Informative and Representative Examples (QUIRE)
 
 """
 
 import bisect
-import time
+
 import numpy as np
 from sklearn.metrics.pairwise import rbf_kernel
 
@@ -12,11 +11,19 @@ from libact.base.interfaces import QueryStrategy
 
 
 class QUIRE(QueryStrategy):
+    """
+
+    Reference
+    ---------
+
+    .. [1] S.-J. Huang, R. Jin, and Z.-H. Zhou. Active learning by querying
+           informative and representative examples.
+    """
 
     def __init__(self, *args, **kwargs):
         super(QUIRE, self).__init__(*args, **kwargs)
         self.Uindex = [
-            idx for idx, feature in self.dataset.get_unlabeled_entries()
+            idx for idx, _ in self.dataset.get_unlabeled_entries()
             ]
         self.Lindex = [
             idx for idx in range(len(self.dataset)) if idx not in self.Uindex
@@ -36,7 +43,7 @@ class QUIRE(QueryStrategy):
 
     def make_query(self):
         L = self.L
-        K = self.K
+        # K = self.K
         Lindex = self.Lindex
         len_Lindex = len(Lindex)
         Uindex = self.Uindex
@@ -46,42 +53,34 @@ class QUIRE(QueryStrategy):
         y_labeled = np.array([label for label in self.y if label is not None])
         Laa = L[Uindex, :][:, Uindex]
         det_Laa = np.linalg.det(Laa)
-        """efficient computation of inv(Laa)
-        """
-        M3 =  np.dot( self.K[Uindex, :][:, Lindex],  np.linalg.inv( self.lmbda * np.eye(len_Lindex) ) )
-        M2 =  np.dot( M3, self.K[Lindex, :][:, Uindex] )
+        # efficient computation of inv(Laa)
+        M3 = np.dot(self.K[Uindex, :][:, Lindex],
+                    np.linalg.inv(self.lmbda * np.eye(len_Lindex)))
+        M2 = np.dot(M3, self.K[Lindex, :][:, Uindex])
         M1 = self.lmbda * np.eye(len_Uindex) + self.K[Uindex, :][:, Uindex]
         inv_Laa = M1 - M2
-        iList = list( range(len_Uindex) )
+        iList = list(range(len_Uindex))
         for i, each_index in enumerate(Uindex):
-            """go through all unlabeled instances and compute their evaluation
-            values one by one
-            """
+            # go through all unlabeled instances and compute their evaluation
+            # values one by one
             Lss = L[each_index][each_index]
             Lsl = L[each_index][Lindex]
             Uindex_r = Uindex[:]
             Uindex_r.remove(each_index)
             Lsu = L[each_index][Uindex_r]
             Lul = L[Uindex_r, :][:, Lindex]
-            Luu = L[Uindex_r, :][:, Uindex_r]
-            """efficient computation of inv(Luu)
-            """
+            # Luu = L[Uindex_r, :][:, Uindex_r]
+            # efficient computation of inv(Luu)
             iList_r = iList[:]
             iList_r.remove(i)
             a = inv_Laa[i, i]
             b = -inv_Laa[iList_r, i]
             D = inv_Laa[iList_r, :][:, iList_r]
-            inv_Luu = D - 1/a * np.dot( b,  b.T )
+            inv_Luu = D - 1/a * np.dot(b, b.T)
             tmp = np.dot(
                 Lsl - np.dot(np.dot(Lsu, inv_Luu), Lul),
                 y_labeled,
                 )
-            """
-            tmp = np.dot(
-                Lsl - np.dot(np.dot(Lsu, np.linalg.inv(Luu)), Lul),
-                y_labeled,
-                )
-            """
             eva = Lss - det_Laa / Lss + 2 * np.abs(tmp)
 
             if eva < min_eva:
