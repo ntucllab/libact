@@ -1,6 +1,6 @@
 # libact
 
-libact - a pool-based active learning package
+libact: Pool-based active learning in Python
 
 # Dependencies
 
