@@ -1,0 +1,31 @@
+language: python
+python:
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "nightly"
+os:
+  - linux
+  - osx
+sudo: required
+dist: trusty
+matrix:
+  allow_failures:
+    - os: osx           # Python 3 not supported in Travis OSX environment
+    - python: "3.5"     # Error importing C extensions, check pending
+    - python: "nightly" # SciPy bug
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      brew update;
+      brew tap homebrew/science;
+      brew install openblas;
+    else
+      sudo apt-get update -qq;
+      sudo apt-get install -y build-essential gfortran libatlas-base-dev liblapacke-dev;
+    fi
+install:
+  - pip install -r requirements.txt
+  - ./setup.py install
+script:
+  - python -m unittest -v
