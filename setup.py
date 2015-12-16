@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup, Extension
+from setuptools import setup, Extension, find_packages
 import numpy.distutils
 import sys
 
@@ -23,18 +23,7 @@ setup(
     author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
     author_email='lsc36x@gmail.com',
     url='https://github.com/ntucllab/libact',
-    packages=[
-        'libact.base',
-        'libact.models',
-        'libact.labelers',
-        'libact.query_strategies',
-        ],
-    package_dir={
-        'libact.base': 'libact/base',
-        'libact.models': 'libact/models',
-        'libact.labelers': 'libact/labelers',
-        'libact.query_strategies': 'libact/query_strategies',
-        },
+    packages=find_packages(exclude=['tests']),
     ext_modules=[
         Extension(
             "libact.query_strategies._variance_reduction",
