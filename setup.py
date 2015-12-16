@@ -34,4 +34,5 @@ setup(
             include_dirs=include_dirs,
             ),
         ],
+    zip_safe=False,
     )
