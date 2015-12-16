@@ -16,13 +16,13 @@ else:
     include_dirs = numpy.distutils.misc_util.get_numpy_include_dirs()
 
 setup(
-    name='Libact',
-    version='0.1.0',
-    description='Active learning package',
-    long_description='Active learning package',
-    author='LSC',
-    author_email='this@is.email',
-    url='http://www.csie.ntu.edu.tw/~htlin/',
+    name='libact',
+    version='0.1',
+    description='Pool-based active learning in Python',
+    long_description='Pool-based active learning in Python',
+    author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
+    author_email='lsc36x@gmail.com',
+    url='https://github.com/ntucllab/libact',
     packages=[
         'libact.base',
         'libact.models',
