@@ -107,7 +107,7 @@ class Dataset(object):
         label : {int, None}
             Label of the sample to be update.
         """
-        self.data[entry_id] = (entry[0], new_label)
+        self.data[entry_id] = (self.data[entry_id][0], new_label)
         self.modified = True
         for callback in self._update_callback:
             callback(entry_id, new_label)
