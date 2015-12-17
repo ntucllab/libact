@@ -49,7 +49,7 @@ def main():
 
     quota = len(y_train) - 10
 
-    qs = UncertaintySampling(trn_ds, method='lc')
+    qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
     model = LogisticRegression()
     E_in_1, E_out_1 = run(trn_ds, tst_ds, y_train, model, qs, quota)
 
