@@ -18,4 +18,4 @@ class LogisticRegression(ContinuousModel):
         return self.model.score(*(testing_dataset.format_sklearn() + args), **kwargs)
 
     def predict_real(self, feature, *args, **kwargs):
-        return self.model.predict_proba(feature, *args, **kwargs)
+        return self.model.decision_function(feature, *args, **kwargs)
