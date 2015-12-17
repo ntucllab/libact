@@ -2,6 +2,8 @@
 
 libact: Pool-based active learning in Python
 
+[![Build Status](https://travis-ci.org/ntucllab/libact.svg)](https://travis-ci.org/ntucllab/libact)
+
 # Dependencies
 
 Python3 dependencies
