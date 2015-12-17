@@ -12,7 +12,6 @@ dist: trusty
 matrix:
   allow_failures:
     - os: osx           # Python 3 not supported in Travis OSX environment
-    - python: "3.5"     # Error importing C extensions, check pending
     - python: "nightly" # SciPy bug
 
 before_install:
@@ -26,6 +25,6 @@ before_install:
     fi
 install:
   - pip install -r requirements.txt
-  - ./setup.py install
+  - ./setup.py build_ext --inplace
 script:
   - python -m unittest -v
