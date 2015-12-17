@@ -26,4 +26,3 @@ class SVM(Model):
 
     def score(self, testing_dataset, *args, **kwargs):
         return self.model.score(*(testing_dataset.format_sklearn() + args), **kwargs)
-
