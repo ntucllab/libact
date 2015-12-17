@@ -59,7 +59,7 @@ Available examples:
 
 ## HintSVM
 
-For HintSVM, you would have to install package from https://github.com/yangarbiter/hintsvm
+For HintSVM, you would have to install package from https://github.com/ntucllab/hintsvm
 
 Before running, you need to make sure the path to hintsvm's library and
 python code are set. Set them up by setting environment variables:
