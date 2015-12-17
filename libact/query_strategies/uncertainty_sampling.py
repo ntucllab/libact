@@ -2,8 +2,9 @@
 
 
 """
-from libact.base.interfaces import QueryStrategy
 import numpy as np
+
+from libact.base.interfaces import QueryStrategy, ContinuousModel
 
 
 class UncertaintySampling(QueryStrategy):
@@ -41,6 +42,10 @@ class UncertaintySampling(QueryStrategy):
         if self.model is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
+                )
+        if not isinstance(self.model, ContinuousModel):
+            raise TypeError(
+                "model has to be a ContinuousModel"
                 )
         self.model.train(self.dataset)
 
