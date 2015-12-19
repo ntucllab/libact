@@ -14,7 +14,7 @@ class QUIRE(QueryStrategy):
     """Querying Informative and Representative Examples (QUIRE)
 
     Query the most informative and representative examples where the metrics
-    measuing and combining are done using min-max approach.
+    measuring and combining are done using min-max approach.
 
     Parameters
     ----------
@@ -25,7 +25,7 @@ class QUIRE(QueryStrategy):
         A parameter for computing rbf kernel.
 
     K: sklearn.metrics.pairwise.*_kernel, optional (default = 'rbf')
-        Kernel matrix. Currently only supports rbf kernel.
+        Kernel matrix. Currently supports only rbf kernel.
 
     Attributes
     ----------
