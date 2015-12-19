@@ -11,20 +11,24 @@ from libact.base.interfaces import QueryStrategy
 
 
 class QUIRE(QueryStrategy):
-    """Querying Informative and Representative Examples (QUIRE) query strategy
+    """Querying Informative and Representative Examples (QUIRE)
 
+    Query the most informative and representative examples where the metrics
+    measuing and combining are done using min-max approach.
 
     Parameters
     ----------
     lmbda: float, optional (default=1.0)
-
+        A regularization parameter used in the regularization learning framework.
 
     gamma: float, optional (default=1.0)
+        A parameter for computing rbf kernel.
 
+    K: sklearn.metrics.pairwise.*_kernel, optional (default = 'rbf')
+        Kernel matrix. Currently only supports rbf kernel.
 
     Attributes
     ----------
-
 
     Reference
     ---------
@@ -45,7 +49,8 @@ class QUIRE(QueryStrategy):
         self.gamma = kwargs.pop('gamma', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
-        K = rbf_kernel(X=X, Y=X, gamma=self.gamma)
+        K = rbf_kernel(X=X, Y=X, gamma=self.gamma) 
+        #TODO: extend for other kernel functions
         self.K = K
         self.L = np.linalg.inv(K + self.lmbda * np.eye(len(X)))
 
