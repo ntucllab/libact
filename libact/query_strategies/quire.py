@@ -61,45 +61,41 @@ class QUIRE(QueryStrategy):
 
     def make_query(self):
         L = self.L
-        # K = self.K
         Lindex = self.Lindex
-        len_Lindex = len(Lindex)
         Uindex = self.Uindex
-        len_Uindex = len(Uindex)
         query_index = -1
         min_eva = np.inf
         y_labeled = np.array([label for label in self.y if label is not None])
-        Laa = L[Uindex, :][:, Uindex]
-        det_Laa = np.linalg.det(Laa)
+        det_Laa = np.linalg.det(L[np.ix_(Uindex, Uindex)])
         # efficient computation of inv(Laa)
-        M3 = np.dot(self.K[Uindex, :][:, Lindex],
-                    np.linalg.inv(self.lmbda * np.eye(len_Lindex)))
-        M2 = np.dot(M3, self.K[Lindex, :][:, Uindex])
-        M1 = self.lmbda * np.eye(len_Uindex) + self.K[Uindex, :][:, Uindex]
+        M3 = np.dot(self.K[np.ix_(Uindex, Lindex)],
+                    np.linalg.inv(self.lmbda * np.eye(len(Lindex))))
+        M2 = np.dot(M3, self.K[np.ix_(Lindex, Uindex)])
+        M1 = self.lmbda * np.eye(len(Uindex)) + self.K[np.ix_(Uindex, Uindex)]
         inv_Laa = M1 - M2
-        iList = list(range(len_Uindex))
+        iList = list(range(len(Uindex)))
         for i, each_index in enumerate(Uindex):
             # go through all unlabeled instances and compute their evaluation
             # values one by one
-            Lss = L[each_index][each_index]
-            Lsl = L[each_index][Lindex]
             Uindex_r = Uindex[:]
             Uindex_r.remove(each_index)
-            Lsu = L[each_index][Uindex_r]
-            Lul = L[Uindex_r, :][:, Lindex]
-            # Luu = L[Uindex_r, :][:, Uindex_r]
-            # efficient computation of inv(Luu)
             iList_r = iList[:]
             iList_r.remove(i)
-            a = inv_Laa[i, i]
-            b = -inv_Laa[iList_r, i]
-            D = inv_Laa[iList_r, :][:, iList_r]
-            inv_Luu = D - 1/a * np.dot(b, b.T)
+            inv_Luu = inv_Laa[np.ix_(iList_r, iList_r)] - 1/inv_Laa[i, i] * \
+                np.dot(inv_Laa[iList_r, i], inv_Laa[iList_r, i].T)
             tmp = np.dot(
-                Lsl - np.dot(np.dot(Lsu, inv_Luu), Lul),
-                y_labeled,
-                )
-            eva = Lss - det_Laa / Lss + 2 * np.abs(tmp)
+                      L[each_index][Lindex] - \
+                          np.dot(
+                              np.dot(
+                                  L[each_index][Uindex_r], 
+                                  inv_Luu
+                              ),
+                              L[np.ix_(Uindex_r, Lindex)]
+                          ),
+                      y_labeled,
+                  )
+            eva = L[each_index][each_index] - \
+                det_Laa / L[each_index][each_index] + 2 * np.abs(tmp)
 
             if eva < min_eva:
                 query_index = each_index
