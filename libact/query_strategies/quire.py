@@ -1,5 +1,4 @@
-""" ===== Reference =====
-[1] S.-J. Huang, R. Jin, and Z.-H. Zhou. Active learning by querying informative and representative examples.
+""" Active Learning by Querying Informative and Representative Examples (QUIRE)
 
 """
 
@@ -12,20 +11,47 @@ from libact.base.interfaces import QueryStrategy
 
 
 class QUIRE(QueryStrategy):
+    """Querying Informative and Representative Examples (QUIRE)
+
+    Query the most informative and representative examples where the metrics
+    measuring and combining are done using min-max approach.
+
+    Parameters
+    ----------
+    lmbda: float, optional (default=1.0)
+        A regularization parameter used in the regularization learning framework.
+
+    gamma: float, optional (default=1.0)
+        A parameter for computing rbf kernel.
+
+    K: sklearn.metrics.pairwise.*_kernel, optional (default = 'rbf')
+        Kernel matrix. Currently supports only rbf kernel.
+
+    Attributes
+    ----------
+
+    Reference
+    ---------
+
+    .. [1] S.-J. Huang, R. Jin, and Z.-H. Zhou. Active learning by querying
+           informative and representative examples.
+    """
 
     def __init__(self, *args, **kwargs):
         super(QUIRE, self).__init__(*args, **kwargs)
         self.Uindex = [
-            idx for idx, feature in self.dataset.get_unlabeled_entries()
+            idx for idx, _ in self.dataset.get_unlabeled_entries()
             ]
         self.Lindex = [
             idx for idx in range(len(self.dataset)) if idx not in self.Uindex
             ]
-        self.lmbda = kwargs.pop('lmbda', 1)
-        self.gamma = kwargs.pop('gamma', 1)
+        self.lmbda = kwargs.pop('lmbda', 1.)
+        self.gamma = kwargs.pop('gamma', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
-        K = rbf_kernel(X=X, Y=X, gamma=self.gamma)
+        K = rbf_kernel(X=X, Y=X, gamma=self.gamma) 
+        #TODO: extend for other kernel functions
+        self.K = K
         self.L = np.linalg.inv(K + self.lmbda * np.eye(len(X)))
 
     def update(self, entry_id, label):
@@ -40,28 +66,38 @@ class QUIRE(QueryStrategy):
         query_index = -1
         min_eva = np.inf
         y_labeled = np.array([label for label in self.y if label is not None])
-        Laa = (((L[Uindex]).T)[Uindex]).T
-        det_Laa = np.linalg.det(Laa)
-        for each_index in Uindex:
-            """go through all unlabeled instances and compute their evaluation
-            values one by one
-            """
-            Lss = L[each_index][each_index]
-            Lsl = L[each_index][Lindex]
+        det_Laa = np.linalg.det(L[np.ix_(Uindex, Uindex)])
+        # efficient computation of inv(Laa)
+        M3 = np.dot(self.K[np.ix_(Uindex, Lindex)],
+                    np.linalg.inv(self.lmbda * np.eye(len(Lindex))))
+        M2 = np.dot(M3, self.K[np.ix_(Lindex, Uindex)])
+        M1 = self.lmbda * np.eye(len(Uindex)) + self.K[np.ix_(Uindex, Uindex)]
+        inv_Laa = M1 - M2
+        iList = list(range(len(Uindex)))
+        for i, each_index in enumerate(Uindex):
+            # go through all unlabeled instances and compute their evaluation
+            # values one by one
             Uindex_r = Uindex[:]
             Uindex_r.remove(each_index)
-            Lsu = L[each_index][Uindex_r]
-            Lul = (((L[Uindex_r]).T)[Lindex]).T
-            Luu = (((L[Uindex_r]).T)[Uindex_r]).T
-
+            iList_r = iList[:]
+            iList_r.remove(i)
+            inv_Luu = inv_Laa[np.ix_(iList_r, iList_r)] - 1/inv_Laa[i, i] * \
+                np.dot(inv_Laa[iList_r, i], inv_Laa[iList_r, i].T)
             tmp = np.dot(
-                Lsl - np.dot(np.dot(Lsu, np.linalg.inv(Luu)), Lul),
-                y_labeled,
-                )
-            eva = Lss - det_Laa / Lss + 2 * np.abs(tmp)
+                      L[each_index][Lindex] - \
+                          np.dot(
+                              np.dot(
+                                  L[each_index][Uindex_r], 
+                                  inv_Luu
+                              ),
+                              L[np.ix_(Uindex_r, Lindex)]
+                          ),
+                      y_labeled,
+                  )
+            eva = L[each_index][each_index] - \
+                det_Laa / L[each_index][each_index] + 2 * np.abs(tmp)
 
             if eva < min_eva:
                 query_index = each_index
                 min_eva = eva
-
         return query_index
