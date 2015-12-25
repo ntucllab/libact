@@ -5,6 +5,7 @@
 # descriptions.
 
 import copy
+import os
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -33,7 +34,9 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota):
 
 
 def split_train_test():
-    X, y = import_libsvm_sparse('./examples/diabetes.txt').format_sklearn()
+    dataset_filepath = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'diabetes.txt')
+    X, y = import_libsvm_sparse(dataset_filepath).format_sklearn()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
 
@@ -47,7 +50,7 @@ def split_train_test():
 
 
 def main():
-    trn_ds, tst_ds, y_train = split_train_test()
+    trn_ds, tst_ds, y_train, fully_labeled_trn_ds = split_train_test()
     trn_ds2 = copy.deepcopy(trn_ds)
     lbr = IdealLabeler(fully_labeled_trn_ds)
 
