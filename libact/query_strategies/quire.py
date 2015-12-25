@@ -74,30 +74,33 @@ class QUIRE(QueryStrategy):
         M1 = self.lmbda * np.eye(len(Uindex)) + self.K[np.ix_(Uindex, Uindex)]
         inv_Laa = M1 - M2
         iList = list(range(len(Uindex)))
-        for i, each_index in enumerate(Uindex):
-            # go through all unlabeled instances and compute their evaluation
-            # values one by one
-            Uindex_r = Uindex[:]
-            Uindex_r.remove(each_index)
-            iList_r = iList[:]
-            iList_r.remove(i)
-            inv_Luu = inv_Laa[np.ix_(iList_r, iList_r)] - 1/inv_Laa[i, i] * \
-                np.dot(inv_Laa[iList_r, i], inv_Laa[iList_r, i].T)
-            tmp = np.dot(
-                      L[each_index][Lindex] - \
-                          np.dot(
+        if len(iList)>1:
+            for i, each_index in enumerate(Uindex):
+                # go through all unlabeled instances and compute their evaluation
+                # values one by one
+                Uindex_r = Uindex[:]
+                Uindex_r.remove(each_index)
+                iList_r = iList[:]
+                iList_r.remove(i)
+                inv_Luu = inv_Laa[np.ix_(iList_r, iList_r)] - 1/inv_Laa[i, i] * \
+                    np.dot(inv_Laa[iList_r, i], inv_Laa[iList_r, i].T)
+                tmp = np.dot(
+                          L[each_index][Lindex] - \
                               np.dot(
-                                  L[each_index][Uindex_r], 
-                                  inv_Luu
+                                  np.dot(
+                                      L[each_index][Uindex_r], 
+                                      inv_Luu
+                                  ),
+                                  L[np.ix_(Uindex_r, Lindex)]
                               ),
-                              L[np.ix_(Uindex_r, Lindex)]
-                          ),
-                      y_labeled,
-                  )
-            eva = L[each_index][each_index] - \
-                det_Laa / L[each_index][each_index] + 2 * np.abs(tmp)
+                          y_labeled,
+                      )
+                eva = L[each_index][each_index] - \
+                    det_Laa / L[each_index][each_index] + 2 * np.abs(tmp)
 
-            if eva < min_eva:
-                query_index = each_index
-                min_eva = eva
-        return query_index
+                if eva < min_eva:
+                    query_index = each_index
+                    min_eva = eva
+            return query_index
+        else:
+            return Uindex[0]
