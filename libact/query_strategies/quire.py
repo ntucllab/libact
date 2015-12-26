@@ -102,4 +102,4 @@ class QUIRE(QueryStrategy):
             if eva < min_eva:
                 query_index = each_index
                 min_eva = eva
-        return query_index            
+        return query_index
