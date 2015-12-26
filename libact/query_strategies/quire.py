@@ -74,7 +74,7 @@ class QUIRE(QueryStrategy):
         M1 = self.lmbda * np.eye(len(Uindex)) + self.K[np.ix_(Uindex, Uindex)]
         inv_Laa = M1 - M2
         iList = list(range(len(Uindex)))
-        if len(iList)==1:
+        if len(iList) == 1:
             return Uindex[0]
         for i, each_index in enumerate(Uindex):
             # go through all unlabeled instances and compute their evaluation
