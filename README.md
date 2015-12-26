@@ -53,7 +53,9 @@ Available examples:
     qs = UncertaintySampling(trn_ds, method='lc') # query strategy instance
     
     ask_id = qs.make_query() # let the specified query strategy suggest a data to query
-    trn_ds.update(ask_id, y_train[ask_id]) # update the dataset with newly queried data
+    X, y = zip(*trn_ds.data)
+    lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler instance
+    trn_ds.update(ask_id, lb) # update the dataset with newly queried data
     ```
   
   
