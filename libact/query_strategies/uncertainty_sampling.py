@@ -56,43 +56,30 @@ class UncertaintySampling(QueryStrategy):
                 self.method
                 )
 
-    def update(self, entry_id, label):
-        self.model.train(self.dataset)
-
     def make_query(self):
         """
         Choices for method (default 'lc'):
         'lc' (Least Confident), 'sm' (Smallest Margin)
         """
-        unlabeled_entry_ids, X_pool = zip(*self.dataset.get_unlabeled_entries())
+        dataset = self.dataset
+        self.model.train(dataset)
+
+        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
         if self.method == 'lc':  # least confident
-            # time complexity analysis:
-            # self.model.predict_real(X_pool) -> O(NK)
-            # np.max(..., axis=1) -> O(NK)
-            # 1 - np.max(..., axis=1) -> O(NK)
-            # np.argmax(...) -> O(N)
-            # therefore, total time complexity is O(NK) + O(NK) + O(NK) + O(N) = O(NK)
-            ask_id = np.argmax(1 - np.max(self.model.predict_real(X_pool), 1))
+            ask_id = np.argmin(
+                np.max(self.model.predict_real(X_pool), axis=1)
+            )
 
         elif self.method == 'sm':  # smallest margin
-            # time complexity analysis:
-            # O(NK) + O(N)
-            prob = self.model.predict_real(X_pool)
-            min_margin = np.inf
-            for j in range(len(prob)):
-                m1_id = np.argmax(prob[j])
-                m2_id = np.argmax(np.delete(prob[j], m1_id))
-                margin = prob[j][m1_id] - prob[j][m2_id]
-                if margin < min_margin:
-                    min_margin = margin
-                    ask_id = j
+            dvalue = self.model.predict_real(X_pool)
 
-        else:
-            raise ValueError(
-                "Invalid method '%s' (available choices: ('lc', 'sm', 'le')"
-                % self.method
-                )
+            if np.shape(dvalue)[1] > 2:
+                # Find 2 largest decision values
+                dvalue = -(np.partition(-dvalue, 2, axis=1)[:, :2])
+
+            margin = np.abs(dvalue[:, 0] - dvalue[:, 1])
+            ask_id = np.argmin(margin)
 
         return unlabeled_entry_ids[ask_id]
 
