@@ -68,17 +68,17 @@ class UncertaintySampling(QueryStrategy):
 
         if self.method == 'lc':  # least confident
             ask_id = np.argmin(
-                np.max(np.abs(self.model.predict_real(X_pool)), axis=1)
+                np.max(self.model.predict_real(X_pool), axis=1)
             )
 
         elif self.method == 'sm':  # smallest margin
             dvalue = self.model.predict_real(X_pool)
-            if np.shape(dvalue)[1] == 2:
-                ind = [0, 1]
-            else:
+
+            if np.shape(dvalue)[1] > 2:
                 # Find 2 largest decision values
-                ind = np.partition(-np.abs(dvalue), 2, axis=1)[:2]
-            margin = np.abs(np.abs(dvalue[:, ind[0]]) - np.abs(dvalue[:, ind[1]]))
+                dvalue = -(np.partition(-dvalue, 2, axis=1)[:, :2])
+
+            margin = np.abs(dvalue[:, 0] - dvalue[:, 1])
             ask_id = np.argmin(margin)
 
         return unlabeled_entry_ids[ask_id]
