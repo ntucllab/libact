@@ -1,5 +1,8 @@
 """ Active Learning by Querying Informative and Representative Examples (QUIRE)
 
+This module contains a class that implements an active learning
+algorithm (strategy): QUIRE
+
 """
 
 import bisect
