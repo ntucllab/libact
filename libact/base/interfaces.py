@@ -7,7 +7,11 @@ from abc import ABCMeta, abstractmethod
 
 
 class QueryStrategy(metaclass=ABCMeta):
-    #TODO: documentation
+    """Pool-based query strategy
+
+    A QueryStrategy advices on which unlabeled data to be queried next given 
+    a pool of labeled and unlabeled data.
+    """
 
     def __init__(self, dataset, **kwargs):
         self._dataset = dataset
@@ -26,7 +30,10 @@ class QueryStrategy(metaclass=ABCMeta):
 
 
 class Labeler(metaclass=ABCMeta):
-    #TODO: documentation
+    """Label the queries made by QueryStrategies
+    
+    A Labeler assigns labels to the features queried by QueryStrategies.
+    """
 
     @abstractmethod
     def label(self, feature):
@@ -34,7 +41,11 @@ class Labeler(metaclass=ABCMeta):
 
 
 class Model(metaclass=ABCMeta):
-    #TODO: documentation
+    """Classification Model
+
+    A Model is trained on a training dataset and produces a class-predicting
+    function for future features.
+    """
 
     @abstractmethod
     def train(self, dataset, *args, **kwargs):
@@ -50,7 +61,13 @@ class Model(metaclass=ABCMeta):
 
 
 class ContinuousModel(Model):
-    #TODO: documentation
+    """Classification Model with intermediate continuous output
+    
+    A continuous classification model is able to output a real-valued vector
+    for each features provided. The output vector is of shape (n_samples, n_classs)
+    for an input feature matrix X of shape (n_samples, n_features). The larger the 
+    kth-column value is, the more likely a feature x belongs the class k.
+    """
 
     @abstractmethod
     def predict_real(self, feature, *args, **kwargs):
