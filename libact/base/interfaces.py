@@ -26,7 +26,7 @@ class QueryStrategy(metaclass=ABCMeta):
 
         Parameters
         ----------
-        entry_id : float
+        entry_id : int
             The index of the newly labeled sample.
             
         label : float
@@ -64,7 +64,7 @@ class Labeler(metaclass=ABCMeta):
     
         Parameters
         ----------
-        feautre : array, shape (n_features,)
+        feautre : array-like, shape (n_features,)
             The feature vector whose label is to queried.
             
         Returns
@@ -103,12 +103,12 @@ class Model(metaclass=ABCMeta):
         
         Parameters
         ----------
-        feature : array, shape (n_samples, n_features)
+        feature : array-like, shape (n_samples, n_features)
             The unlabeled samples whose labels are to be predicted.
             
         Returns
         -------
-        y_pred : array, shape (n_samples,)
+        y_pred : array-like, shape (n_samples,)
             The class labels for samples in the feature array.
         """
         pass
@@ -148,7 +148,7 @@ class ContinuousModel(Model):
         
         Parameters
         ----------
-        feature : array, shape (n_samples, n_features)
+        feature : array-like, shape (n_samples, n_features)
             The samples whose confidence scores are to be predicted.
 
         Returns
