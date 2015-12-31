@@ -2,11 +2,15 @@
 
 libact: Pool-based active learning in Python
 
+Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin](http://www.csie.ntu.edu.tw/~htlin)
+
 [![Build Status](https://travis-ci.org/ntucllab/libact.svg)](https://travis-ci.org/ntucllab/libact)
 
 # Introduction
 
-`libact` is a package designed to make active learning easier for real-world users. The package not only implements several popular active learning strategies, but also features the [active learning by learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf) meta-strategy that allows the machine to automatically *learn* the best strategy on the fly. The package is designed for easy extension in terms of strategies, models and labelers. In particular, `libact` models can be easily obtained by interfacing with the models in [`scikit-learn`](http://scikit-learn.org/).
+`libact` is a python package designed to make active learning easier for real-world users. The package not only implements several popular active learning strategies, but also features the [active learning by learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf) meta-strategy that allows the machine to automatically *learn* the best strategy on the fly. The package is designed for easy extension in terms of strategies, models and labelers. In particular, `libact` models can be easily obtained by interfacing with the models in [`scikit-learn`](http://scikit-learn.org/).
+
+Comments on the 
 
 # Dependencies
 
@@ -74,3 +78,7 @@ python code are set. Set them up by setting environment variables:
 
     export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
     export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
+
+## Acknowledgments
+
+The authors thank Chih-Wei Chang and other members of the [Computational Learning Lab](https://learner.csie.ntu.edu.tw/) at National Taiwan University for valuable discussions and various contributions to making this package better.
