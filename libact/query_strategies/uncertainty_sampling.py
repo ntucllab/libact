@@ -1,4 +1,4 @@
-"""Uncertainty Sampling
+""" Uncertainty Sampling
 
 This module contains a class that implements two of the most well-known uncertainty sampling
 query strategies, which are least confidence and smallest margin (margin sampling).
