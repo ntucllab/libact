@@ -67,6 +67,7 @@ python code of `hintsvm` are set in the environment variables:
 # Usage
 
 The main usage of `libact` is as follows:
+
     ```python
     qs = UncertaintySampling(trn_ds, method='lc') # query strategy instance
     
