@@ -26,4 +26,6 @@ class IdealLabeler(Labeler):
         self.y = y
 
     def label(self, feature):
-        return self.y[np.where([np.array_equal(x, feature) for x in self.X])[0]]
+        if np.count_nonzero([np.array_equal(x, feature) for x in self.X])==0
+            raise ValueError("No matching sample found in the dataset.")
+        return self.y[np.where([np.array_equal(x, feature) for x in self.X])]
