@@ -140,11 +140,13 @@ class ContinuousModel(Model):
     def predict_real(self, feature, *args, **kwargs):
         """Predict confidence scores for samples. 
         
-        This method returns the confidence score of each class for each sample.
-        The larger this value is, the more confident this model is sure about
-        whether this sample belongs to this class or not.
-        Take Logistic Regression as example, the return value is the is the
-        signed distance of that sample to the hyperplane.
+        Returns the confidence score for each (sample, class) combination.
+        
+        The larger the value for entry (sample=x, class=k) is, the more confident 
+        the model is about the sample x belonging to the class k.
+        
+        Take Logistic Regression as example, the return value is the signed dis-
+        tance of that sample to the hyperplane.
         
         Parameters
         ----------
