@@ -6,7 +6,7 @@ libact: Pool-based active learning in Python
 
 # Introduction
 
-`libact` is a package designed to make active learning easier for real-world users. The package not only implements several popular active learning strategies, but also features the [active learning by learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf) meta-strategy that allows the machine to automatically *learn* the best strategy on the fly. The package is designed for easy extension in terms of strategies, models and labelers. In particular, `libact` models can be easily wrapped from models in [`scikit-learn`](http://scikit-learn.org/).
+`libact` is a package designed to make active learning easier for real-world users. The package not only implements several popular active learning strategies, but also features the [active learning by learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf) meta-strategy that allows the machine to automatically *learn* the best strategy on the fly. The package is designed for easy extension in terms of strategies, models and labelers. In particular, `libact` models can be easily obtained by interfacing with the models in [`scikit-learn`](http://scikit-learn.org/).
 
 # Dependencies
 
