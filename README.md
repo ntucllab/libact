@@ -12,7 +12,7 @@ Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin](http://
 
 Comments on the 
 
-# Dependencies
+# Basic Dependencies
 
 Python3 dependencies
 ```
@@ -32,7 +32,10 @@ brew install openblas
 
 # Installation
 
-To install in your home directory:
+One of the query strategies (`hintsvm`) depends on the HintSVM package that requires special installation. If you are not using the strategy, please simply follow the section on general installation. Otherwise please follow the section on HintSVM.
+
+## General Installation
+After resolving the dependencies, it should be fairly simple to install the package in your home directory:
 
 ```
 python setup.py install --user
@@ -43,6 +46,16 @@ To install for all users on Unix/Linux:
 python setup.py build
 sudo python setup.py install
 ```
+
+## Special Installation for HintSVM
+
+For HintSVM, you would have to install package from https://github.com/ntucllab/hintsvm
+
+Before running, you need to make sure the path to hintsvm's library and
+python code are set. Set them up by setting environment variables:
+
+    export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
+    export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
 
 # Examples
 
@@ -65,20 +78,7 @@ Available examples:
     lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler instance
     trn_ds.update(ask_id, lb) # update the dataset with newly queried data
     ```
-  
-  
 
-
-## HintSVM
-
-For HintSVM, you would have to install package from https://github.com/ntucllab/hintsvm
-
-Before running, you need to make sure the path to hintsvm's library and
-python code are set. Set them up by setting environment variables:
-
-    export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
-    export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
-
-## Acknowledgments
+# Acknowledgments
 
 The authors thank Chih-Wei Chang and other members of the [Computational Learning Lab](https://learner.csie.ntu.edu.tw/) at National Taiwan University for valuable discussions and various contributions to making this package better.
