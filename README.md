@@ -1,4 +1,4 @@
-# libact: Pool-based active learning in Python
+# libact: Pool-based Active Learning in Python
 
 authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin](http://www.csie.ntu.edu.tw/~htlin)
 
@@ -8,7 +8,16 @@ authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin
 
 `libact` is a python package designed to make active learning easier for real-world users. The package not only implements several popular active learning strategies, but also features the [active learning by learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf) meta-strategy that allows the machine to automatically *learn* the best strategy on the fly. The package is designed for easy extension in terms of strategies, models and labelers. In particular, `libact` models can be easily obtained by interfacing with the models in [`scikit-learn`](http://scikit-learn.org/).
 
-Comments on the package is welcomed at (temporarily) `htlin@csie.ntu.edu.tw`.
+Comments on the package is welcomed at (temporarily) `htlin@csie.ntu.edu.tw`. If you find this package useful, please (temporarily) cite
+
+```
+@Misc{libact,
+  author =   {Yu-An Chung and Shao-Chuan Lee and Yao-Yuan Yang and Tung-En Wu and Hsuan-Tien Lin},
+  title =    {Pool-based Active Learning in Python},
+  howpublished = {\url{https://github.com/ntucllab/libact}},
+  year = {2015}
+}
+```
 
 # Basic Dependencies
 
