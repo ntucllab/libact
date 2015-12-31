@@ -11,11 +11,12 @@ class IdealLabeler(Labeler):
 
     Attributes
     ----------
-    features: numpy array
+    features: array-like, shape = (n_samples, n_features)
         an array of features used as the search keys for labels
     
-    label: numpy array
-        an array of noiesless labels corresponding to the features
+    label: array-like, shape = (n_samples)
+        an array of labels corresponding to the features
+        
     """ 
 
     def __init__(self, dataset, **kwargs):
