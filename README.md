@@ -56,27 +56,17 @@ sudo python setup.py install
 
 ## Special Installation for HintSVM
 
-For HintSVM, you would have to install package from https://github.com/ntucllab/hintsvm
+For HintSVM, you would have to install the [hintsvm package](https://github.com/ntucllab/hintsvm) first.
 
-Before running, you need to make sure the path to hintsvm's library and
-python code are set. Set them up by setting environment variables:
+Before running, you need to make sure the path to the library and
+python code of `hintsvm` are set in the environment variables:
 
     export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
     export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
 
-# Examples
+# Usage
 
-Some examples are available under the `examples` directory. Before running, use
-`examples/get_dataset.py` to retrieve the dataset used by the examples.
-
-Available examples:
-
-  - `examples/plot.py`: This example performs basic usage of libact. It splits
-    an supervised learning dataset and remove some label from dataset to simulate
-    an active learning scenario. Each query of an unlabeled dataset is simply putting
-    the label back to dataset.
-
-    The main libact usage part is below:
+The main usage of `libact` is as follows:
     ```python
     qs = UncertaintySampling(trn_ds, method='lc') # query strategy instance
     
@@ -85,6 +75,15 @@ Available examples:
     lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler instance
     trn_ds.update(ask_id, lb) # update the dataset with newly queried data
     ```
+
+Some examples are available under the `examples` directory. Before running, use
+`examples/get_dataset.py` to retrieve the dataset used by the examples.
+
+Available examples:
+
+  - `examples/plot.py`: This example performs basic usage of libact. It splits
+    a fully-labeled dataset and remove some label from dataset to simulate
+    the pool-based active learning scenario. Each query of an unlabeled dataset is then equivalent to revealing one labeled example in the original data set.
 
 # Acknowledgments
 
