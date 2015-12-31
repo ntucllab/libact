@@ -31,11 +31,6 @@ class QueryStrategy(metaclass=ABCMeta):
             
         label : float
             The label of the queried sample.
-        
-        Returns
-        -------
-        self : object
-            Returns self.
         """
         pass
 
@@ -47,7 +42,7 @@ class QueryStrategy(metaclass=ABCMeta):
         
         Returns
         -------
-        ask_id : float
+        ask_id : int
             The index of the next unlabeled sample to be queried and labeled.
         """
         pass
@@ -69,9 +64,9 @@ class Labeler(metaclass=ABCMeta):
             
         Returns
         -------
-        label : float
+        label : int
             The class label of the queried feature.
-        """        
+        """
         pass
 
 
