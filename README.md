@@ -68,14 +68,14 @@ python code of `hintsvm` are set in the environment variables:
 
 The main usage of `libact` is as follows:
 
-    ```python
-    qs = UncertaintySampling(trn_ds, method='lc') # query strategy instance
-    
-    ask_id = qs.make_query() # let the specified query strategy suggest a data to query
-    X, y = zip(*trn_ds.data)
-    lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler instance
-    trn_ds.update(ask_id, lb) # update the dataset with newly queried data
-    ```
+```python
+qs = UncertaintySampling(trn_ds, method='lc') # query strategy instance
+
+ask_id = qs.make_query() # let the specified query strategy suggest a data to query
+X, y = zip(*trn_ds.data)
+lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler instance
+trn_ds.update(ask_id, lb) # update the dataset with newly queried data
+```
 
 Some examples are available under the `examples` directory. Before running, use
 `examples/get_dataset.py` to retrieve the dataset used by the examples.
