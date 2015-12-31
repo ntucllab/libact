@@ -73,7 +73,7 @@ class Labeler(metaclass=ABCMeta):
 class Model(metaclass=ABCMeta):
     """Classification Model
 
-    A Model retruns a class-predicting function for future samples after 
+    A Model returns a class-predicting function for future samples after 
     trained on a training dataset.
     """
     @abstractmethod
