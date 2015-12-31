@@ -2,20 +2,18 @@
 Ideal/Noiseless labeler that returns true label
 
 """
-from libact.base.interfaces import Labeler
 import numpy as np
+
+from libact.base.interfaces import Labeler
 
 class IdealLabeler(Labeler):
     """    
     Provide the errorless/noiseless label to any feature vectors being queried.
 
-    Attributes
+    Parameters
     ----------
-    features: array-like, shape = (n_samples, n_features)
-        an array of features used as the search keys for labels
-    
-    label: array-like, shape = (n_samples)
-        an array of labels corresponding to the features
+    dataset: Dataset object
+        Dataset object with the ground truth in labeled data.
         
     """ 
 
