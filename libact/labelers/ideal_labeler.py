@@ -13,7 +13,7 @@ class IdealLabeler(Labeler):
     Parameters
     ----------
     dataset: Dataset object
-        Dataset object with the ground truth in labeled data.
+        Dataset object with the ground-truth label for each sample.
         
     """ 
 

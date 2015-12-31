@@ -59,7 +59,7 @@ class Labeler(metaclass=ABCMeta):
     
         Parameters
         ----------
-        feautre : array-like, shape (n_features,)
+        feature : array-like, shape (n_features,)
             The feature vector whose label is to queried.
             
         Returns
