@@ -307,7 +307,7 @@ class Exp4P():
 
         Yields
         ------
-        p: array-like, shape = [K]
+        q: array-like, shape = [K]
             The query vector which tells ALBL what kind of distribution if
             should sample from the unlabeled pool.
 
