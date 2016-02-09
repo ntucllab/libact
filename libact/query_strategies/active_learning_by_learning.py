@@ -20,6 +20,9 @@ class ActiveLearningByLearning(QueryStrategy):
 
     Parameters
     ----------
+    T: integer
+        Query budget, the maximal number of queries to be made.
+        
     query_strategies: list of libact.query_strategies.* object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
@@ -31,9 +34,6 @@ class ActiveLearningByLearning(QueryStrategy):
 
     uniform_sampler: {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
-
-    T: integer, optional (default=100)
-        Query budget, the maximal number of queries to be made.
 
     pmin: float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
@@ -81,7 +81,11 @@ class ActiveLearningByLearning(QueryStrategy):
         self.delta = kwargs.pop('delta', 0.1)
 
         # query budget
-        self.T = kwargs.pop('T', 100)
+        self.T = kwargs.pop('T', None)
+        if self.T is None:
+            raise TypeError(
+                "__init__() missing required keyword-only argument: 'T'"
+                )
 
         self.unlabeled_entry_ids, X_pool = \
             zip(*self.dataset.get_unlabeled_entries())
