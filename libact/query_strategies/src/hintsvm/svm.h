@@ -47,6 +47,8 @@ struct svm_parameter
 	double p;	/* for EPSILON_SVR */
 	int shrinking;	/* use the shrinking heuristics */
 	int probability; /* do probability estimates */
+    int max_iter;
+    int random_seed;
 };
 
 //
