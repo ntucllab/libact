@@ -2,3 +2,4 @@ numpy
 scipy
 scikit-learn
 matplotlib
+Cython
