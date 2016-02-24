@@ -86,15 +86,10 @@ class HintSVM(QueryStrategy):
         X = [x.tolist() for x in labeled_pool] +\
             [x.tolist() for x in hint_pool]
 
-        prob = hintsvmutil.svm_problem(weight, y, X)
-        param = hintsvmutil.svm_parameter('-s 5 -t 0 -b 0 -c %f -q' % cl)
-        m = hintsvmutil.svm_train(prob, param)
+        from libact.query_strategies._hintsvm import hintsvm_query
+        p_val = hintsvm_query(np.array(X), np.array(y), np.array(weight), np.array([x.tolist() for x in unlabeled_pool]))
 
-        # TODO need only p_val
-        y = np.zeros((len(unlabeled_pool), ))
-        p_label, p_acc, p_val = hintsvmutil.svm_predict(
-            y, [x.tolist() for x in unlabeled_pool], m)
-
-        p_val = [abs(val[0]) for val in p_val]
-        idx = np.argmax(p_val)
+        print(np.array(p_val)[:5])
+        p_val = [abs(float(val[0])) for val in p_val]
+        idx = int(np.argmax(p_val))
         return unlabeled_entry_ids[idx]
