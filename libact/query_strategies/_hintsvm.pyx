@@ -17,23 +17,27 @@ def hintsvm_query(
     np.ndarray[np.float64_t, ndim=2, mode='c'] X,
     np.ndarray[np.float64_t, ndim=1, mode='c'] y,
     np.ndarray[np.float64_t, ndim=1, mode='c'] w,
-    np.ndarray[np.float64_t, ndim=2, mode='c'] X_pool):
+    np.ndarray[np.float64_t, ndim=2, mode='c'] X_pool,
+    svm_params):
 
     # libsvm parameters
     cdef int svm_type=5
-    cdef str kernel='linear'
-    cdef int degree=3
-    cdef double gamma=0.1
-    cdef double coef0=0.
-    cdef double tol=1e-3
-    cdef double C=0.1
-    cdef double nu=0.5
-    cdef double epsilon=0.1
-    cdef np.ndarray[np.float64_t, ndim=1, mode='c'] class_weight=np.empty(0),
     cdef np.ndarray[np.float64_t, ndim=1, mode='c'] sample_weight=w,
-    cdef int shrinking=1
+
+    cdef str kernel=svm_params.pop('kernel', 'linear')
+    cdef int degree=svm_params.pop('degree', 3)
+    cdef double gamma=svm_params.pop('gamma', 0.1)
+    cdef double coef0=svm_params.pop('coef0', 0.)
+    cdef double tol=svm_params.pop('tol', 1e-3)
+    cdef int shrinking=svm_params.pop('shrinking', 1)
+    cdef double cache_size=svm_params.pop('cache_size', 100.)
+    cdef double C=svm_params.pop('C', 0.1) # cl --> for hintsvm
+
+    # not used for now
+    cdef np.ndarray[np.float64_t, ndim=1, mode='c'] class_weight=np.empty(0),
+    cdef double epsilon=0.1
+    cdef double nu=0.5
     cdef int probability=0
-    cdef double cache_size=100.
     cdef int max_iter=-1
     cdef int random_seed=0
 
