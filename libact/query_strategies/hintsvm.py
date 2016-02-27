@@ -36,7 +36,6 @@ class HintSVM(QueryStrategy):
 
     svm_params
     ----------
-
     kernel : {'linear', 'poly', 'rbf', 'sigmoid'}, optional (default='linear')
 		linear: u'*v
 		poly: (gamma*u'*v + coef0)^degree

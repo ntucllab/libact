@@ -265,7 +265,7 @@ void copy_intercept(char *data, struct svm_model *model, npy_intp *dims)
 //    }
 //}
 
-void copy_support (char *data, struct svm_model *model)
+void copy_support(char *data, struct svm_model *model)
 {
     memcpy (data, model->sv_indices, (model->l) * sizeof(int));
 }
@@ -290,33 +290,6 @@ void copy_probB(char *data, struct svm_model *model, npy_intp * dims)
     memcpy(data, model->probB, dims[0] * sizeof(double));
 }
 
-/*
- * Predict using model.
- *
- *  It will return -1 if we run out of memory.
- */
-int copy_predict(char *predict, struct svm_model *model, npy_intp *predict_dims,
-                 char *dec_values)
-{
-    double *t = (double *) dec_values;
-    struct svm_node **predict_nodes;
-    int i;
-
-    predict_nodes = dense_to_libsvm((double *) predict, predict_dims);
-
-    if (predict_nodes == NULL)
-        return -1;
-    for(i=0; i<predict_dims[0]; ++i) {
-        *t = svm_predict(model, predict_nodes[i]);
-        ++t;
-    }
-
-    for (i=0; i<predict_dims[0]; ++i)
-        free(predict_nodes[i]);
-    free(predict_nodes);
-    return 0;
-}
-
 int copy_predict_values(char *predict, struct svm_model *model,
                         npy_intp *predict_dims, char *dec_values, int nr_class)
 {
@@ -335,25 +308,6 @@ int copy_predict_values(char *predict, struct svm_model *model,
     free(predict_nodes);
     return 0;
 }
-
-//int copy_predict_proba(char *predict, struct svm_model *model, npy_intp *predict_dims,
-//                 char *dec_values)
-//{
-//    npy_intp i, n, m;
-//    struct svm_node *predict_nodes;
-//    n = predict_dims[0];
-//    m = (npy_intp) model->nr_class;
-//    predict_nodes = dense_to_libsvm((double *) predict, predict_dims);
-//    if (predict_nodes == NULL)
-//        return -1;
-//    for(i=0; i<n; ++i) {
-//        svm_predict_probability(model, predict_nodes[i],
-//                                ((double *) dec_values) + i*m);
-//    }
-//    free(predict_nodes);
-//    return 0;
-//}
-
 
 /*
  * Some free routines. Some of them are nontrivial since a lot of
@@ -387,7 +341,6 @@ int free_param(struct svm_parameter *param)
     free(param);
     return 0;
 }
-
 
 /* borrowed from original libsvm code */
 static void print_null(const char *s) {}
