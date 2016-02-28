@@ -1557,18 +1557,6 @@ int svm_get_nr_sv(const svm_model *model)
 	return model->l;
 }
 
-double svm_get_svr_probability(const svm_model *model)
-{
-	if ((model->param.svm_type == EPSILON_SVR || model->param.svm_type == NU_SVR) &&
-	    model->probA!=NULL)
-		return model->probA[0];
-	else
-	{
-		fprintf(stderr,"Model doesn't contain information for SVR probability inference\n");
-		return 0;
-	}
-}
-
 double svm_predict_values(const svm_model *model, const svm_node *x, double* dec_values)
 {
 	int i;
