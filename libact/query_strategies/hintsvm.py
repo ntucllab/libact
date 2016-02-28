@@ -11,6 +11,7 @@ https://github.com/yangarbiter/hintsvm
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy
+from libact.query_strategies._hintsvm import hintsvm_query
 
 
 class HintSVM(QueryStrategy):
@@ -59,6 +60,9 @@ class HintSVM(QueryStrategy):
 
     cache_size : float, optional (default=100.)
         Set cache memory size in MB.
+
+    verbose : int, optional (default=0)
+        Set verbosity level for hintsvm solver.
 
     Attributes
     ----------
@@ -121,12 +125,10 @@ class HintSVM(QueryStrategy):
         X = [x.tolist() for x in labeled_pool] +\
             [x.tolist() for x in hint_pool]
 
-        from libact.query_strategies._hintsvm import hintsvm_query
         p_val = hintsvm_query(
             np.array(X), np.array(y), np.array(weight),
             np.array([x.tolist() for x in unlabeled_pool]), self.svm_params)
 
-        print(np.array(p_val)[:5])
         p_val = [abs(float(val[0])) for val in p_val]
         idx = int(np.argmax(p_val))
         return unlabeled_entry_ids[idx]

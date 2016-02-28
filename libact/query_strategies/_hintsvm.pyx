@@ -32,6 +32,7 @@ def hintsvm_query(
     cdef int shrinking=svm_params.pop('shrinking', 1)
     cdef double cache_size=svm_params.pop('cache_size', 100.)
     cdef double C=svm_params.pop('C', 0.1) # cl --> for hintsvm
+    cdef int verbose=svm_params.pop('verbose', 0)
 
     # not used for now
     cdef np.ndarray[np.float64_t, ndim=1, mode='c'] class_weight=np.empty(0),
@@ -61,6 +62,7 @@ def hintsvm_query(
         &param, svm_type, kernel_index, degree, gamma, coef0, nu, cache_size,
         C, tol, epsilon, shrinking, probability, <int> class_weight.shape[0],
         class_weight_label.data, class_weight.data, max_iter, random_seed)
+    set_verbosity(verbose)
 
     error_msg = svm_check_parameter(&problem, &param)
     if error_msg:
