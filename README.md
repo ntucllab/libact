@@ -28,7 +28,7 @@ pip3 install -r requirements.txt
 
 Debian (>= 7) / Ubuntu (>= 14.04)
 ```
-sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev
+sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
 ```
 
 MacOS
