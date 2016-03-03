@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <numpy/arrayobject.h>
 #include "svm.h"
 
