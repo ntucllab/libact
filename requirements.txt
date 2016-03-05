@@ -1,2 +1,4 @@
-numpydoc
-sphinx_rtd_theme
+numpy
+scipy
+scikit-learn
+matplotlib
