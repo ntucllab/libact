@@ -26,8 +26,10 @@ class Mock(MagicMock):
 
 MOCK_MODULES = ['scipy', 'matplotlib', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
-                'sklearn.metrics.pairwise', 'hintsvmutil', 'hintsvm'
-                'libact.query_strategies.estVar']
+                'sklearn.metrics.pairwise',
+                # c extensions
+                'libact.query_strategies._hintsvm',
+                'libact.query_strategies._variance_reduction']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
