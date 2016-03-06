@@ -53,6 +53,9 @@ setup(
     author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
     author_email='lsc36x@gmail.com',
     url='https://github.com/ntucllab/libact',
+    classifiers=[
+        "Topic :: Scientific/Engineering"
+    ],
     cmdclass = {'build_ext': build_ext},
 
     packages=[
