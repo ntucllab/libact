@@ -1,20 +1,37 @@
 #!/usr/bin/env python
 
 from distutils.core import setup, Extension
-import numpy.distutils
+import os
 import sys
 
-if sys.platform == 'darwin':
-    print("Platform Detection: Mac OS X. Link to openblas...")
-    extra_link_args = ['-L/usr/local/opt/openblas/lib -lopenblas']
-    include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
-                    ['/usr/local/opt/openblas/include'])
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# read the docs could not compile numpy and c extensions
+if on_rtd:
+    extensions = []
 else:
-    # assume linux otherwise, unless we support Windows in the future...
-    print("Platform Detection: Linux. Link to liblapacke...")
-    extra_link_args = ['-llapacke -llapack -lblas']
-    include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
-                    ['/usr/include/lapacke'])
+    import numpy.distutils
+    if sys.platform == 'darwin':
+        print("Platform Detection: Mac OS X. Link to openblas...")
+        extra_link_args = ['-L/usr/local/opt/openblas/lib -lopenblas']
+        include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
+                        ['/usr/local/opt/openblas/include'])
+    else:
+        # assume linux otherwise, unless we support Windows in the future...
+        print("Platform Detection: Linux. Link to liblapacke...")
+        extra_link_args = ['-llapacke -llapack -lblas']
+        include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
+                        ['/usr/include/lapacke'])
+
+    extensions = [
+        Extension(
+            "libact.query_strategies._variance_reduction",
+            ["libact/query_strategies/variance_reduction.c"],
+            extra_link_args=extra_link_args,
+            extra_compile_args=['-std=c11'],
+            include_dirs=include_dirs,
+            ),
+        ]
+
 
 setup(
     name='libact',
@@ -36,13 +53,5 @@ setup(
         'libact.labelers': 'libact/labelers',
         'libact.query_strategies': 'libact/query_strategies',
         },
-    ext_modules=[
-        Extension(
-            "libact.query_strategies._variance_reduction",
-            ["libact/query_strategies/variance_reduction.c"],
-            extra_link_args=extra_link_args,
-            extra_compile_args=['-std=c11'],
-            include_dirs=include_dirs,
-            ),
-        ],
+    ext_modules=extensions,
     )
