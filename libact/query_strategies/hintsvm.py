@@ -8,10 +8,10 @@ To use this module, it is required to install the following package:
 https://github.com/yangarbiter/hintsvm
 """
 
-import hintsvmutil  # from hinsvm package
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy
+from libact.query_strategies._hintsvm import hintsvm_query
 
 
 class HintSVM(QueryStrategy):
@@ -23,14 +23,46 @@ class HintSVM(QueryStrategy):
 
     Parameters
     ----------
-    Cl : float, >0
+    Cl : float, >0, optional (default=0.1)
         The weight of the classification error on labeled pool.
 
-    Ch : float, >0
+    Ch : float, >0, optional (default=0.1)
         The weight of the hint error on hint pool.
 
-    p : float, >0 and <=1
+    p : float, >0 and <=1, optional (default=.5)
         The probability to select an instance from unlabeld pool to hint pool.
+
+    svm_params : dict, optional (default={})
+        Parameters for hintsvm solver.
+
+    svm_params
+    ----------
+    kernel : {'linear', 'poly', 'rbf', 'sigmoid'}, optional (default='linear')
+		linear: u'*v
+		poly: (gamma*u'*v + coef0)^degree
+		rbf: exp(-gamma*|u-v|^2)
+		sigmoid: tanh(gamma*u'*v + coef0)
+
+    degree : int, optional (default=3)
+        Parameter for kernel function.
+
+    gamma : float, optional (default=0.1)
+        Parameter for kernel function.
+
+    coef0 : float, optional (default=0.)
+        Parameter for kernel function.
+
+    tol : float, optional (default=1e-3)
+        Tolerance of termination criterion.
+
+    shrinking : {0, 1}, optional (default=1)
+        Whether to use the shrinking heuristics.
+
+    cache_size : float, optional (default=100.)
+        Set cache memory size in MB.
+
+    verbose : int, optional (default=0)
+        Set verbosity level for hintsvm solver.
 
     Attributes
     ----------
@@ -47,14 +79,17 @@ class HintSVM(QueryStrategy):
 
     def __init__(self, *args, **kwargs):
         super(HintSVM, self).__init__(*args, **kwargs)
+
         # Weight on labeled data's classification error
         self.cl = kwargs.pop('Cl', 0.1)
         if self.cl <= 0:
             raise ValueError('Parameter Cl should be greater than 0.')
+
         # Weight on hinted data's classification error
         self.ch = kwargs.pop('Ch', 0.1)
         if self.ch <= 0:
             raise ValueError('Parameter Cl should be greater than 0.')
+
         # Prabability of sampling a data from unlabeled pool to hinted pool
         self.p = kwargs.pop('p', 0.5)
         if self.p > 1.0 or self.p < 0.0:
@@ -62,6 +97,10 @@ class HintSVM(QueryStrategy):
                 'Parameter p should be greater than or equal to 0 and less '
                 'than or equal to 1.'
                 )
+
+        # svm solver parameters
+        self.svm_params = kwargs.pop('svm_params', {})
+        self.svm_params['C'] = self.cl
 
     def update(self, entry_id, label):
         pass
@@ -86,15 +125,10 @@ class HintSVM(QueryStrategy):
         X = [x.tolist() for x in labeled_pool] +\
             [x.tolist() for x in hint_pool]
 
-        prob = hintsvmutil.svm_problem(weight, y, X)
-        param = hintsvmutil.svm_parameter('-s 5 -t 0 -b 0 -c %f -q' % cl)
-        m = hintsvmutil.svm_train(prob, param)
+        p_val = hintsvm_query(
+            np.array(X), np.array(y), np.array(weight),
+            np.array([x.tolist() for x in unlabeled_pool]), self.svm_params)
 
-        # TODO need only p_val
-        y = np.zeros((len(unlabeled_pool), ))
-        p_label, p_acc, p_val = hintsvmutil.svm_predict(
-            y, [x.tolist() for x in unlabeled_pool], m)
-
-        p_val = [abs(val[0]) for val in p_val]
-        idx = np.argmax(p_val)
+        p_val = [abs(float(val[0])) for val in p_val]
+        idx = int(np.argmax(p_val))
         return unlabeled_entry_ids[idx]

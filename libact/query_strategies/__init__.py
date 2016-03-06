@@ -7,10 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .active_learning_by_learning import ActiveLearningByLearning
-try:
-    from .hintsvm import HintSVM
-except ImportError:
-    logger.warn('HintSVM library not found, not importing.')
+from .hintsvm import HintSVM
 from .uncertainty_sampling import UncertaintySampling
 from .query_by_committee import QueryByCommittee
 from .quire import QUIRE

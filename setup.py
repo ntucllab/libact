@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 from distutils.core import setup, Extension
+from Cython.Build import cythonize
+from Cython.Distutils import build_ext
+import numpy
+import numpy.distutils
 import os
 import sys
 
@@ -22,7 +26,7 @@ else:
         include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
                         ['/usr/include/lapacke'])
 
-    extensions = [
+    extensions = cythonize([
         Extension(
             "libact.query_strategies._variance_reduction",
             ["libact/query_strategies/variance_reduction.c"],
@@ -30,8 +34,16 @@ else:
             extra_compile_args=['-std=c11'],
             include_dirs=include_dirs,
             ),
-        ]
-
+        Extension(
+            "libact.query_strategies._hintsvm",
+            sources=["libact/query_strategies/_hintsvm.pyx",
+                     "libact/query_strategies/src/hintsvm/libsvm_helper.c",
+                     "libact/query_strategies/src/hintsvm/svm.cpp"],
+            include_dirs=[numpy.get_include(),
+                          "libact/query_strategies/src/hintsvm/"],
+            extra_compile_args=['-lstdc++'],
+            ),
+        ])
 
 setup(
     name='libact',
@@ -41,6 +53,8 @@ setup(
     author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
     author_email='lsc36x@gmail.com',
     url='https://github.com/ntucllab/libact',
+    cmdclass = {'build_ext': build_ext},
+
     packages=[
         'libact.base',
         'libact.models',
