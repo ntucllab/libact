@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <Python.h>
 #include <numpy/arrayobject.h>
 #include "svm.h"
 
