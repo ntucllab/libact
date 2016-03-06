@@ -61,6 +61,12 @@ if __name__ == '__main__':
     n_labeled = 10      # number of samples that are initially labeled
 
     # Load the dataset
+    # trn_ds is the train set containing both labeled and unlabeled parts.
+    # For each round, the query strategy picks a sample in the unlabeled part and asks for
+    # its label. Then, the sample is removed from the unlabeled part and added to the labeled
+    # part along with its label.
+    # tst_ds is the test set of fixed size that is used to evaluate the quality of the query
+    # strategy.
     trn_ds, tst_ds, y_train, fully_labeled_trn_ds = split_train_test(dataset_filepath, test_size, n_labeled)
     trn_ds2 = copy.deepcopy(trn_ds)
     lbr = IdealLabeler(fully_labeled_trn_ds)
@@ -83,6 +89,8 @@ if __name__ == '__main__':
     E_in_2, E_out_2 = run(trn_ds2, tst_ds, lbr, model, qs2, quota)
 
     # Plot and compare the learning curve of UncertaintySampling to RandomSampling
+    # The x-axis is the number of queries, and the y-axis is the corresponding
+    # error rate.
     query_num = np.arange(1, quota + 1)
     plt.plot(query_num, E_in_1, 'b', label='qs Ein')
     plt.plot(query_num, E_in_2, 'r', label='random Ein')
