@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 from distutils.core import setup, Extension
-from Cython.Build import cythonize
-from Cython.Distutils import build_ext
-import numpy
-import numpy.distutils
 import os
 import sys
 
@@ -13,6 +9,9 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
     extensions = []
 else:
+    from Cython.Build import cythonize
+    from Cython.Distutils import build_ext
+    import numpy
     import numpy.distutils
     if sys.platform == 'darwin':
         print("Platform Detection: Mac OS X. Link to openblas...")

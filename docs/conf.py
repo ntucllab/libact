@@ -26,7 +26,8 @@ class Mock(MagicMock):
 
 MOCK_MODULES = ['scipy', 'matplotlib', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
-                'sklearn.metrics.pairwise', 'hintsvmutil', 'hintsvm'
+                'sklearn.metrics.pairwise', 'hintsvmutil', 'hintsvm',
+                'libact.query_strategies._hintsvm.hintsvm_query',
                 'libact.query_strategies.estVar']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
