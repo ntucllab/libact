@@ -8,6 +8,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # read the docs could not compile numpy and c extensions
 if on_rtd:
     extensions = []
+    cmdclasses = {}
 else:
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
@@ -43,6 +44,8 @@ else:
             extra_compile_args=['-lstdc++'],
             ),
         ])
+    cmdclasses = {'build_ext': build_ext}
+
 
 setup(
     name='libact',
@@ -52,7 +55,7 @@ setup(
     author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
     author_email='lsc36x@gmail.com',
     url='https://github.com/ntucllab/libact',
-    cmdclass = {'build_ext': build_ext},
+    cmdclass = cmdclasses,
 
     packages=[
         'libact.base',
