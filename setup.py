@@ -56,6 +56,9 @@ setup(
     author_email='lsc36x@gmail.com',
     url='https://github.com/ntucllab/libact',
     cmdclass = cmdclasses,
+    classifiers=[
+        "Topic :: Scientific/Engineering"
+    ],
 
     packages=[
         'libact.base',
