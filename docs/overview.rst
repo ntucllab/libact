@@ -45,5 +45,11 @@ learning algorithm wants to query.
 Model
 -----
 :py:class:`libact.base.interfaces.Model` objects are the implementation of
-classification algorithms. 
+classification algorithms. It has method train and predict just like the
+classification algorithms in `scikit-learn <http://scikit-learn.org/>`_ has fit
+and predict.
+
+:py:class:`libact.base.interfaces.ContinuousModel` are the classification
+algorithms that supports continuous predictions, which has the predict_real
+method.
 
