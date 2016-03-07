@@ -4,6 +4,7 @@ authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin
 
 [![Build Status](https://travis-ci.org/ntucllab/libact.svg)](https://travis-ci.org/ntucllab/libact)
 [![Documentation Status](https://readthedocs.org/projects/libact/badge/?version=latest)](http://libact.readthedocs.org/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/libact.svg)](https://badge.fury.io/py/libact)
 
 # Introduction
 
