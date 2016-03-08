@@ -47,9 +47,29 @@ Model
 :py:class:`libact.base.interfaces.Model` objects are the implementation of
 classification algorithms. It has method train and predict just like the
 classification algorithms in `scikit-learn <http://scikit-learn.org/>`_ has fit
-and predict.
+and predict. The only difference is that the train method takes in an Dataset
+instance, which will train the model with only the labeled samples.
 
 :py:class:`libact.base.interfaces.ContinuousModel` are the classification
 algorithms that supports continuous predictions, which has the predict_real
 method.
+
+Example Usage
+-------------
+Here is an example usage of `libact`:
+
+.. code-block:: python
+   :linenos:
+
+   ds = Dataset(X, y) # declare Dataset instance, X is the feature, y is the label (None if unlabeled)
+   qs = QueryStrategy(trn_ds, method='lc') # declare a QueryStrategy instance
+   lbr = Labeler() # declare Labeler instance
+   model = Model() # declare model instance
+
+   for i in range(quota): # loop through the number of chances to ask oracle for label
+       ask_id = qs.make_query() # let the specified QueryStrategy suggest a data to query
+       X, _ = zip(*ds.data) # retrieve feature from Dataset
+       lb = lbr.label(X[ask_id]) # query the label of unlabeled sample from labeler instance
+       ds.update(ask_id, lb) # update the dataset with newly queried sample
+       model.train(ds) # train model with newly updated Dataset
 
