@@ -48,8 +48,7 @@ def split_train_test(dataset_filepath, test_size, n_labeled):
 
     return trn_ds, tst_ds, y_train, fully_labeled_trn_ds
 
-
-if __name__ == '__main__':
+def main():
     #####################################
     ########## Start From Here ##########
     #####################################
@@ -101,3 +100,7 @@ if __name__ == '__main__':
     plt.title('Experiment Result')
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
     plt.show()
+
+
+if __name__ == '__main__':
+    main()
