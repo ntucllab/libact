@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-#
-# The script helps guide the users to quickly understand how to use
-# libact by going through a simple active learning task with clear
-# descriptions.
+"""
+This script simulates real world use of active learning algorithms. Which in the
+start, there are only a small fraction of samples are labeled. During active
+learing process active learning algorithm (QueryStrategy) will choose a sample
+from unlabeled samples to ask the oracle to give this sample a label (Labeler).
+
+In this example, ther dataset are from the digits dataset from sklearn. User
+would have to label each sample choosed by QueryStrategy by hand. Human would
+label each selected sample through InteractiveLabeler. Then we will compare the
+performance of using UncertaintySampling and RandomSampling under
+LogisticRegression.
+"""
 
 import copy
-import os
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,8 +20,8 @@ from sklearn.cross_validation import train_test_split
 
 # libact classes
 from libact.base.dataset import Dataset
-from libact.models import *
-from libact.query_strategies import *
+from libact.models import LogisticRegression
+from libact.query_strategies import UncertaintySampling, RandomSampling
 from libact.labelers import InteractiveLabeler
 
 
@@ -32,15 +39,15 @@ def split_train_test():
     while len(np.unique(y_train[:n_labeled])) < n_classes:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
 
-    trn_ds = Dataset(X_train, np.concatenate([y_train[:n_labeled], [None] * (len(y_train) - n_labeled)]))
+    trn_ds = Dataset(X_train, np.concatenate(
+        [y_train[:n_labeled], [None] * (len(y_train) - n_labeled)]))
     tst_ds = Dataset(X_test, y_test)
-    fully_labeled_trn_ds = Dataset(X_train, y_train)
 
-    return trn_ds, tst_ds, y_train, fully_labeled_trn_ds, digits
+    return trn_ds, tst_ds, digits
 
 
 def main():
-    trn_ds, tst_ds, y_train, fully_labeled_trn_ds, ds = split_train_test()
+    trn_ds, tst_ds, ds = split_train_test()
     trn_ds2 = copy.deepcopy(trn_ds)
 
     qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
@@ -50,7 +57,7 @@ def main():
 
     E_out1, E_out2 = [], []
 
-    quota = 30 # ask human to label 30 samples
+    quota = 30  # ask human to label 30 samples
 
     fig = plt.figure()
     ax = fig.add_subplot(2, 1, 1)
@@ -65,15 +72,17 @@ def main():
     query_num = np.arange(0, 1)
     p1, = ax.plot(query_num, E_out1, 'g', label='qs Eout')
     p2, = ax.plot(query_num, E_out2, 'k', label='random Eout')
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True,
+               shadow=True, ncol=5)
     plt.show(block=False)
 
     img_ax = fig.add_subplot(2, 1, 2)
     box = img_ax.get_position()
-    img_ax.set_position([box.x0, box.y0 - box.height * 0.1, box.width, box.height * 0.9])
+    img_ax.set_position([box.x0, box.y0 - box.height * 0.1, box.width,
+                         box.height * 0.9])
     lbr = InteractiveLabeler(labels=np.unique(ds.target))
 
-    for i in range(quota) :
+    for i in range(quota):
         ask_id = qs.make_query()
         print("asking sample from Uncertainty Sampling")
         lb = lbr.label(trn_ds.data[ask_id][0].reshape(8, 8))
@@ -96,8 +105,6 @@ def main():
         p2.set_xdata(query_num)
         p2.set_ydata(E_out2)
 
-        print(np.shape(E_out1))
-        #plt.show(block=False)
         plt.draw_all()
 
 if __name__ == '__main__':

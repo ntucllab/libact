@@ -1,14 +1,18 @@
-"""
+"""Interactive Labeler
 
+This module includes an InteractiveLabeler.
 """
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
-import numpy as np
 
 from libact.base.interfaces import Labeler
 
+
 class InteractiveLabeler(Labeler):
-    """
+    """Interactive Labeler
+
+    InteractiveLabeler is a Labeler object that shows the feature through image
+    using matplotlib and lets human label each feature through command line
+    interface.
 
     Parameters
     ----------
@@ -34,4 +38,3 @@ class InteractiveLabeler(Labeler):
             raise ValueError('Invalid label.')
 
         return int(lbl)
-
