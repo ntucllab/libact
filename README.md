@@ -87,6 +87,8 @@ Available examples:
   - `examples/plot.py`: This example performs basic usage of libact. It splits
     a fully-labeled dataset and remove some label from dataset to simulate
     the pool-based active learning scenario. Each query of an unlabeled dataset is then equivalent to revealing one labeled example in the original data set.
+  - `examples/label_digits.py`: This example shows how to use libact in the case
+    that you want a human to label the selected sample for your algorithm.
 
 # Acknowledgments
 
