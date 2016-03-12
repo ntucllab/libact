@@ -11,7 +11,7 @@ choose the one you want in variable :python_code:`dataset_filepath`.
 
 .. literalinclude:: ../../examples/plot.py
    :language: python
-   :lines: 38
+   :lines: 56
    :linenos:
 
 First, the data are splitted into training and testing set:
