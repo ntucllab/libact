@@ -7,8 +7,8 @@ from libact.models import *
 from libact.query_strategies import *
 from libact.labelers import IdealLabeler
 
-X = [[-2, -1], [-1, -1], [-1, -2], [1, 1], [1, 2], [2, 1], [-2, -2], [0, -2], \
-        [0, 1], [1.5, 1.5]]
+X = [[-2, -1], [-1, -1], [-1, -2], [1, 1], [1, 2], [2, 1], [0, 1], [0, -2], \
+    [1.5, 1.5], [-2, -2]]
 Y = [-1, -1, -1, 1, 1, 1, -1, -1, 1, 1]
 fully_labeled_trn_ds = Dataset(X, Y)
 lbr = IdealLabeler(fully_labeled_trn_ds)
@@ -34,12 +34,19 @@ def test_uncertainty_lc():
     trn_ds = init_toyexample()
     qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
     model = LogisticRegression()
-    qseq = run(trn_ds, lbr, model, qs, quota)
-    assert_array_equal(qseq, np.array(Y[6:]))
+    qseq = run_qs(trn_ds, lbr, model, qs, quota)
+    assert_array_equal(qseq, np.array([6,7,8,9]))
     
 def test_uncertainty_sm():
     trn_ds = init_toyexample()
     qs = UncertaintySampling(trn_ds, method='sm', model=LogisticRegression())
     model = LogisticRegression()
-    qseq = run(trn_ds, lbr, model, qs, quota)
-    assert_array_equal(qseq, np.array(Y[6:]))
+    qseq = run_qs(trn_ds, lbr, model, qs, quota)
+    assert_array_equal(qseq, np.array([6,7,8,9]))
+
+def test_quire():
+    trn_ds = init_toyexample()
+    qs = QUIRE(trn_ds)
+    model = LogisticRegression()
+    qseq = run_qs(trn_ds, lbr, model, qs, quota)
+    assert_array_equal(qseq, np.array([6,7,9,8]))
