@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-#
-# The script helps guide the users to quickly understand how to use
-# libact by going through a simple active learning task with clear
-# descriptions.
+"""
+The script helps guide the users to quickly understand how to use
+libact by going through a simple active learning task with clear
+descriptions.
+"""
 
 import copy
 import os
@@ -21,14 +22,10 @@ from libact.labelers import IdealLabeler
 def run(trn_ds, tst_ds, lbr, model, qs, quota):
     E_in, E_out = [], []
 
-    for i in range(quota) :
-        # For each round, qs will select one unlabeded sample x_{i}
-        # from trn_ds and ask the IdealLabeler for its label y_{i}.
-        # Then, (x_{i}, y_{i}) is added into the labeled part
-        # (controled by trn_ds.update()), and the based learner is
-        # re-trained.
+    for _ in range(quota):
+        # Standard usage of libact objects
         ask_id = qs.make_query()
-        X, y = zip(*trn_ds.data)
+        X, _ = zip(*trn_ds.data)
         lb = lbr.label(X[ask_id])
         trn_ds.update(ask_id, lb)
 
@@ -38,47 +35,39 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota):
 
     return E_in, E_out
 
+
 def split_train_test(dataset_filepath, test_size, n_labeled):
     X, y = import_libsvm_sparse(dataset_filepath).format_sklearn()
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-    trn_ds = Dataset(X_train, np.concatenate([y_train[:n_labeled], [None] * (len(y_train) - n_labeled)]))
+    X_train, X_test, y_train, y_test = \
+        train_test_split(X, y, test_size=test_size)
+    trn_ds = Dataset(X_train, np.concatenate(
+        [y_train[:n_labeled], [None] * (len(y_train) - n_labeled)]))
     tst_ds = Dataset(X_test, y_test)
     fully_labeled_trn_ds = Dataset(X_train, y_train)
 
     return trn_ds, tst_ds, y_train, fully_labeled_trn_ds
 
-def main():
-    #####################################
-    ########## Start From Here ##########
-    #####################################
 
+def main():
     # Specifiy the parameters here:
-    dataset_filepath = './diabetes.txt' # path to your binary classification dataset
-    test_size = 0.33    # the percentage of samples in the dataset that will be randomly
-                        # selected and assigned to the test set
+    # path to your binary classification dataset
+    dataset_filepath = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'diabetes.txt')
+    test_size = 0.33    # the percentage of samples in the dataset that will be
+                        # randomly selected and assigned to the test set
     n_labeled = 10      # number of samples that are initially labeled
 
-    # Load the dataset
-    # trn_ds is the train set containing both labeled and unlabeled parts.
-    # For each round, the query strategy picks a sample in the unlabeled part and asks for
-    # its label. Then, the sample is removed from the unlabeled part and added to the labeled
-    # part along with its label.
-    # tst_ds is the test set of fixed size that is used to evaluate the quality of the query
-    # strategy.
-    trn_ds, tst_ds, y_train, fully_labeled_trn_ds = split_train_test(dataset_filepath, test_size, n_labeled)
+    # Load dataset
+    trn_ds, tst_ds, y_train, fully_labeled_trn_ds = \
+        split_train_test(dataset_filepath, test_size, n_labeled)
     trn_ds2 = copy.deepcopy(trn_ds)
     lbr = IdealLabeler(fully_labeled_trn_ds)
 
-    quota = len(y_train) - n_labeled    # quota is the number of queries
+    quota = len(y_train) - n_labeled    # number of samples to query
 
-    # For example, we are now going to compare the UncertaintySampling strategy
-    # with RandomSampling.
-    # E_in_1 and E_out_1 record the in-sample error and out-sample error of
-    # UncertaintySampling, respectively.
-    # E_in_2 and E_out_2 record the in-sample error and out-sample error of
-    # RamdomSampling, respectively.
-    # morel is the based learner, e.g. LogisticRegression, SVM ... etc.
+    # Comparing UncertaintySampling strategy with RandomSampling.
+    # model is the base learner, e.g. LogisticRegression, SVM ... etc.
     qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
     model = LogisticRegression()
     E_in_1, E_out_1 = run(trn_ds, tst_ds, lbr, model, qs, quota)
@@ -87,7 +76,7 @@ def main():
     model = LogisticRegression()
     E_in_2, E_out_2 = run(trn_ds2, tst_ds, lbr, model, qs2, quota)
 
-    # Plot and compare the learning curve of UncertaintySampling to RandomSampling
+    # Plot the learning curve of UncertaintySampling to RandomSampling
     # The x-axis is the number of queries, and the y-axis is the corresponding
     # error rate.
     query_num = np.arange(1, quota + 1)
@@ -98,7 +87,8 @@ def main():
     plt.xlabel('Number of Queries')
     plt.ylabel('Error')
     plt.title('Experiment Result')
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+               fancybox=True, shadow=True, ncol=5)
     plt.show()
 
 
