@@ -1,10 +1,11 @@
 Examples
 ========
 
-Here are some examples of using `libact`
+Here are some examples of using `libact`:
 
 .. toctree::
   :maxdepth: 1
 
-  plotpy.rst
+  plot.rst
+  label_digits.rst
 
