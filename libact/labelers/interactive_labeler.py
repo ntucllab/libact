@@ -34,7 +34,8 @@ class InteractiveLabeler(Labeler):
             banner += str(self.lbls) + ' '
         lbl = input(banner)
 
-        if (self.lbls is not None) and (int(lbl) not in self.lbls):
-            raise ValueError('Invalid label.')
+        while (self.lbls is not None) and (int(lbl) not in self.lbls):
+            print('Invalid label, please re-enter the associated label.')
+            lbl = input(banner)
 
         return int(lbl)
