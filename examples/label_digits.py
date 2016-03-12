@@ -25,11 +25,10 @@ from libact.query_strategies import UncertaintySampling, RandomSampling
 from libact.labelers import InteractiveLabeler
 
 
-def split_train_test():
+def split_train_test(n_classes):
     from sklearn.datasets import load_digits
 
     n_labeled = 5
-    n_classes = 5
     digits = load_digits(n_class=n_classes) # consider binary case
     X = digits.data
     y = digits.target
@@ -47,17 +46,17 @@ def split_train_test():
 
 
 def main():
-    trn_ds, tst_ds, ds = split_train_test()
+    quota = 10  # ask human to label 30 samples
+    n_classes = 5
+    E_out1, E_out2 = [], []
+
+    trn_ds, tst_ds, ds = split_train_test(n_classes)
     trn_ds2 = copy.deepcopy(trn_ds)
 
     qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
     qs2 = RandomSampling(trn_ds2)
 
     model = LogisticRegression()
-
-    E_out1, E_out2 = [], []
-
-    quota = 30  # ask human to label 30 samples
 
     fig = plt.figure()
     ax = fig.add_subplot(2, 1, 1)
@@ -80,11 +79,13 @@ def main():
     box = img_ax.get_position()
     img_ax.set_position([box.x0, box.y0 - box.height * 0.1, box.width,
                          box.height * 0.9])
-    lbr = InteractiveLabeler(labels=np.unique(ds.target))
+    # Give each label its name (labels are from 0 to n_classes-1)
+    lbr = InteractiveLabeler(label_name=[str(lbl) for lbl in range(n_classes)])
 
     for i in range(quota):
         ask_id = qs.make_query()
         print("asking sample from Uncertainty Sampling")
+        # reshape the image to its width and height
         lb = lbr.label(trn_ds.data[ask_id][0].reshape(8, 8))
         trn_ds.update(ask_id, lb)
         model.train(trn_ds)
@@ -105,7 +106,9 @@ def main():
         p2.set_xdata(query_num)
         p2.set_ydata(E_out2)
 
-        plt.draw_all()
+        plt.draw()
+
+    input("Press any key to continue...")
 
 if __name__ == '__main__':
     main()

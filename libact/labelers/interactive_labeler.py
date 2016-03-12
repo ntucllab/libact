@@ -16,13 +16,14 @@ class InteractiveLabeler(Labeler):
 
     Parameters
     ----------
-    labels: list
-        List of valid labels.
+    label_name: list
+        Let the label space be from 0 to len(label_name)-1, this list
+        corresponds to each label's name.
 
     """
 
     def __init__(self, **kwargs):
-        self.lbls = kwargs.pop('labels', None)
+        self.label_name = kwargs.pop('label_name', None)
 
     def label(self, feature):
         plt.imshow(feature, cmap=plt.cm.gray_r, interpolation='nearest')
@@ -30,12 +31,12 @@ class InteractiveLabeler(Labeler):
 
         banner = "Enter the associated label with the image: "
 
-        if self.lbls is not None:
-            banner += str(self.lbls) + ' '
+        if self.label_name is not None:
+            banner += str(self.label_name) + ' '
         lbl = input(banner)
 
-        while (self.lbls is not None) and (int(lbl) not in self.lbls):
+        while (self.label_name is not None) and (lbl not in self.label_name):
             print('Invalid label, please re-enter the associated label.')
             lbl = input(banner)
 
-        return int(lbl)
+        return self.label_name.index(lbl)
