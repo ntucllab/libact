@@ -4,14 +4,15 @@ plot.py
 .. role:: python_code(code)
    :language: python
 
-This example shows the basic way to compare two active learning algorithm.
-The script is located in :code:`/examples/plot.py`. Before running the script, you
-need to download sample dataset by running :code:`/examples/get_dataset.py` and choose
-the one you want in variable :python_code:`dataset_filepath`.
+This example shows the basic way to compare two active learning algorithm.  The
+script is located in :code:`/examples/plot.py`. Before running the script, you
+need to download sample dataset by running :code:`/examples/get_dataset.py` and
+choose the one you want in variable :python_code:`dataset_filepath`.
 
 .. literalinclude:: ../../examples/plot.py
    :language: python
    :lines: 38
+   :linenos:
 
 First, the data are splitted into training and testing set:
 
@@ -27,6 +28,24 @@ The main part that uses `libact` is in the :python_code:`run` function:
    :pyobject: run
    :linenos:
 
+In the :python_code:`for` loop on line :code:`25`, it iterates through each
+query in active learning process. :python_code:`qs.make_query` returns the
+index of the sample that the active learning algorithm wants to query.
+:python_code:`lbr` acts as the oracle and :python_code:`lbr.label` returns the
+label of the given sample answered by oracle. :python_code:`ds.update` updates
+the unlabeled sample with queried label.
+
+A common way of evaluating the performance of active learning algorithm is to
+plot the learning curve. Where the X-axis is the number samples of queried, and
+the Y-axis is the corresponding error rate.  List :python_code:`E_in`,
+:python_code:`E_out` collects the in-sample and out-sample error rate after each
+query. These information will be used to plot the learning curve. Learning curve
+are plotted by the following code:
+
+.. literalinclude:: ../../examples/plot.py
+   :language: python
+   :lines: 82-92
+   :linenos:
 
 Full source code:
 
