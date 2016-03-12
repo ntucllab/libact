@@ -8,7 +8,7 @@ import numpy as np
 from libact.base.interfaces import QueryStrategy
 from libact.base.dataset import Dataset
 import libact.models
-from libact.query_strategies import _variance_reduction
+from libact.query_strategies._variance_reduction import estVar
 
 
 class VarianceReduction(QueryStrategy):
@@ -58,7 +58,7 @@ class VarianceReduction(QueryStrategy):
         self.sigma = kwargs.pop('sigma', 100.0)
 
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
-        ret = _variance_reduction.estVar(0.000001, PI, X, epi, ex)
+        ret = estVar(0.000001, PI, X, epi, ex)
         return ret
 
     def E(self, args):
