@@ -3,6 +3,8 @@
 authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin](http://www.csie.ntu.edu.tw/~htlin)
 
 [![Build Status](https://travis-ci.org/ntucllab/libact.svg)](https://travis-ci.org/ntucllab/libact)
+[![Documentation Status](https://readthedocs.org/projects/libact/badge/?version=latest)](http://libact.readthedocs.org/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/libact.svg)](https://badge.fury.io/py/libact)
 
 # Introduction
 
@@ -28,7 +30,7 @@ pip3 install -r requirements.txt
 
 Debian (>= 7) / Ubuntu (>= 14.04)
 ```
-sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev
+sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
 ```
 
 MacOS
