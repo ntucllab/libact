@@ -23,6 +23,7 @@ Table of Contents
   :maxdepth: 2
 
   overview.rst
+  examples/examples.rst
 
 * :ref:`genindex`
 * :ref:`modindex`
