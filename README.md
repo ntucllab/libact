@@ -56,6 +56,16 @@ python setup.py build
 sudo python setup.py install
 ```
 
+Or via pip: (for all users)
+```
+sudo pip install libact
+```
+
+in home directory
+```
+pip install --user libact
+```
+
 ## Special Installation for HintSVM
 
 For HintSVM, you would have to install the [hintsvm package](https://github.com/ntucllab/hintsvm) first.
