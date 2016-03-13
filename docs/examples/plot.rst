@@ -21,7 +21,7 @@ First, the data are splitted into training and testing set:
    :pyobject: split_train_test
    :linenos:
 
-The main part that uses `libact` is in the :python_code:`run` function: 
+The main part that uses `libact` is in the :python_code:`run` function:
 
 .. literalinclude:: ../../examples/plot.py
    :language: python
@@ -54,6 +54,9 @@ removed for simplicity.
 
 .. image:: ./plot_diabetes.png
    :alt: plot.py diabetes dataset result
+
+We can see from the example that uncertainty sample is able to reach lower error
+rate faster than random sampling.
 
 Full source code:
 
