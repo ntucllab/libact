@@ -28,6 +28,10 @@ Here are a snapshot of this example:
 .. image:: ./label_digits.png
    :alt: snapshot of label digits example
 
+On top, it is the learning curve of ucertainty sampling and random sampling.
+X-axis is the number samples of queried, and Y-axis is the corresponding error
+rate. The figure on the button is the sample that human should assign label to.
+
 Full source code:
 
 .. literalinclude:: ../../examples/label_digits.py
