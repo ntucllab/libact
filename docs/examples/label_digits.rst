@@ -1,2 +1,35 @@
 label_digits.py
 ===============
+
+.. role:: python_code(code)
+   :language: python
+
+This example simiulates the use case where you want to humane to assign label to
+active learning algorithm selected samples. We uses the `digits dataset
+<http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html>`_
+provided by sklearn, each time a sample is selected by active learning
+algorithm, the sample's image (written digits) will be shown on the screen.  The
+user will have to enter the corresponding digit to the command line, this
+simulates the labeling process in real world.
+
+The useage is roughly the same as the :code:`plot.py` example.
+
+.. literalinclude:: ../../examples/label_digits.py
+   :language: python
+   :lines:86-91
+   :linenos:
+
+The difference is that the :code:`labeler` is replaced by
+:python_code:`InteractiveLabeler`, which opens the digit image for human labeler
+to see and receive the answer from command line.
+
+Here are a snapshot of this example:
+
+.. image:: ./label_digits.png
+   :alt: snapshot of label digits example
+
+Full source code:
+
+.. literalinclude:: ../../examples/label_digits.py
+   :language: python
+   :linenos:
