@@ -56,12 +56,12 @@ python setup.py build
 sudo python setup.py install
 ```
 
-Or via pip: (for all users)
+Or via pip: (for all users):
 ```
 sudo pip install libact
 ```
 
-in home directory
+Pip install in home directory:
 ```
 pip install --user libact
 ```
