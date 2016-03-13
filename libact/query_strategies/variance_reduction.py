@@ -22,7 +22,7 @@ class VarianceReduction(QueryStrategy):
         The model used for variance reduction to evaluate the variance.
         Only Logistic regression are supported now.
 
-    sigma: float, >0, optional (default=100.0)
+    sigma: float, >0, optional (default=1.0)
         The regularization term to be added to the diagonal of Fisher
         information matrix. 1/sigma will be added to the matrix.
 
@@ -55,10 +55,10 @@ class VarianceReduction(QueryStrategy):
         else:
             self.model = model
         self.optimality = kwargs.pop('optimality', 'trace')
-        self.sigma = kwargs.pop('sigma', 100.0)
+        self.sigma = kwargs.pop('sigma', 1.0)
 
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
-        ret = estVar(0.000001, PI, X, epi, ex)
+        ret = estVar(self.sigma, PI, X, epi, ex)
         return ret
 
     def E(self, args):
