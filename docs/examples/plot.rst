@@ -47,6 +47,14 @@ are plotted by the following code:
    :lines: 82-92
    :linenos:
 
+The following figure are the result of using the `diabetes` dataset with
+:python_code:`train_test_split` and :python_code:`LogisticRegression`'s
+random_state set as 0, and :python_code:`random.seed(0)`. The E_out line are
+removed for simplicity.
+
+.. image:: ./plot_diabetes.png
+   :alt: plot.py diabetes dataset result
+
 Full source code:
 
 .. literalinclude:: ../../examples/plot.py
