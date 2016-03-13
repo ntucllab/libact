@@ -56,16 +56,6 @@ python setup.py build
 sudo python setup.py install
 ```
 
-## Special Installation for HintSVM
-
-For HintSVM, you would have to install the [hintsvm package](https://github.com/ntucllab/hintsvm) first.
-
-Before running, you need to make sure the path to the library and
-python code of `hintsvm` are set in the environment variables:
-
-    export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
-    export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
-
 # Usage
 
 The main usage of `libact` is as follows:
