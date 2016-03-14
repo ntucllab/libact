@@ -50,6 +50,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
     'numpydoc',
 ]
 
