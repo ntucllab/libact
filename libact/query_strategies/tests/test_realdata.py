@@ -72,11 +72,22 @@ class RealdataTestCase(unittest.TestCase):
         assert_array_equal(
             qseq, np.array([10, 11, 13, 16, 18, 12, 17, 19, 20, 21]))
 
-    def test_UcertaintySampling(self):
+    def test_UcertaintySamplingLc(self):
         random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
-        qs = UncertaintySampling(trn_ds, model=LogisticRegression())
+        qs = UncertaintySampling(trn_ds, method='lc',
+                                 model=LogisticRegression())
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(
+            qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
+
+    def test_UcertaintySamplingSm(self):
+        random.seed(1126)
+        trn_ds = Dataset(self.X,
+                         np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
+        qs = UncertaintySampling(trn_ds, method='sm',
+                                 model=LogisticRegression())
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
