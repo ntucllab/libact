@@ -14,43 +14,43 @@ class ActiveLearningByLearning(QueryStrategy):
     """Active Learning By Learning (ALBL) query strategy.
 
     ALBL is an active learning algorithm that adaptively choose among existing
-    query strategies to decide which data to make query. It utilizes
-    Exp4.P, a multi-armed bandit algorithm to adaptively make such decision.
-    More details of ALBL can refer to the work listed in the reference section.
+    query strategies to decide which data to make query. It utilizes Exp4.P, a
+    multi-armed bandit algorithm to adaptively make such decision.  More details
+    of ALBL can refer to the work listed in the reference section.
 
     Parameters
     ----------
-    T: integer
+    T : integer
         Query budget, the maximal number of queries to be made.
-        
-    query_strategies: list of libact.query_strategies.* object instance
+
+    query_strategies : list of py:module`libact.query_strategies.*` object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
         Note that these query_strategies should share the same dataset
         instance with ActiveLearningByLearning instance.
 
-    delta: float, optional (default=0.1)
+    delta : float, optional (default=0.1)
         Parameter for Exp4.P.
 
-    uniform_sampler: {True, False}, optional (default=True)
+    uniform_sampler : {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
 
-    pmin: float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
+    pmin : float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms). N = K =
         number of query_strategies, T is the number of query budgets.
 
-    model: libact.model.* object instance
+    model : py:module`libact.model.*` object instance
         The learning model used for the task.
 
 
     Attributes
     ----------
-    query_strategies_: list of libact.query_strategies.* object instance
+    query_strategies_ : list of py:module`libact.query_strategies.*` object instance
 
-    exp4p_: instance of Exp4P object
+    exp4p_ : instance of Exp4P object
 
-    queried_hist_: list of integer
+    queried_hist_ : list of integer
         A list of entry_id of the dataset which is queried in the past.
 
 
