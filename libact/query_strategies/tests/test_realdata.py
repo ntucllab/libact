@@ -81,6 +81,20 @@ class RealdataTestCase(unittest.TestCase):
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
 
+    def test_ActiveLearningByLearning(self):
+        np.random.seed(1126)
+        trn_ds = Dataset(self.X,
+                         np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
+        qs = ActiveLearningByLearning(trn_ds, T=self.quota,
+                query_strategies=[
+                    UncertaintySampling(trn_ds, model=LogisticRegression()),
+                    HintSVM(trn_ds)],
+                model=LogisticRegression()
+            )
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(
+            qseq, np.array([103, 220, 118,  75, 176,  50, 247, 199,  46,  55]))
+
 
 if __name__ == '__main__':
     unittest.main()
