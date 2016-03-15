@@ -24,6 +24,7 @@ Table of Contents
 
   overview.rst
   examples/examples.rst
+  api_reference.rst
 
 * :ref:`genindex`
 * :ref:`modindex`
