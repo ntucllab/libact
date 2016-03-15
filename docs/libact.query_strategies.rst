@@ -5,7 +5,7 @@ Submodules
 ----------
 
 libact.query_strategies.active_learning_by_learning module
--------------------------------------------------
+----------------------------------------------------------
 
 .. automodule:: libact.query_strategies.active_learning_by_learning
     :members:
@@ -13,7 +13,7 @@ libact.query_strategies.active_learning_by_learning module
     :show-inheritance:
 
 libact.query_strategies.hintsvm module
--------------------------------------------------
+--------------------------------------
 
 .. automodule:: libact.query_strategies.hintsvm
     :members:
@@ -37,7 +37,7 @@ libact.query_strategies.quire module
     :show-inheritance:
 
 libact.query_strategies.random_sampling module
-------------------------------------
+----------------------------------------------
 
 .. automodule:: libact.query_strategies.random_sampling
     :members:

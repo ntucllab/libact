@@ -30,16 +30,11 @@ class HintSVM(QueryStrategy):
     p : float, >0 and <=1, optional (default=.5)
         The probability to select an instance from unlabeld pool to hint pool.
 
-    svm_params : dict, optional (default={})
-        Parameters for hintsvm solver.
-
-    svm_params
-    ----------
     kernel : {'linear', 'poly', 'rbf', 'sigmoid'}, optional (default='linear')
-		linear: u'*v
-		poly: (gamma*u'*v + coef0)^degree
-		rbf: exp(-gamma*|u-v|^2)
-		sigmoid: tanh(gamma*u'*v + coef0)
+		linear: u'\*v
+		poly: (gamma\*u'\*v + coef0)^degree
+		rbf: exp(-gamma\*|u-v|^2)
+		sigmoid: tanh(gamma\*u'\*v + coef0)
 
     degree : int, optional (default=3)
         Parameter for kernel function.
@@ -62,17 +57,15 @@ class HintSVM(QueryStrategy):
     verbose : int, optional (default=0)
         Set verbosity level for hintsvm solver.
 
-    Attributes
-    ----------
-
-
     References
     ----------
-    Li, Chun-Liang, Chun-Sung Ferng, and Hsuan-Tien Lin. "Active Learning with
-    Hinted Support Vector Machine." ACML. 2012.
+    .. [1] Li, Chun-Liang, Chun-Sung Ferng, and Hsuan-Tien Lin. "Active Learning
+           with Hinted Support Vector Machine." ACML. 2012.
 
-    Chun-Liang Li, Chun-Sung Ferng, and Hsuan-Tien Lin. Active learning using
-    hint information. Neural Computation, 27(8):1738--1765, August 2015.
+    .. [2] Chun-Liang Li, Chun-Sung Ferng, and Hsuan-Tien Lin. Active learning
+           using hint information. Neural Computation, 27(8):1738--1765, August
+           2015.
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -97,7 +90,16 @@ class HintSVM(QueryStrategy):
                 )
 
         # svm solver parameters
-        self.svm_params = kwargs.pop('svm_params', {})
+        self.svm_params = {}
+        self.svm_params['kernel'] = kwargs.pop('kernel', 'linear')
+        self.svm_params['degree'] = kwargs.pop('degree', 3)
+        self.svm_params['gamma'] = kwargs.pop('gamma', 0.1)
+        self.svm_params['coef0'] = kwargs.pop('coef0', 0.)
+        self.svm_params['tol'] = kwargs.pop('tol', 1e-3)
+        self.svm_params['shrinking'] = kwargs.pop('shrinking', 1)
+        self.svm_params['cache_size'] = kwargs.pop('cache_size', 100.)
+        self.svm_params['verbose'] = kwargs.pop('verbose', 0)
+
         self.svm_params['C'] = self.cl
 
     def update(self, entry_id, label):

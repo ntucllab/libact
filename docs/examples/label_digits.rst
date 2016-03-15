@@ -16,7 +16,7 @@ The useage is roughly the same as the :code:`plot.py` example.
 
 .. literalinclude:: ../../examples/label_digits.py
    :language: python
-   :lines:86-91
+   :lines: 86-91
    :linenos:
 
 The difference is that the :code:`labeler` is replaced by

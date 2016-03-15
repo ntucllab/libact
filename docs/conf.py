@@ -24,7 +24,7 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
         return Mock()
 
-MOCK_MODULES = ['scipy', 'matplotlib', 'numpy', 'sklearn',
+MOCK_MODULES = ['scipy', 'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
                 'sklearn.metrics.pairwise',
                 # c extensions
@@ -50,9 +50,17 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
     'numpydoc',
 ]
+
+# Napoleon settings
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
+napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_references = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

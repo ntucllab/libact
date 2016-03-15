@@ -33,8 +33,8 @@ class QUIRE(QueryStrategy):
     Attributes
     ----------
 
-    Reference
-    ---------
+    References
+    ----------
 
     .. [1] S.-J. Huang, R. Jin, and Z.-H. Zhou. Active learning by querying
            informative and representative examples.
@@ -52,7 +52,7 @@ class QUIRE(QueryStrategy):
         self.gamma = kwargs.pop('gamma', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
-        K = rbf_kernel(X=X, Y=X, gamma=self.gamma) 
+        K = rbf_kernel(X=X, Y=X, gamma=self.gamma)
         #TODO: extend for other kernel functions
         self.K = K
         self.L = np.linalg.inv(K + self.lmbda * np.eye(len(X)))
@@ -92,7 +92,7 @@ class QUIRE(QueryStrategy):
                       L[each_index][Lindex] - \
                           np.dot(
                               np.dot(
-                                  L[each_index][Uindex_r], 
+                                  L[each_index][Uindex_r],
                                   inv_Luu
                               ),
                               L[np.ix_(Uindex_r, Lindex)]
