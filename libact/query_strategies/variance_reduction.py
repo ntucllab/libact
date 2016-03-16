@@ -63,13 +63,14 @@ class VarianceReduction(QueryStrategy):
 
     def E(self, args):
         X, y, qx, clf, label_count = args
-        query_point = clf.predict_real([qx])
+        sigmoid = lambda x: 1 / (1 + np.exp(-x))
+        query_point = sigmoid(clf.predict_real([qx]))
         feature_count = len(X[0])
         ret = 0.0
         for i in range(label_count):
             clf = copy.copy(self.model)
             clf.train(Dataset(X+[qx], y+[i]))
-            PI = clf.predict_real(X+[qx])
+            PI = sigmoid(clf.predict_real(X+[qx]))
             ret += query_point[-1][i] * self.Phi(PI[:-1], X, PI[-1], qx,
                     label_count, feature_count)
         return ret

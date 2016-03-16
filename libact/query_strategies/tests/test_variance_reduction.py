@@ -10,7 +10,7 @@ from libact.query_strategies import VarianceReduction
 def run_qs(trn_ds, qs, truth, quota):
     ret = []
     for _ in range(quota):
-        ask_id = qs.make_query()
+        ask_id = qs.make_query(n_jobs=1)
         trn_ds.update(ask_id, truth[ask_id])
 
         ret.append(ask_id)
@@ -28,7 +28,7 @@ class VarianceReductionTestCase(unittest.TestCase):
                          np.concatenate([self.y[:2], [None]*(len(self.y)-2)]))
         qs = VarianceReduction(trn_ds, model=LogisticRegression(), sigma=0.1)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
-        assert_array_equal(qseq, np.array([2, 3, 4, 5]))
+        assert_array_equal(qseq, np.array([3, 4, 2, 5]))
 
 
 if __name__ == '__main__':
