@@ -61,6 +61,7 @@ class RealdataTestCase(unittest.TestCase):
             qseq, np.array([24, 235, 228, 209, 18, 143, 119, 90, 149, 207]))
 
     def test_QueryByCommittee(self):
+        #import ipdb; ipdb.set_trace()
         random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
@@ -70,7 +71,7 @@ class RealdataTestCase(unittest.TestCase):
                                       LogisticRegression(C=100)])
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([10, 11, 13, 16, 18, 12, 17, 19, 20, 21]))
+            qseq, np.array([ 11, 207, 101, 30, 116, 108, 83, 172, 211, 42]))
 
     def test_UcertaintySamplingLc(self):
         random.seed(1126)
