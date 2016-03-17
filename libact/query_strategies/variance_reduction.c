@@ -168,21 +168,9 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
     }
     double *ePI =  (double*) PyArray_DATA(ePI_array);
     double *eX  =  (double*) PyArray_DATA(eX_array);
-    
+
     double **retF = Fisher(ePI, eX, sigma, labs, dims);
     double **retA = A(PI, X, labs, dims, n_pool);
-
-    for(int i=0; i<dims*labs; i++){
-        for(int j=0; j<dims*labs; j++){
-            if(isnan(retF[i][j])){
-                printf("F: %f\n", retF[i][j]);
-            }
-            if(isnan(retA[i][j])){
-                printf("A: %f\n", retA[i][j]);
-            }
-        }
-    }
-
 
     pinv(retF, labs, dims);
 
