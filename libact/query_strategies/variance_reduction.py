@@ -75,7 +75,20 @@ class VarianceReduction(QueryStrategy):
                     label_count, feature_count)
         return ret
 
-    def make_query(self, n_queries=1, n_jobs=20):
+    def make_query(self, n_jobs=1):
+        """
+        Calculate which point to query.
+
+        Parameters
+        ----------
+        n_jobs : int, optional (default=1)
+            The number of jobs to run in parallel.
+
+        Returns
+        -------
+        ask_id : int
+            The entry id of the sample wants to query.
+        """
         labeled_entries = self.dataset.get_labeled_entries()
         Xlabeled, y = zip(*labeled_entries)
         Xlabeled = np.array(Xlabeled)
