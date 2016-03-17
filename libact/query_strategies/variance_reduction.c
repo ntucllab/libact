@@ -116,6 +116,7 @@ void pinv(double** X, int labs, int dims){
             X[i][j] = ret_pinv[i*n + j];
 
     free(ret);
+    free(ret_pinv);
     free(work);
     free(a);
     free(s);
