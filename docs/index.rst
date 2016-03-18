@@ -24,6 +24,7 @@ Table of Contents
 
   overview.rst
   examples/examples.rst
+  active_learning_by_learning.rst
   api_reference.rst
 
 * :ref:`genindex`
