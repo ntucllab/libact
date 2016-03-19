@@ -16,8 +16,8 @@ class UncertaintySampling(QueryStrategy):
 
     Parameters
     ----------
-    model: libact.model.* object instance
-        The base model used for trainin, this model should support predict_real.
+    model: :py:class:`libact.base.interfaces.ContinuousModel` object instance
+        The base model used for training.
 
     method: {'lc', 'sm'}, optional (default='lc')
         least confidence (lc), it queries the instance whose posterior
@@ -25,8 +25,11 @@ class UncertaintySampling(QueryStrategy):
         smallest margin (sm), it queries the instance whose posterior
         probability gap between the most and the second probable labels is minimal;
 
+
     Attributes
     ----------
+    model: :py:class:`libact.base.interfaces.ContinuousModel` object instance
+        The model trained in last query.
 
 
     References
@@ -37,7 +40,6 @@ class UncertaintySampling(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        """Currently only LogisticRegression is supported."""
         super(UncertaintySampling, self).__init__(*args, **kwargs)
 
         self.model = kwargs.pop('model', None)
@@ -59,9 +61,12 @@ class UncertaintySampling(QueryStrategy):
                 )
 
     def make_query(self):
-        """
-        Choices for method (default 'lc'):
-        'lc' (Least Confident), 'sm' (Smallest Margin)
+        """Return the index of the sample to be queried and labeled.
+
+        Returns
+        -------
+        ask_id: int
+            The entry_id of the sample this algorithm wants to query.
         """
         dataset = self.dataset
         self.model.train(dataset)
@@ -84,7 +89,3 @@ class UncertaintySampling(QueryStrategy):
             ask_id = np.argmin(margin)
 
         return unlabeled_entry_ids[ask_id]
-
-    def get_model(self):
-        """Returns the model used by the last query"""
-        return self.model
