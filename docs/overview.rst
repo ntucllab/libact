@@ -1,22 +1,16 @@
 Overview
 ========
 
-`libact` designed a framework to make `active learning
+`libact` is a framework to make `active learning
 <https://en.wikipedia.org/wiki/Active_learning_(machine_learning)>`_ easy for
 user to apply to real world problem. Currently `libact` supports only pool-based
-active learning problems. In the start of the problem, there is a small labeled
-set, a larger unlabeled set, and a training model.  During the problem, active
-learning algorithm has to choose a data point from the unlabeled set and ask the
-oracle for its label. The goal for active learning algorithm is to make the
-training model performs better with less labeled data.
+active learning problems. For a active learning problem, there is a labeled set,
+unlabeled set, oracle and a supervised learning model. During the querying
+state, active learning algorithm will choose a data point from the unlabeled set
+and ask the oracle for its label. The goal for active learning algorithm is to
+make the given supervied learning model performs better with less labeled data.
 
-`libact` is consitituded by following parts:
-
-Labeler
--------
-:py:class:`libact.base.interfaces.Labeler` object plays the role as an oracle in
-the given problem. After retrieveing the sample to be queried, pass the samepl
-(feature) to the label method, it will return the label from oracle.
+`libact` is consitituded of the following parts:
 
 Dataset
 -------
@@ -30,6 +24,12 @@ sample to update.
 Internally, Dataset also maintains a callback queue. The method on_update can be
 used to register callback functions, which will be called after each update to
 the Dataset.
+
+Labeler
+-------
+:py:class:`libact.base.interfaces.Labeler` object plays the role as an oracle in
+the given problem. After retrieveing the sample to be queried, pass the samepl
+(feature) to the label method, it will return the label from oracle.
 
 QueryStrategy
 -------------
@@ -61,8 +61,9 @@ Here is an example usage of `libact`:
 .. code-block:: python
    :linenos:
 
-   ds = Dataset(X, y) # declare Dataset instance, X is the feature, y is the label (None if unlabeled)
-   qs = QueryStrategy(trn_ds, method='lc') # declare a QueryStrategy instance
+   # declare Dataset instance, X is the feature, y is the label (None if unlabeled)
+   ds = Dataset(X, y)
+   qs = QueryStrategy(trn_ds) # declare a QueryStrategy instance
    lbr = Labeler() # declare Labeler instance
    model = Model() # declare model instance
 

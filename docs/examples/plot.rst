@@ -1,8 +1,10 @@
-plot.py
-=======
+Comparing Different Query Strategies
+====================================
 
 .. role:: python_code(code)
    :language: python
+
+Example file: :file:`examples/plot.py`
 
 This example shows the basic way to compare two active learning algorithm.  The
 script is located in :code:`/examples/plot.py`. Before running the script, you

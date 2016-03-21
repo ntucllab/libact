@@ -26,5 +26,32 @@ The reward function that ALBL adopt is the Importance-Weighted-Accuracy (IW-ACC)
     IW-ACC(f, τ) = \frac{1}{nT} \sum^{τ}_{t=1} W_t[y_{i_t} = f(x_{i_t})]
 
 :math:`f` is the current model learned from the labeled samples, :math:`τ` is
-the number of queries ALBL have asked, :math:`n` is nmuber of samples (labeled +
-unlabeled).
+the number of queries ALBL have asked, :math:`n` is number of samples (labeled +
+unlabeled), :math:`i_t` is the index of the sample which is queried in turn
+:math:`t`.
+
+Here is an example of how to declare a ALBL query_strategy object:
+
+.. code-block:: python
+
+   from libact.query_strategies import ActiveLearningByLearning
+   from libact.query_strategies import HintSVM
+   from libact.query_strategies import UncertaintySampling
+   from libact.models import LogisticRegression
+
+   qs = ActiveLearningByLearning(
+            dataset, # Dataset object
+            query_strategies=[
+                UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
+                UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
+                HintSVM(dataset)
+                ],
+            model=LogisticRegression()
+            )
+
+The :code:`query_strategies` parameter is a list of
+:code:`libact.query_strategies` object instances where each of their associated
+dataset must be the same :code:`Dataset` instance. ALBL combines the result of
+these query strategies and generate its own suggestion of which sample to query.
+ALBL will adaptively *learn* from each of the decision it made, using the given
+supervised learning model in :code:`model` parameter to evaluate its IW-ACC.

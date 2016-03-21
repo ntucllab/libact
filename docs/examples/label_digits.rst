@@ -1,8 +1,10 @@
-label_digits.py
-===============
+Interactive Digits Labeling
+===========================
 
 .. role:: python_code(code)
    :language: python
+
+Example file: :file:`examples/label_digits.py`
 
 This example simiulates the use case where you want to humane to assign label to
 active learning algorithm selected samples. We uses the `digits dataset

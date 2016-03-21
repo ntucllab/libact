@@ -20,7 +20,7 @@ labeled and unlabeled data. With supervised learning models, labeled data can be
 retrieved like this:
 
 .. code-block:: python
-   
+
    X, y = zip(*Dataset.get_labeled_entries())
 
 :code:`X`, :code:`y` is the samples (shape=(n_samples, n_feature)) and labels
@@ -61,10 +61,9 @@ Implement your active learning algorithm
 You may implement your own active learning algorithm under QueryStrategy
 classes. QueryStrategy class should inherent from
 :py:class:`libact.base.interfaces.QueryStrategy` and add the following into your
-__init__ method. 
+__init__ method.
 
-.. code-block::
-   :lanbuage: python
+.. code-block:: python
 
    super(YourClassName, self).__init__(*args, **kwargs)
 
