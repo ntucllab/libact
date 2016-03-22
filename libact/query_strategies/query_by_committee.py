@@ -20,7 +20,7 @@ class QueryByCommittee(QueryStrategy):
 
     Parameters
     ----------
-    models : list of libact.models instances or str
+    models : list of :py:mod:`libact.models` instances or str
         This parameter accepts a list of initialized libact Model instances,
         or class names of libact Model classes to determine the models to be
         included in the committee to vote for each unlabeled instance.
@@ -28,8 +28,26 @@ class QueryByCommittee(QueryStrategy):
 
     Attributes
     ----------
-    students : list, shape = [len(models)]
+    students : list, shape = (len(models))
         A list of model instances used in this algorithm.
+
+
+    Examples
+    --------
+    Here is an example of declaring a QueryByCommittee query_strategy object:
+
+    .. code-block:: python
+
+       from libact.query_strategies import QueryByCommittee
+       from libact.models import LogisticRegression
+
+       qs = QueryStrategy(
+            dataset, # Dataset object
+            models=[
+                LogisticRegression(C=1.0),
+                LogisticRegression(C=0.1),
+                ]
+            )
 
 
     References
