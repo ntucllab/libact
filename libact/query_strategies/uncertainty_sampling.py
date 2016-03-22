@@ -32,6 +32,24 @@ class UncertaintySampling(QueryStrategy):
         The model trained in last query.
 
 
+    Examples
+    --------
+    Here is an example of declaring a HintSVM query_strategy object:
+
+    .. code-block:: python
+
+       from libact.query_strategies import UncertaintySampling
+       from libact.models import LogisticRegression
+
+       qs = UmcertaintySampling(
+            dataset, # Dataset object
+            model=LogisticRegression(C=0.1)
+            )
+
+    Note that the model given in the :code:`model` parameter must be a
+    :py:class:`ContinuousModel` which supports predict_real method.
+
+
     References
     ----------
 

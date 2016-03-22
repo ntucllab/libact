@@ -54,6 +54,36 @@ class ActiveLearningByLearning(QueryStrategy):
     queried_hist\\_ : list of integer
         A list of entry_id of the dataset which is queried in the past.
 
+    Examples
+    --------
+    Here is an example of how to declare a ActiveLearningByLearning
+    query_strategy object:
+
+    .. code-block:: python
+
+    from libact.query_strategies import ActiveLearningByLearning
+    from libact.query_strategies import HintSVM
+    from libact.query_strategies import UncertaintySampling
+    from libact.models import LogisticRegression
+
+    qs = ActiveLearningByLearning(
+                dataset, # Dataset object
+                query_strategies=[
+                    UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
+                    UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
+                    HintSVM(dataset)
+                    ],
+                model=LogisticRegression()
+                )
+
+    The :code:`query_strategies` parameter is a list of
+    :code:`libact.query_strategies` object instances where each of their
+    associated dataset must be the same :code:`Dataset` instance. ALBL combines
+    the result of these query strategies and generate its own suggestion of
+    which sample to query.  ALBL will adaptively *learn* from each of the
+    decision it made, using the given supervised learning model in :code:`model`
+    parameter to evaluate its IW-ACC.
+
     References
     ----------
     .. [1] Wei-Ning Hsu, and Hsuan-Tien Lin. "Active Learning by Learning."

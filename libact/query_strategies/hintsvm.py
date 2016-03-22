@@ -57,6 +57,20 @@ class HintSVM(QueryStrategy):
     verbose : int, optional (default=0)
         Set verbosity level for hintsvm solver.
 
+    Examples
+    --------
+    Here is an example of declaring a HintSVM query_strategy object:
+
+    .. code-block:: python
+
+       from libact.query_strategies import HintSVM
+
+       qs = HintSVM(
+            dataset, # Dataset object
+            Cl=0.01,
+            p=0.8,
+            )
+
     References
     ----------
     .. [1] Li, Chun-Liang, Chun-Sung Ferng, and Hsuan-Tien Lin. "Active Learning
