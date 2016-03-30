@@ -15,15 +15,15 @@ balance between exploring each bandit machine and exploit the information gotten
 from previous exploration to receive good reward. It wants to maximize the total
 rewards earned through a series of decisions.
 
-In ALBL, it utilizes `Exp4.P` contextual bandit algorithm. The bandit machines
-corresponds to each sub-active learning algorithm. It wants to balance between
-each exploring a good active learning algorithm for this problem and exploiting
+In ALBL, it utilizes `Exp4.P` contextual bandit algorithm. Each bandit machine
+corresponds to each sub-active learning algorithm. ALBL wants to balance between
+exploring a good active learning algorithm for this problem and exploiting
 the active learning algorithm that already performs well to earn a good reward.
 The reward function that ALBL adopt is the Importance-Weighted-Accuracy (IW-ACC)
 
 .. math::
 
-    IW-ACC(f, τ) = \frac{1}{nT} \sum^{τ}_{t=1} W_t[y_{i_t} = f(x_{i_t})]
+    IW-ACC(f, τ) = \frac{1}{n\tau} \sum^{τ}_{t=1} W_t[y_{i_t} = f(x_{i_t})]
 
 :math:`f` is the current model learned from the labeled samples, :math:`τ` is
 the number of queries ALBL have asked, :math:`n` is number of samples (labeled +
@@ -33,6 +33,7 @@ unlabeled), :math:`i_t` is the index of the sample which is queried in turn
 Here is an example of how to declare a ALBL query_strategy object:
 
 .. code-block:: python
+   :linenos:
 
    from libact.query_strategies import ActiveLearningByLearning
    from libact.query_strategies import HintSVM

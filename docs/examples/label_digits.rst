@@ -9,10 +9,10 @@ Example file: :file:`examples/label_digits.py`
 This example simiulates the use case where you want to humane to assign label to
 active learning algorithm selected samples. We uses the `digits dataset
 <http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html>`_
-provided by sklearn, each time a sample is selected by active learning
-algorithm, the sample's image (written digits) will be shown on the screen.  The
-user will have to enter the corresponding digit to the command line, this
-simulates the labeling process in real world.
+provided by scikit-learn. Each time a sample is selected by active learning
+algorithm, the sample (a written digit) will be shown on the screen. The
+user will have to enter the corresponding digit to the command line to finish
+the labeling process.
 
 The useage is roughly the same as the :code:`plot.py` example.
 
@@ -30,9 +30,10 @@ Here are a snapshot of this example:
 .. image:: ./label_digits.png
    :alt: snapshot of label digits example
 
-On top, it is the learning curve of ucertainty sampling and random sampling.
-X-axis is the number samples of queried, and Y-axis is the corresponding error
-rate. The figure on the button is the sample that human should assign label to.
+The figure on the top is the learning curve of ucertainty sampling and random
+sampling.  X-axis is the number samples of queried, and Y-axis is the
+corresponding error rate. The figure on the button is the sample that human
+should assign label to.
 
 Full source code:
 
