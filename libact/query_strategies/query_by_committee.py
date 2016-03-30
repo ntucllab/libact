@@ -100,6 +100,7 @@ class QueryByCommittee(QueryStrategy):
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
                 reverse=True)
-        ret = disagreement[0][0]
+        ask_id = np.random.choice(
+            [e[0] for e in disagreement if e[1] == disagreement[0][1] ])
 
-        return ret
+        return ask_id
