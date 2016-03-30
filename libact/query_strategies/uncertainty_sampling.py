@@ -1,7 +1,8 @@
 """ Uncertainty Sampling
 
-This module contains a class that implements two of the most well-known uncertainty sampling
-query strategies, which are least confidence and smallest margin (margin sampling).
+This module contains a class that implements two of the most well-known
+uncertainty sampling query strategies: the least confidence method and the
+smallest margin method (margin sampling).
 
 """
 import numpy as np
@@ -34,16 +35,16 @@ class UncertaintySampling(QueryStrategy):
 
     Examples
     --------
-    Here is an example of declaring a HintSVM query_strategy object:
+    Here is an example of declaring a UncertaintySampling query_strategy object:
 
     .. code-block:: python
 
        from libact.query_strategies import UncertaintySampling
        from libact.models import LogisticRegression
 
-       qs = UmcertaintySampling(
-            dataset, # Dataset object
-            model=LogisticRegression(C=0.1)
+       qs = UncertaintySampling(
+                dataset, # Dataset object
+                model=LogisticRegression(C=0.1)
             )
 
     Note that the model given in the :code:`model` parameter must be a

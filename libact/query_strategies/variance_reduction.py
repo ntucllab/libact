@@ -23,13 +23,12 @@ class VarianceReduction(QueryStrategy):
         Only Logistic regression are supported now.
 
     sigma: float, >0, optional (default=100.0)
-        The regularization term to be added to the diagonal of Fisher
-        information matrix. 1/sigma will be added to the matrix.
+        1/sigma is added to the diagonal of the Fisher information matrix as
+        regularization term.
 
     optimality : {'trace', 'determinant', 'eigenvalue'}, optional (default='trace')
-        Choosing what to optimize. These options optimize the trace,
-        determinant, and maximum eigenvalue of the inverse Fisher information
-        matrix.
+        The type of optimal design.  The options are the trace, determinant, or
+        maximum eigenvalue of the inverse Fisher information matrix.
         Only 'trace' are supported now.
 
 
@@ -39,7 +38,6 @@ class VarianceReduction(QueryStrategy):
 
     References
     ----------
-
     .. [1] Schein, Andrew I., and Lyle H. Ungar. "Active learning for logistic
            regression: an evaluation." Machine Learning 68.3 (2007): 235-265.
 
