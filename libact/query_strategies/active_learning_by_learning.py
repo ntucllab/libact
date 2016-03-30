@@ -61,20 +61,20 @@ class ActiveLearningByLearning(QueryStrategy):
 
     .. code-block:: python
 
-    from libact.query_strategies import ActiveLearningByLearning
-    from libact.query_strategies import HintSVM
-    from libact.query_strategies import UncertaintySampling
-    from libact.models import LogisticRegression
+       from libact.query_strategies import ActiveLearningByLearning
+       from libact.query_strategies import HintSVM
+       from libact.query_strategies import UncertaintySampling
+       from libact.models import LogisticRegression
 
-    qs = ActiveLearningByLearning(
-                dataset, # Dataset object
-                query_strategies=[
-                    UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
-                    UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
-                    HintSVM(dataset)
-                    ],
-                model=LogisticRegression()
-                )
+       qs = ActiveLearningByLearning(
+                   dataset, # Dataset object
+                   query_strategies=[
+                       UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
+                       UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
+                       HintSVM(dataset)
+                       ],
+                   model=LogisticRegression()
+                   )
 
     The :code:`query_strategies` parameter is a list of
     :code:`libact.query_strategies` object instances where each of their
@@ -241,7 +241,7 @@ class Exp4P():
     delta : float, >0, optional (default=0.1)
         A parameter.
 
-    pmin : float, 0<pmin<1/len(query_strategies), optional (default=:math:`\\frac{\\sqrt{log(N)}{KT}`)
+    pmin : float, 0<pmin<1/len(query_strategies), optional (default= :math:`\\frac{\\sqrt{log(N)}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data), N = K = number of query_strategies, T is the maximum
         number of rounds.
