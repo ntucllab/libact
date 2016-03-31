@@ -42,20 +42,21 @@ class QueryByCommittee(QueryStrategy):
        from libact.models import LogisticRegression
 
        qs = QueryStrategy(
-            dataset, # Dataset object
-            models=[
-                LogisticRegression(C=1.0),
-                LogisticRegression(C=0.1),
-                ]
+                dataset, # Dataset object
+                models=[
+                    LogisticRegression(C=1.0),
+                    LogisticRegression(C=0.1),
+                ],
             )
 
 
     References
     ----------
-    Seung, H. Sebastian, Manfred Opper, and Haim Sompolinsky. "Query by
-    committee." Proceedings of the fifth annual workshop on Computational
-    learning theory. ACM, 1992.
+    .. [1] Seung, H. Sebastian, Manfred Opper, and Haim Sompolinsky. "Query by
+           committee." Proceedings of the fifth annual workshop on Computational
+           learning theory. ACM, 1992.
     """
+
     def __init__(self, *args, **kwargs):
         super(QueryByCommittee, self).__init__(*args, **kwargs)
         self.students = list()
@@ -75,6 +76,20 @@ class QueryByCommittee(QueryStrategy):
         self.teach_students()
 
     def disagreement(self, votes):
+        """
+        Return disagreement measurement of the given number of votes.
+        It uses the vote entropy to measure the disagreement.
+
+        Parameters
+        ----------
+        votes : list of int, shape==(n_samples, n_students)
+            The prediction that each student gave to each sample.
+
+        Returns
+        -------
+        disagreement : list of float, shape=(n_samples)
+            The vote entropy of the given votes.
+        """
         ret = []
         for candidate in votes:
             ret.append(0.0)
@@ -90,15 +105,17 @@ class QueryByCommittee(QueryStrategy):
         return ret
 
     def teach_students(self):
+        """
+        Train each model (student) with labeled data using bootstrap aggregating
+        (bagging).
+        """
         dataset = self.dataset
-        # Training models with labeled data using bootstrap aggregating
-        # (bagging)
         for student in self.students:
             bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
                 bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
                 logger.warning('There is student receiving only one label,'
-                               'resample the bag.')
+                               're-sample the bag.')
             student.train(bag)
 
     def update(self, entry_id, label):
