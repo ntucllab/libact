@@ -53,26 +53,40 @@ class VarianceReduction(QueryStrategy):
         else:
             self.model = model
         self.optimality = kwargs.pop('optimality', 'trace')
-        self.sigma = kwargs.pop('sigma', 100.0)
+        self.sigma = kwargs.pop('sigma', 1.0)
 
     def Phi(self, PI, X, epi, ex, label_count, feature_count):
-        ret = estVar(0.000001, PI, X, epi, ex)
+        ret = estVar(self.sigma, PI, X, epi, ex)
         return ret
 
     def E(self, args):
         X, y, qx, clf, label_count = args
-        query_point = clf.predict_real([qx])
+        sigmoid = lambda x: 1 / (1 + np.exp(-x))
+        query_point = sigmoid(clf.predict_real([qx]))
         feature_count = len(X[0])
         ret = 0.0
         for i in range(label_count):
             clf = copy.copy(self.model)
-            clf.train(Dataset(X+[qx], y+[i]))
-            PI = clf.predict_real(X+[qx])
+            clf.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
+            PI = sigmoid(clf.predict_real(np.vstack((X, [qx]))))
             ret += query_point[-1][i] * self.Phi(PI[:-1], X, PI[-1], qx,
                     label_count, feature_count)
         return ret
 
-    def make_query(self, n_queries=1, n_jobs=20):
+    def make_query(self, n_jobs=1):
+        """
+        Calculate which point to query.
+
+        Parameters
+        ----------
+        n_jobs : int, optional (default=1)
+            The number of jobs to run in parallel.
+
+        Returns
+        -------
+        ask_id : int
+            The entry id of the sample wants to query.
+        """
         labeled_entries = self.dataset.get_labeled_entries()
         Xlabeled, y = zip(*labeled_entries)
         Xlabeled = np.array(Xlabeled)

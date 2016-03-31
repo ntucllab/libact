@@ -163,8 +163,9 @@ class ActiveLearningByLearning(QueryStrategy):
         reward = 0.
         for i in range(len(self.queried_hist_)):
             reward += self.W[i] *\
-                (model.predict(self.dataset.data[self.queried_hist_[i]][0])[0] ==
-                 self.dataset.data[self.queried_hist_[i]][1])
+                (model.predict(self.dataset.data[
+                    self.queried_hist_[i]][0].reshape(1, -1))[0] ==
+                    self.dataset.data[self.queried_hist_[i]][1])
         reward /= (self.dataset.len_labeled() + self.dataset.len_unlabeled())
         reward /= self.T
         return reward
@@ -172,7 +173,7 @@ class ActiveLearningByLearning(QueryStrategy):
     def calc_query(self):
         """Calculate the sampling query distribution"""
         # initial query
-        if self.query_dist == None:
+        if self.query_dist is None:
             self.query_dist = self.exp4p_.next(-1, None, None)
         else:
             self.query_dist = self.exp4p_.next(
