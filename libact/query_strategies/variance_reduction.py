@@ -23,7 +23,7 @@ class VarianceReduction(QueryStrategy):
         Only Logistic regression are supported now.
 
     sigma: float, >0, optional (default=100.0)
-        1/sigma is added to the diagonal of the Fisher information matrix as
+        1/sigma is added to the diagonal of the Fisher information matrix as a
         regularization term.
 
     optimality : {'trace', 'determinant', 'eigenvalue'}, optional (default='trace')
