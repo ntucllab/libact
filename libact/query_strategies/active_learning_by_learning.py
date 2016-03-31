@@ -35,7 +35,7 @@ class ActiveLearningByLearning(QueryStrategy):
     uniform_sampler : {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
 
-    pmin : float, 0<pmin< :math:`\\frac{1}{len(query_strategies)}`, optional (default= :math:`\\frac{\\sqrt{\\log{N}}}{KT}`)
+    pmin : float, 0<pmin< :math:`\\frac{1}{len(query\_strategies)}`, optional (default= :math:`\\frac{\\sqrt{\\log{N}}}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms). N = K =
         number of query_strategies, T is the number of query budgets.
@@ -242,7 +242,7 @@ class Exp4P():
     delta : float, >0, optional (default=0.1)
         A parameter.
 
-    pmin : float, 0<pmin<1/len(query_strategies), optional (default= :math:`\\frac{\\sqrt{log(N)}{KT}`)
+    pmin : float, 0<pmin<1/len(query_strategies), optional (default= :math:`\\frac{\\sqrt{log(N)}}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data), N = K = number of query_strategies, T is the maximum
         number of rounds.
