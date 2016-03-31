@@ -55,11 +55,11 @@ class VarianceReduction(QueryStrategy):
         self.optimality = kwargs.pop('optimality', 'trace')
         self.sigma = kwargs.pop('sigma', 1.0)
 
-    def Phi(self, PI, X, epi, ex, label_count, feature_count):
+    def _Phi(self, PI, X, epi, ex, label_count, feature_count):
         ret = estVar(self.sigma, PI, X, epi, ex)
         return ret
 
-    def E(self, args):
+    def _E(self, args):
         X, y, qx, clf, label_count = args
         sigmoid = lambda x: 1 / (1 + np.exp(-x))
         query_point = sigmoid(clf.predict_real([qx]))
@@ -69,7 +69,7 @@ class VarianceReduction(QueryStrategy):
             clf = copy.copy(self.model)
             clf.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
             PI = sigmoid(clf.predict_real(np.vstack((X, [qx]))))
-            ret += query_point[-1][i] * self.Phi(PI[:-1], X, PI[-1], qx,
+            ret += query_point[-1][i] * self._Phi(PI[:-1], X, PI[-1], qx,
                     label_count, feature_count)
         return ret
 
@@ -102,7 +102,7 @@ class VarianceReduction(QueryStrategy):
 
         p = Pool(n_jobs)
 
-        errors = p.map(self.E, [(Xlabeled, y, x, clf, label_count) for x in
+        errors = p.map(self._E, [(Xlabeled, y, x, clf, label_count) for x in
                                 X_pool])
         p.terminate()
         return unlabeled_entry_ids[errors.index(min(errors))]
