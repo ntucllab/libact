@@ -29,7 +29,7 @@ class QueryByCommittee(QueryStrategy):
     Attributes
     ----------
     students : list, shape = (len(models))
-        A list of model instances used in this algorithm.
+        A list of the model instances used in this algorithm.
 
 
     Examples
@@ -77,13 +77,13 @@ class QueryByCommittee(QueryStrategy):
 
     def disagreement(self, votes):
         """
-        Return disagreement measurement of the given number of votes.
+        Return the disagreement measurement of the given number of votes.
         It uses the vote entropy to measure the disagreement.
 
         Parameters
         ----------
         votes : list of int, shape==(n_samples, n_students)
-            The prediction that each student gave to each sample.
+            The predictions that each student gives to each sample.
 
         Returns
         -------
@@ -106,8 +106,8 @@ class QueryByCommittee(QueryStrategy):
 
     def teach_students(self):
         """
-        Train each model (student) with labeled data using bootstrap aggregating
-        (bagging).
+        Train each model (student) with the labeled data using bootstrap
+        aggregating (bagging).
         """
         dataset = self.dataset
         for student in self.students:
