@@ -119,6 +119,7 @@ class HintSVM(QueryStrategy):
     def update(self, entry_id, label):
         pass
 
+    @_inherit_docstring
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, unlabeled_pool = zip(

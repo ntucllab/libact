@@ -24,5 +24,6 @@ class IdealLabeler(Labeler):
         self.X = X
         self.y = y
 
+    @_inherit_docstring
     def label(self, feature):
         return self.y[np.where([np.array_equal(x, feature) for x in self.X])[0][0]]

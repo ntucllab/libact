@@ -26,6 +26,7 @@ class RandomSampling(QueryStrategy):
         super(RandomSampling, self).__init__(dataset, **kwargs)
         # TODO random state as parameter
 
+    @_inherit_docstring
     def make_query(self):
         entry_id, feature = random.choice(self.dataset.get_unlabeled_entries())
         return entry_id

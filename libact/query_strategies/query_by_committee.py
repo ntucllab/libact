@@ -41,7 +41,7 @@ class QueryByCommittee(QueryStrategy):
        from libact.query_strategies import QueryByCommittee
        from libact.models import LogisticRegression
 
-       qs = QueryStrategy(
+       qs = QueryByCommittee(
                 dataset, # Dataset object
                 models=[
                     LogisticRegression(C=1.0),
@@ -119,8 +119,12 @@ class QueryByCommittee(QueryStrategy):
             student.train(bag)
 
     def update(self, entry_id, label):
+        """
+        Train each model with newly updated label.
+        """
         self.teach_students()
 
+    @_inherit_docstring
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())

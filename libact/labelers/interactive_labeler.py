@@ -25,6 +25,7 @@ class InteractiveLabeler(Labeler):
     def __init__(self, **kwargs):
         self.label_name = kwargs.pop('label_name', None)
 
+    @_inherit_docstring
     def label(self, feature):
         plt.imshow(feature, cmap=plt.cm.gray_r, interpolation='nearest')
         plt.draw()
