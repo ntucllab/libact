@@ -29,6 +29,7 @@ class SVM(ContinuousModel):
 
     def score(self, testing_dataset, *args, **kwargs):
         return self.model.score(*(testing_dataset.format_sklearn() + args), **kwargs)
+
     def predict_real(self, feature, *args, **kwargs):
         if self.model.decision_function_shape != 'ovr':
             logger.warn("SVM model support only 'ovr' for predict_real.")

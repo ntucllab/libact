@@ -4,8 +4,16 @@ libact.query_strategies package
 Submodules
 ----------
 
+libact.query_strategies.active_learning_by_learning module
+----------------------------------------------------------
+
+.. automodule:: libact.query_strategies.active_learning_by_learning
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.hintsvm module
--------------------------------------------------
+--------------------------------------
 
 .. automodule:: libact.query_strategies.hintsvm
     :members:
@@ -29,7 +37,7 @@ libact.query_strategies.quire module
     :show-inheritance:
 
 libact.query_strategies.random_sampling module
-------------------------------------
+----------------------------------------------
 
 .. automodule:: libact.query_strategies.random_sampling
     :members:

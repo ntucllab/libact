@@ -23,6 +23,10 @@ Table of Contents
   :maxdepth: 2
 
   overview.rst
+  examples/examples.rst
+  active_learning_by_learning.rst
+  dev_with_libact.rst
+  api_reference.rst
 
 * :ref:`genindex`
 * :ref:`modindex`

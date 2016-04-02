@@ -21,7 +21,7 @@ class QUIRE(QueryStrategy):
 
     Parameters
     ----------
-    lmbda: float, optional (default=1.0)
+    lambda: float, optional (default=1.0)
         A regularization parameter used in the regularization learning framework.
 
     gamma: float, optional (default=1.0)
@@ -33,9 +33,20 @@ class QUIRE(QueryStrategy):
     Attributes
     ----------
 
-    Reference
-    ---------
+    Examples
+    --------
+    Here is an example of declaring a QUIRE query_strategy object:
 
+    .. code-block:: python
+
+       from libact.query_strategies import QUIRE
+
+       qs = QUIRE(
+                dataset, # Dataset object
+            )
+
+    References
+    ----------
     .. [1] S.-J. Huang, R. Jin, and Z.-H. Zhou. Active learning by querying
            informative and representative examples.
     """
@@ -48,11 +59,11 @@ class QUIRE(QueryStrategy):
         self.Lindex = [
             idx for idx in range(len(self.dataset)) if idx not in self.Uindex
             ]
-        self.lmbda = kwargs.pop('lmbda', 1.)
+        self.lmbda = kwargs.pop('lambda', 1.)
         self.gamma = kwargs.pop('gamma', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
-        K = rbf_kernel(X=X, Y=X, gamma=self.gamma) 
+        K = rbf_kernel(X=X, Y=X, gamma=self.gamma)
         #TODO: extend for other kernel functions
         self.K = K
         self.L = np.linalg.inv(K + self.lmbda * np.eye(len(X)))
@@ -62,6 +73,7 @@ class QUIRE(QueryStrategy):
         self.Uindex.remove(entry_id)
         self.y[entry_id] = label
 
+    @_inherit_docstring
     def make_query(self):
         L = self.L
         Lindex = self.Lindex
@@ -92,7 +104,7 @@ class QUIRE(QueryStrategy):
                       L[each_index][Lindex] - \
                           np.dot(
                               np.dot(
-                                  L[each_index][Uindex_r], 
+                                  L[each_index][Uindex_r],
                                   inv_Luu
                               ),
                               L[np.ix_(Uindex_r, Lindex)]

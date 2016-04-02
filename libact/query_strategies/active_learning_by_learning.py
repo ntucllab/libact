@@ -3,7 +3,6 @@
 This module includes two classes. ActiveLearningByLearning is the main
 algorithm for ALBL and Exp4P is the multi-armed bandit algorithm which will be
 used in ALBL.
-
 """
 from libact.base.interfaces import QueryStrategy
 import numpy as np
@@ -11,54 +10,85 @@ import copy
 
 
 class ActiveLearningByLearning(QueryStrategy):
+
     """Active Learning By Learning (ALBL) query strategy.
 
     ALBL is an active learning algorithm that adaptively choose among existing
-    query strategies to decide which data to make query. It utilizes
-    Exp4.P, a multi-armed bandit algorithm to adaptively make such decision.
-    More details of ALBL can refer to the work listed in the reference section.
+    query strategies to decide which data to make query. It utilizes Exp4.P, a
+    multi-armed bandit algorithm to adaptively make such decision. More details
+    of ALBL can refer to the work listed in the reference section.
 
     Parameters
     ----------
-    T: integer
+    T : integer
         Query budget, the maximal number of queries to be made.
 
-    query_strategies: list of libact.query_strategies.* object instance
+    query_strategies : list of :py:mod:`libact.query_strategies` object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
         Note that these query_strategies should share the same dataset
         instance with ActiveLearningByLearning instance.
 
-    delta: float, optional (default=0.1)
+    delta : float, optional (default=0.1)
         Parameter for Exp4.P.
 
-    uniform_sampler: {True, False}, optional (default=True)
+    uniform_sampler : {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
 
-    pmin: float, 0<pmin<1/len(n_active_algorithm), optional (default=:math:`\frac{√{log(N)}{KT}`)
+    pmin : float, 0<pmin< :math:`\\frac{1}{len(query\_strategies)}`, optional (default= :math:`\\frac{\\sqrt{\\log{N}}}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms). N = K =
         number of query_strategies, T is the number of query budgets.
 
-    model: libact.model.* object instance
+    model : :py:mod:`libact.models` object instance
         The learning model used for the task.
-
 
     Attributes
     ----------
-    query_strategies_: list of libact.query_strategies.* object instance
+    query_strategies\\_ : list of :py:mod:`libact.query_strategies` object instance
+        The active learning algorithm instances.
 
-    exp4p_: instance of Exp4P object
+    exp4p\\_ : instance of Exp4P object
+        The multi-armed bandit instance.
 
-    queried_hist_: list of integer
+    queried_hist\\_ : list of integer
         A list of entry_id of the dataset which is queried in the past.
 
+    Examples
+    --------
+    Here is an example of how to declare a ActiveLearningByLearning
+    query_strategy object:
 
-    Reference
-    ---------
+    .. code-block:: python
 
+       from libact.query_strategies import ActiveLearningByLearning
+       from libact.query_strategies import HintSVM
+       from libact.query_strategies import UncertaintySampling
+       from libact.models import LogisticRegression
+
+       qs = ActiveLearningByLearning(
+                   dataset, # Dataset object
+                   query_strategies=[
+                       UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
+                       UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
+                       HintSVM(dataset)
+                       ],
+                   model=LogisticRegression()
+                   )
+
+    The :code:`query_strategies` parameter is a list of
+    :code:`libact.query_strategies` object instances where each of their
+    associated dataset must be the same :code:`Dataset` instance. ALBL combines
+    the result of these query strategies and generate its own suggestion of
+    which sample to query.  ALBL will adaptively *learn* from each of the
+    decision it made, using the given supervised learning model in :code:`model`
+    parameter to evaluate its IW-ACC.
+
+    References
+    ----------
     .. [1] Wei-Ning Hsu, and Hsuan-Tien Lin. "Active Learning by Learning."
            Twenty-Ninth AAAI Conference on Artificial Intelligence. 2015.
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -193,56 +223,55 @@ class Exp4P():
     """A multi-armed bandit algorithm Exp4.P.
 
     For the Exp4.P used in ALBL, the number of arms (actions) and number of
-    experts are equal to the number of active learning algorithms wanted to
-    use. The arms (actions) are the active learning algorithms, where is
-    inputed from parameter 'query_strategies'. There is no need for the input of
-    experts, the advice of the kth expert are always equal e_k, where e_k is
-    the kth column of the identity matrix.
+    experts are equal to the number of active learning algorithms wanted to use.
+    The arms (actions) are the active learning algorithms, where is inputed from
+    parameter 'query_strategies'. There is no need for the input of experts, the
+    advice of the kth expert are always equal e_k, where e_k is the kth column
+    of the identity matrix.
 
     Parameters
     ----------
-    query_strategies: QueryStrategy instances
+    query_strategies : QueryStrategy instances
         The active learning algorithms wanted to use, it is equivalent to
         actions or arms in original Exp4.P.
 
-    unlabeled_invert_id_idx: dictionary
+    unlabeled_invert_id_idx : dict
         A look up table for the correspondance of entry_id to the index of the
         unlabeled data.
 
-    delta: float, >0, optional (default=0.1)
+    delta : float, >0, optional (default=0.1)
         A parameter.
 
-    pmin: float, 0<pmin<1/len(query_strategies), optional (default=:math:`\frac{√{log(N)}{KT}`)
+    pmin : float, 0<pmin<1/len(query_strategies), optional (default= :math:`\\frac{\\sqrt{log(N)}}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data), N = K = number of query_strategies, T is the maximum
         number of rounds.
 
-    T: integer, optional (default=100)
+    T : int, optional (default=100)
         The maximum number of rounds.
 
-    uniform_sampler: {True, False}, optional (default=Truee)
+    uniform_sampler : {True, False}, optional (default=Truee)
         Determining whether to include uniform random sampler as one of the
         underlying active learning algorithms.
 
-
     Attributes
     ----------
-    t: integer
+    t : int
         The current round this instance is at.
 
-    N: integer
+    N : int
         The number of arms (actions) in this exp4.p instance.
 
-    quert_models_: list of libact.query_strategies.* object instance
+    query_models\\_ : list of :py:mod:`libact.query_strategies` object instance
         The underlying active learning algorithm instances.
 
-
-    Reference
-    ---------
+    References
+    ----------
     .. [1] Beygelzimer, Alina, et al. "Contextual bandit algorithms with
            supervised learning guarantees." In Proceedings on the International
            Conference on Artificial Intelligence and Statistics (AISTATS),
            2011u.
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -310,15 +339,8 @@ class Exp4P():
     def exp4p(self):
         """The generator which implements the main part of Exp4.P.
 
-        Yields
-        ------
-        q: array-like, shape = [K]
-            The query vector which tells ALBL what kind of distribution if
-            should sample from the unlabeled pool.
-
-
-        Send
-        ----
+        Parameters
+        ----------
         reward: float
             The reward value calculated from ALBL.
 
@@ -327,6 +349,13 @@ class Exp4P():
 
         lbl: integer
             The answer received from asking the entry_id ask_id.
+
+        Yields
+        ------
+        q: array-like, shape = [K]
+            The query vector which tells ALBL what kind of distribution if
+            should sample from the unlabeled pool.
+
         """
         while True:
             #TODO probabilistic active learning algorithm

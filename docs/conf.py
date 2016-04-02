@@ -24,7 +24,7 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
         return Mock()
 
-MOCK_MODULES = ['scipy', 'matplotlib', 'numpy', 'sklearn',
+MOCK_MODULES = ['scipy', 'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
                 'sklearn.metrics.pairwise',
                 # c extensions
@@ -35,7 +35,7 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -50,8 +50,17 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
     'numpydoc',
 ]
+
+# Napoleon settings
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
+napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_references = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -117,7 +126,7 @@ exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
-#modindex_common_prefix = []
+modindex_common_prefix = ['libact']
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
