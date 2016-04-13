@@ -24,10 +24,7 @@ class QUIRE(QueryStrategy):
     lambda: float, optional (default=1.0)
         A regularization parameter used in the regularization learning framework.
 
-    gamma: float, optional (default=1.0)
-        A parameter for computing rbf kernel.
-
-    K: sklearn.metrics.pairwise.*_kernel, optional (default = 'rbf')
+    K: sklearn.metrics.pairwise.*_kernel, optional (default = rbf_kernel(X=X, Y=X, gamma=1.))
         Kernel matrix. Currently supports only rbf kernel.
 
     Attributes
@@ -60,12 +57,9 @@ class QUIRE(QueryStrategy):
             idx for idx in range(len(self.dataset)) if idx not in self.Uindex
             ]
         self.lmbda = kwargs.pop('lambda', 1.)
-        self.gamma = kwargs.pop('gamma', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
-        K = rbf_kernel(X=X, Y=X, gamma=self.gamma)
-        #TODO: extend for other kernel functions
-        self.K = K
+        self.K = kwargs.pop('kernel', rbf_kernel(X=X, Y=X, gamma=1.))
         self.L = np.linalg.inv(K + self.lmbda * np.eye(len(X)))
 
     def update(self, entry_id, label):
