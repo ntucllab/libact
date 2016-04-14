@@ -62,7 +62,7 @@ class QUIRE(QueryStrategy):
         self.K = kwargs.pop('kernel', rbf_kernel(X=X, Y=X, gamma=1.))
         if not isinstance(self.K, np.ndarray):
             raise TypeError('kernel should be an ndarray')
-        if self.K.shape == (len(X), len(X)):
+        if self.K.shape != (len(X), len(X)):
             raise ValueError('kernel should have size (%d, %d)' %(len(X), len(X)))
         self.L = np.linalg.inv(self.K + self.lmbda * np.eye(len(X)))
 
