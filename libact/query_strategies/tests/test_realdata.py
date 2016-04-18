@@ -42,6 +42,17 @@ class RealdataTestCase(unittest.TestCase):
         assert_array_equal(
             qseq, np.array([117, 175, 256, 64, 103, 118, 180, 159, 129, 235]))
 
+    def test_quire_mykernel(self):
+        def my_kernel(X, Y):
+            return np.dot(X, Y.T)
+        np.random.seed(1126)
+        trn_ds = Dataset(self.X,
+                         np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
+        qs = QUIRE(trn_ds, kernel = my_kernel)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(
+            qseq, np.array([383, 355, 313, 320, 407, 232, 56, 146, 13, 162]))
+
     def test_RandomSampling(self):
         random.seed(1126)
         trn_ds = Dataset(self.X,

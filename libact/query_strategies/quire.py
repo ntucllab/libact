@@ -76,16 +76,17 @@ class QUIRE(QueryStrategy):
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
         self.kernel = kwargs.pop('kernel', 'rbf')
-        if self.kernel == 'rbf'
+        if self.kernel == 'rbf':
             self.K = rbf_kernel(X=X, Y=X, gamma = kwargs.pop('gamma', 1.))
-        elif self.kernel == 'poly'
+        elif self.kernel == 'poly':
             self.K = polynomial_kernel(X=X, Y=X, coef0 = kwargs.pop('coef0', 1),\
                 degree = kwargs.pop('degree', 3), gamma = kwargs.pop('gamma', 1.))
-        elif self.kernel == 'linear'
+        elif self.kernel == 'linear':
             self.K = linear_kernel(X=X, Y=X)
-        elif hasattr(self.kernel, '__call__')
-            self.K = self.kernel(X=X, Y=X)
-        else
+        elif hasattr(self.kernel, '__call__'):
+            print('use callable')
+            self.K = self.kernel(X=np.array(X), Y=np.array(X))
+        else:
             raise NotImplementedError
         
         if not isinstance(self.K, np.ndarray):
