@@ -51,7 +51,7 @@ class RealdataTestCase(unittest.TestCase):
         qs = QUIRE(trn_ds, kernel = my_kernel)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([383, 355, 313, 320, 407, 232, 56, 146, 13, 162]))
+            qseq, np.array([9, 227, 176, 110,  52, 117, 228, 205, 103, 175]))
 
     def test_RandomSampling(self):
         random.seed(1126)
