@@ -8,7 +8,7 @@ This module contains a class that implements an active learning algorithm
 import bisect
 
 import numpy as np
-from sklearn.metrics.pairwise import rbf_kernel
+from sklearn.metrics.pairwise import *
 
 from libact.base.interfaces import QueryStrategy
 
@@ -24,8 +24,24 @@ class QUIRE(QueryStrategy):
     lambda: float, optional (default=1.0)
         A regularization parameter used in the regularization learning framework.
 
-    K: sklearn.metrics.pairwise.*_kernel, optional (default = rbf_kernel(X=X, Y=X, gamma=1.))
-        Kernel matrix. Currently supports only rbf kernel.
+    kernel : string, optional (default='rbf')
+        Specifies the kernel type to be used in the algorithm.
+        It must be one of 'linear', 'poly', 'rbf', or a callable.
+        If none is given, 'rbf' will be used. If a callable is given it is
+        used to pre-compute the kernel matrix from data matrices; that matrix
+        should be an array of shape ``(n_samples, n_samples)``.
+
+    degree : int, optional (default=3)
+        Degree of the polynomial kernel function ('poly').
+        Ignored by all other kernels.
+
+    gamma : float, optional (default=1.)
+        Kernel coefficient for 'rbf', 'poly'.
+
+    coef0 : float, optional (default=1.)
+        Independent term in kernel function.
+        It is only significant in 'poly'.
+
 
     Attributes
     ----------
@@ -59,9 +75,21 @@ class QUIRE(QueryStrategy):
         self.lmbda = kwargs.pop('lambda', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
-        self.K = kwargs.pop('kernel', rbf_kernel(X=X, Y=X, gamma=1.))
+        self.kernel = kwargs.pop('kernel', 'rbf')
+        if self.kernel == 'rbf'
+            self.K = rbf_kernel(X=X, Y=X, gamma = kwargs.pop('gamma', 1.))
+        elif self.kernel == 'poly'
+            self.K = polynomial_kernel(X=X, Y=X, coef0 = kwargs.pop('coef0', 1),\
+                degree = kwargs.pop('degree', 3), gamma = kwargs.pop('gamma', 1.))
+        elif self.kernel == 'linear'
+            self.K = linear_kernel(X=X, Y=X)
+        elif hasattr(self.kernel, '__call__')
+            self.K = self.kernel(X=X, Y=X)
+        else
+            raise NotImplementedError
+        
         if not isinstance(self.K, np.ndarray):
-            raise TypeError('kernel should be an ndarray')
+            raise TypeError('K should be an ndarray')
         if self.K.shape != (len(X), len(X)):
             raise ValueError('kernel should have size (%d, %d)' %(len(X), len(X)))
         self.L = np.linalg.inv(self.K + self.lmbda * np.eye(len(X)))
