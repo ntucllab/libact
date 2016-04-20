@@ -34,7 +34,6 @@ class RealdataTestCase(unittest.TestCase):
         self.quota = 10
 
     def test_quire(self):
-        np.random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
         qs = QUIRE(trn_ds)
@@ -43,35 +42,32 @@ class RealdataTestCase(unittest.TestCase):
             qseq, np.array([117, 175, 256, 64, 103, 118, 180, 159, 129, 235]))
 
     def test_RandomSampling(self):
-        random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
-        qs = RandomSampling(trn_ds)
+        qs = RandomSampling(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([141, 37, 129, 15, 151, 149, 237, 17, 146, 91]))
+            qseq, np.array([150, 16, 122, 157, 233, 160, 114, 163, 155, 56]))
 
     def test_HintSVM(self):
-        np.random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
-        qs = HintSVM(trn_ds)
+        qs = HintSVM(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([24, 235, 228, 209, 18, 143, 119, 90, 149, 207]))
 
     def test_QueryByCommittee(self):
-        #import ipdb; ipdb.set_trace()
-        random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
         qs = QueryByCommittee(trn_ds,
                               models=[LogisticRegression(C=1.0),
                                       LogisticRegression(C=0.01),
-                                      LogisticRegression(C=100)])
+                                      LogisticRegression(C=100)],
+                              random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([ 11, 207, 101, 30, 116, 108, 83, 172, 211, 42]))
+            qseq, np.array([267, 210, 229, 220, 134, 252, 222, 142, 245, 228]))
 
     def test_UcertaintySamplingLc(self):
         random.seed(1126)
@@ -94,18 +90,18 @@ class RealdataTestCase(unittest.TestCase):
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
 
     def test_ActiveLearningByLearning(self):
-        np.random.seed(1126)
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
         qs = ActiveLearningByLearning(trn_ds, T=self.quota,
                 query_strategies=[
                     UncertaintySampling(trn_ds, model=LogisticRegression()),
-                    HintSVM(trn_ds)],
-                model=LogisticRegression()
+                    HintSVM(trn_ds, random_state=1126)],
+                model=LogisticRegression(),
+                random_state=1126
             )
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([103, 220, 118,  75, 176,  50, 247, 199,  46,  55]))
+            qseq, np.array([173, 103, 133, 184, 187, 147, 251, 83, 93, 33]))
 
 
 if __name__ == '__main__':
