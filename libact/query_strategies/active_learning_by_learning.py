@@ -4,10 +4,18 @@ This module includes two classes. ActiveLearningByLearning is the main
 algorithm for ALBL and Exp4P is the multi-armed bandit algorithm which will be
 used in ALBL.
 """
-from libact.base.interfaces import QueryStrategy
-import numpy as np
+from __future__ import division
+try:
+    from future_builtins import zip
+except ImportError:
+    pass
+
 import copy
 
+import numpy as np
+
+from libact.base.interfaces import QueryStrategy
+from libact.utils import inherit_docstring_from
 
 class ActiveLearningByLearning(QueryStrategy):
 
@@ -183,16 +191,16 @@ class ActiveLearningByLearning(QueryStrategy):
             )
         return
 
+    @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
-        """Calculate the next query after updating the question asked with an
-        answer."""
+        # Calculate the next query after updating the question asked with an
+        # answer.
         ask_idx = self.unlabeled_invert_id_idx[entry_id]
         self.W.append(1./self.query_dist[ask_idx])
         self.queried_hist_.append(entry_id)
 
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
-        """Except for the initial query, it returns the id of the data albl
-        wants to query."""
         dataset = self.dataset
         try:
             unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())

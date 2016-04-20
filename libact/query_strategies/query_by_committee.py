@@ -3,6 +3,12 @@
 This module contains a class that implements Query by committee active learning
 algorithm.
 """
+from __future__ import division
+try:
+    from future_builtins import zip
+except ImportError:
+    pass
+
 from functools import cmp_to_key
 import logging
 import math
@@ -11,6 +17,7 @@ import numpy as np
 
 from libact.base.interfaces import QueryStrategy
 import libact.models
+from libact.utils import inherit_docstring_from
 
 logger = logging.getLogger(__name__)
 
@@ -118,13 +125,12 @@ class QueryByCommittee(QueryStrategy):
                                're-sample the bag.')
             student.train(bag)
 
+    @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
-        """
-        Train each model with newly updated label.
-        """
+        # Train each model with newly updated label.
         self.teach_students()
 
-    @_inherit_docstring
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())

@@ -1,6 +1,7 @@
 import random
 
 from libact.base.interfaces import QueryStrategy
+from libact.utils import inherit_docstring_from
 
 
 class RandomSampling(QueryStrategy):
@@ -26,7 +27,7 @@ class RandomSampling(QueryStrategy):
         super(RandomSampling, self).__init__(dataset, **kwargs)
         # TODO random state as parameter
 
-    @_inherit_docstring
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         entry_id, feature = random.choice(self.dataset.get_unlabeled_entries())
         return entry_id

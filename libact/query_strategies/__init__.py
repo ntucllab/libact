@@ -1,6 +1,12 @@
 """
 Concrete query strategy classes.
 """
+from __future__ import absolute_import
+try:
+    from future_builtins import zip
+except ImportError:
+    pass
+
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 import logging

@@ -23,6 +23,7 @@ static PyMethodDef module_methods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "_variance_reduction",  /* m_name */
@@ -46,6 +47,12 @@ PyMODINIT_FUNC PyInit__variance_reduction(void){
 
     return m;
 }
+#else
+PyMODINIT_FUNC init_variance_reduction(void){
+    PyObject *module = Py_InitModule("_variance_reduction", module_methods);
+    import_array();
+}
+#endif
 
 double* matrix_mul(double* a, double* b, int m1, int n1, int m2, int n2){
     double *ret = (double*) malloc(m1 * n2 * sizeof(double));

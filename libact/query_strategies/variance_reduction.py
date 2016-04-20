@@ -1,4 +1,8 @@
 """Variance Reduction"""
+try:
+    from future_builtins import zip
+except ImportError:
+    pass
 
 import copy
 from multiprocessing import Pool
@@ -9,6 +13,7 @@ from libact.base.interfaces import QueryStrategy
 from libact.base.dataset import Dataset
 import libact.models
 from libact.query_strategies._variance_reduction import estVar
+from libact.utils import inherit_docstring_from
 
 
 class VarianceReduction(QueryStrategy):
@@ -73,6 +78,7 @@ class VarianceReduction(QueryStrategy):
                     label_count, feature_count)
         return ret
 
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self, n_jobs=1):
         """
         Calculate which point to query.
@@ -105,4 +111,5 @@ class VarianceReduction(QueryStrategy):
         errors = p.map(self._E, [(Xlabeled, y, x, clf, label_count) for x in
                                 X_pool])
         p.terminate()
+
         return unlabeled_entry_ids[errors.index(min(errors))]

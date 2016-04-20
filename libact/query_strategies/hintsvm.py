@@ -5,11 +5,16 @@ active learning algorithm.
 
 Standalone hintsvm can be retrieved from https://github.com/yangarbiter/hintsvm
 """
+try:
+    from future_builtins import zip
+except ImportError:
+    pass
 
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy
 from libact.query_strategies._hintsvm import hintsvm_query
+from libact.utils import inherit_docstring_from
 
 
 class HintSVM(QueryStrategy):
@@ -116,10 +121,7 @@ class HintSVM(QueryStrategy):
 
         self.svm_params['C'] = self.cl
 
-    def update(self, entry_id, label):
-        pass
-
-    @_inherit_docstring
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, unlabeled_pool = zip(

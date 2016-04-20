@@ -73,7 +73,6 @@ class QUIRE(QueryStrategy):
         self.Uindex.remove(entry_id)
         self.y[entry_id] = label
 
-    @_inherit_docstring
     def make_query(self):
         L = self.L
         Lindex = self.Lindex
