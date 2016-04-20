@@ -14,11 +14,10 @@ import numpy as np
 
 from libact.base.interfaces import QueryStrategy
 from libact.query_strategies._hintsvm import hintsvm_query
-from libact.utils import inherit_docstring_from
+from libact.utils import inherit_docstring_from, seed_random_state
 
 
 class HintSVM(QueryStrategy):
-
     """Hinted Support Vector Machine
 
     Hinted Support Vector Machine is an active learning algorithm within the
@@ -34,6 +33,11 @@ class HintSVM(QueryStrategy):
 
     p : float, >0 and <=1, optional (default=.5)
         The probability to select an instance from unlabeld pool to hint pool.
+
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+        If int or None, random_state is passed as parameter to generate
+        np.random.RandomState instance. if np.random.RandomState instance,
+        random_state is the random number generate.
 
     kernel : {'linear', 'poly', 'rbf', 'sigmoid'}, optional (default='linear')
 		linear: u'\*v
@@ -61,6 +65,11 @@ class HintSVM(QueryStrategy):
 
     verbose : int, optional (default=0)
         Set verbosity level for hintsvm solver.
+
+    Attributes
+    ----------
+    random_states\\_ : np.random.RandomState instance
+        The random number generator using.
 
     Examples
     --------
@@ -108,6 +117,9 @@ class HintSVM(QueryStrategy):
                 'than or equal to 1.'
                 )
 
+        random_state = kwargs.pop('random_state', None)
+        self.random_state_ = seed_random_state(random_state)
+
         # svm solver parameters
         self.svm_params = {}
         self.svm_params['kernel'] = kwargs.pop('kernel', 'linear')
@@ -131,9 +143,8 @@ class HintSVM(QueryStrategy):
         cl = self.cl
         ch = self.ch
         p = self.p
-        hint_pool_idx = np.random.choice(
-            len(unlabeled_pool), int(
-                len(unlabeled_pool)*p))
+        hint_pool_idx = self.random_state_.choice(
+            len(unlabeled_pool), int(len(unlabeled_pool)*p))
         hint_pool = np.array(unlabeled_pool)[hint_pool_idx]
 
         weight = [1.0 for _ in range(len(labeled_pool))] +\
