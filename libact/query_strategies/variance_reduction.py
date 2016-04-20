@@ -23,11 +23,11 @@ class VarianceReduction(QueryStrategy):
 
     Parameters
     ----------
-    model: {libact.model.LogisticRegression instance, 'LogisticRegression'}
+    model : {libact.model.LogisticRegression instance, 'LogisticRegression'}
         The model used for variance reduction to evaluate the variance.
         Only Logistic regression are supported now.
 
-    sigma: float, >0, optional (default=100.0)
+    sigma : float, >0, optional (default=100.0)
         1/sigma is added to the diagonal of the Fisher information matrix as a
         regularization term.
 
@@ -36,6 +36,8 @@ class VarianceReduction(QueryStrategy):
         maximum eigenvalue of the inverse Fisher information matrix.
         Only 'trace' are supported now.
 
+    n_jobs : int, optional (default=1)
+        The number of processors to estimate the expected variance.
 
     Attributes
     ----------
@@ -59,40 +61,10 @@ class VarianceReduction(QueryStrategy):
             self.model = model
         self.optimality = kwargs.pop('optimality', 'trace')
         self.sigma = kwargs.pop('sigma', 1.0)
-
-    def _Phi(self, PI, X, epi, ex, label_count, feature_count):
-        ret = estVar(self.sigma, PI, X, epi, ex)
-        return ret
-
-    def _E(self, args):
-        X, y, qx, clf, label_count = args
-        sigmoid = lambda x: 1 / (1 + np.exp(-x))
-        query_point = sigmoid(clf.predict_real([qx]))
-        feature_count = len(X[0])
-        ret = 0.0
-        for i in range(label_count):
-            clf = copy.copy(self.model)
-            clf.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
-            PI = sigmoid(clf.predict_real(np.vstack((X, [qx]))))
-            ret += query_point[-1][i] * self._Phi(PI[:-1], X, PI[-1], qx,
-                    label_count, feature_count)
-        return ret
+        self.n_jobs = kwargs.pop('n_jobs', 1)
 
     @inherit_docstring_from(QueryStrategy)
-    def make_query(self, n_jobs=1):
-        """
-        Calculate which point to query.
-
-        Parameters
-        ----------
-        n_jobs : int, optional (default=1)
-            The number of jobs to run in parallel.
-
-        Returns
-        -------
-        ask_id : int
-            The entry id of the sample wants to query.
-        """
+    def make_query(self):
         labeled_entries = self.dataset.get_labeled_entries()
         Xlabeled, y = zip(*labeled_entries)
         Xlabeled = np.array(Xlabeled)
@@ -106,10 +78,27 @@ class VarianceReduction(QueryStrategy):
         clf = copy.copy(self.model)
         clf.train(Dataset(Xlabeled, y))
 
-        p = Pool(n_jobs)
-
-        errors = p.map(self._E, [(Xlabeled, y, x, clf, label_count) for x in
-                                X_pool])
+        p = Pool(self.n_jobs)
+        errors = p.map(_E, [(Xlabeled, y, x, clf, label_count, self.sigma,
+                             self.model) for x in X_pool])
         p.terminate()
 
         return unlabeled_entry_ids[errors.index(min(errors))]
+
+def _Phi(sigma, PI, X, epi, ex, label_count, feature_count):
+	ret = estVar(sigma, PI, X, epi, ex)
+	return ret
+
+def _E(args):
+	X, y, qx, clf, label_count, sigma, model = args
+	sigmoid = lambda x: 1 / (1 + np.exp(-x))
+	query_point = sigmoid(clf.predict_real([qx]))
+	feature_count = len(X[0])
+	ret = 0.0
+	for i in range(label_count):
+		clf_ = copy.copy(model)
+		clf_.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
+		PI = sigmoid(clf_.predict_real(np.vstack((X, [qx]))))
+		ret += query_point[-1][i] * _Phi(sigma, PI[:-1], X, PI[-1], qx,
+				label_count, feature_count)
+	return ret
