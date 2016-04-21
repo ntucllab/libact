@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from distutils.core import setup, Extension
 import os
+from setuptools import setup, Extension
 import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -61,7 +61,7 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
     ],
-
+    test_suite='libact',
     packages=[
         'libact',
         'libact.base',
