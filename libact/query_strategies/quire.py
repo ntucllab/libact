@@ -24,12 +24,12 @@ class QUIRE(QueryStrategy):
     lambda: float, optional (default=1.0)
         A regularization parameter used in the regularization learning framework.
 
-    kernel : string, optional (default='rbf')
+    kernel : {'linear', 'poly', 'rbf', callable}, optional (default='rbf')
         Specifies the kernel type to be used in the algorithm.
         It must be one of 'linear', 'poly', 'rbf', or a callable.
-        If none is given, 'rbf' will be used. If a callable is given it is
-        used to pre-compute the kernel matrix from data matrices; that matrix
-        should be an array of shape ``(n_samples, n_samples)``.
+        If a callable is given it is used to pre-compute the kernel matrix 
+        from data matrices; that matrix should be an array of shape 
+        ``(n_samples, n_samples)``.
 
     degree : int, optional (default=3)
         Degree of the polynomial kernel function ('poly').
@@ -84,7 +84,6 @@ class QUIRE(QueryStrategy):
         elif self.kernel == 'linear':
             self.K = linear_kernel(X=X, Y=X)
         elif hasattr(self.kernel, '__call__'):
-            print('use callable')
             self.K = self.kernel(X=np.array(X), Y=np.array(X))
         else:
             raise NotImplementedError
