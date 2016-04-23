@@ -5,17 +5,13 @@ algorithm for ALBL and Exp4P is the multi-armed bandit algorithm which will be
 used in ALBL.
 """
 from __future__ import division
-try:
-    from future_builtins import zip
-except ImportError:
-    pass
 
 import copy
 
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy
-from libact.utils import inherit_docstring_from, seed_random_state
+from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 class ActiveLearningByLearning(QueryStrategy):
     """Active Learning By Learning (ALBL) query strategy.

@@ -1,14 +1,9 @@
 """
 """
-try:
-    from future_builtins import zip
-except ImportError:
-    pass
-
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy
-from libact.utils import inherit_docstring_from, seed_random_state
+from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 
 class RandomSampling(QueryStrategy):

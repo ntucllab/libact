@@ -1,6 +1,21 @@
 
+import sys
+
 import numpy as np
 
+# Syntax sugar.
+_ver = sys.version_info
+#: Python 2.x?
+is_py2 = (_ver[0] == 2)
+#: Python 3.x?
+is_py3 = (_ver[0] == 3)
+
+if is_py2:
+    from future_builtins import zip
+
+__all__ = ['inherit_docstring_from', 'seed_random_state', 'zip']
+
+zip = zip
 def inherit_docstring_from(cls):
     """Decorator for class methods to inherit docstring from :code:`cls`
     """
@@ -19,5 +34,3 @@ def seed_random_state(seed):
         return seed
     raise ValueError("%r can not be used to generate numpy.random.RandomState"
                      " instance" % seed)
-
-__all__ = ['inherit_docstring_from', seed_random_state]

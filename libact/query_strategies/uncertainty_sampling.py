@@ -5,15 +5,10 @@ uncertainty sampling query strategies: the least confidence method and the
 smallest margin method (margin sampling).
 
 """
-try:
-    from future_builtins import zip
-except ImportError:
-    pass
-
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy, ContinuousModel
-from libact.utils import inherit_docstring_from
+from libact.utils import inherit_docstring_from, zip
 
 
 class UncertaintySampling(QueryStrategy):

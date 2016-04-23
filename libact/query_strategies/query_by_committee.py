@@ -4,10 +4,6 @@ This module contains a class that implements Query by committee active learning
 algorithm.
 """
 from __future__ import division
-try:
-    from future_builtins import zip
-except ImportError:
-    pass
 
 from functools import cmp_to_key
 import logging
@@ -18,7 +14,7 @@ import numpy as np
 from libact.base.dataset import Dataset
 from libact.base.interfaces import QueryStrategy
 import libact.models
-from libact.utils import inherit_docstring_from, seed_random_state
+from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 logger = logging.getLogger(__name__)
 

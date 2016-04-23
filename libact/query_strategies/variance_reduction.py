@@ -1,9 +1,4 @@
 """Variance Reduction"""
-try:
-    from future_builtins import zip
-except ImportError:
-    pass
-
 import copy
 from multiprocessing import Pool
 
@@ -13,7 +8,7 @@ from libact.base.interfaces import QueryStrategy
 from libact.base.dataset import Dataset
 import libact.models
 from libact.query_strategies._variance_reduction import estVar
-from libact.utils import inherit_docstring_from
+from libact.utils import inherit_docstring_from, zip
 
 
 class VarianceReduction(QueryStrategy):
