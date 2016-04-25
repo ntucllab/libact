@@ -13,6 +13,8 @@ authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin
 
 Comments on the package is welcomed at (temporarily) `htlin@csie.ntu.edu.tw`. If you find this package useful, please cite the original works (see Reference of each strategy) as well as (temporarily)
 
+Documentation for the latest release is hosted [here](http://libact.readthedocs.org/en/latest/).
+
 ```
 @Misc{libact,
   author =   {Yu-An Chung and Shao-Chuan Lee and Yao-Yuan Yang and Tung-En Wu and Hsuan-Tien Lin},
