@@ -1,6 +1,8 @@
 """
 Concrete query strategy classes.
 """
+from __future__ import absolute_import
+
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 import logging

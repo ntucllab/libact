@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from distutils.core import setup, Extension
 import os
+from setuptools import setup, Extension
 import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -57,20 +57,26 @@ setup(
     url='https://github.com/ntucllab/libact',
     cmdclass = cmdclasses,
     classifiers=[
-        "Topic :: Scientific/Engineering"
+        "Topic :: Scientific/Engineering",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
     ],
-
+    test_suite='libact',
     packages=[
+        'libact',
         'libact.base',
         'libact.models',
         'libact.labelers',
         'libact.query_strategies',
+        'libact.utils',
         ],
     package_dir={
+        'libact': 'libact',
         'libact.base': 'libact/base',
         'libact.models': 'libact/models',
         'libact.labelers': 'libact/labelers',
         'libact.query_strategies': 'libact/query_strategies',
+        'libact.utils': 'libact/utils',
         },
     ext_modules=extensions,
     )

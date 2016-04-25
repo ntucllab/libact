@@ -3,14 +3,18 @@
 This module contains a class that implements Query by committee active learning
 algorithm.
 """
+from __future__ import division
+
 from functools import cmp_to_key
 import logging
 import math
 
 import numpy as np
 
+from libact.base.dataset import Dataset
 from libact.base.interfaces import QueryStrategy
 import libact.models
+from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +29,18 @@ class QueryByCommittee(QueryStrategy):
         or class names of libact Model classes to determine the models to be
         included in the committee to vote for each unlabeled instance.
 
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+        If int or None, random_state is passed as parameter to generate
+        np.random.RandomState instance. if np.random.RandomState instance,
+        random_state is the random number generate.
 
     Attributes
     ----------
     students : list, shape = (len(models))
         A list of the model instances used in this algorithm.
 
+    random_states\\_ : np.random.RandomState instance
+        The random number generator using.
 
     Examples
     --------
@@ -59,7 +69,7 @@ class QueryByCommittee(QueryStrategy):
 
     def __init__(self, *args, **kwargs):
         super(QueryByCommittee, self).__init__(*args, **kwargs)
-        self.students = list()
+
         models = kwargs.pop('models', None)
         if models is None:
             raise TypeError(
@@ -67,6 +77,11 @@ class QueryByCommittee(QueryStrategy):
                 )
         elif not models:
             raise ValueError("models list is empty")
+
+        random_state = kwargs.pop('random_state', None)
+        self.random_state_ = seed_random_state(random_state)
+
+        self.students = list()
         for model in models:
             if type(model) is str:
                 self.students.append(getattr(libact.models, model)())
@@ -104,6 +119,13 @@ class QueryByCommittee(QueryStrategy):
 
         return ret
 
+    def _labeled_uniform_sample(self, sample_size):
+        labeled_entries = self.dataset.get_labeled_entries()
+        samples = [labeled_entries[
+                        self.random_state_.randint(0, len(labeled_entries))
+                    ]for _ in range(sample_size)]
+        return Dataset(*zip(*samples))
+
     def teach_students(self):
         """
         Train each model (student) with the labeled data using bootstrap
@@ -111,20 +133,21 @@ class QueryByCommittee(QueryStrategy):
         """
         dataset = self.dataset
         for student in self.students:
-            bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+            #bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+            bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
-                bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
+                bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
+                #bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
                 logger.warning('There is student receiving only one label,'
                                're-sample the bag.')
             student.train(bag)
 
+    @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
-        """
-        Train each model with newly updated label.
-        """
+        # Train each model with newly updated label.
         self.teach_students()
 
-    @_inherit_docstring
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
@@ -139,7 +162,7 @@ class QueryByCommittee(QueryStrategy):
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
                 reverse=True)
-        ask_id = np.random.choice(
-            [e[0] for e in disagreement if e[1] == disagreement[0][1] ])
+        ask_id = self.random_state_.choice(
+            [e[0] for e in disagreement if e[1] == disagreement[0][1]])
 
         return ask_id

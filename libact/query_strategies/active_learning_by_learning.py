@@ -4,13 +4,16 @@ This module includes two classes. ActiveLearningByLearning is the main
 algorithm for ALBL and Exp4P is the multi-armed bandit algorithm which will be
 used in ALBL.
 """
-from libact.base.interfaces import QueryStrategy
-import numpy as np
+from __future__ import division
+
 import copy
 
+import numpy as np
+
+from libact.base.interfaces import QueryStrategy
+from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 class ActiveLearningByLearning(QueryStrategy):
-
     """Active Learning By Learning (ALBL) query strategy.
 
     ALBL is an active learning algorithm that adaptively choose among existing
@@ -43,6 +46,11 @@ class ActiveLearningByLearning(QueryStrategy):
     model : :py:mod:`libact.models` object instance
         The learning model used for the task.
 
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+        If int or None, random_state is passed as parameter to generate
+        np.random.RandomState instance. if np.random.RandomState instance,
+        random_state is the random number generate.
+
     Attributes
     ----------
     query_strategies\\_ : list of :py:mod:`libact.query_strategies` object instance
@@ -53,6 +61,9 @@ class ActiveLearningByLearning(QueryStrategy):
 
     queried_hist\\_ : list of integer
         A list of entry_id of the dataset which is queried in the past.
+
+    random_states\\_ : np.random.RandomState instance
+        The random number generator using.
 
     Examples
     --------
@@ -149,6 +160,9 @@ class ActiveLearningByLearning(QueryStrategy):
                 "__init__() missing required keyword-only argument: 'model'"
                 )
 
+        random_state = kwargs.pop('random_state', None)
+        self.random_state_ = seed_random_state(random_state)
+
         self.query_dist = None
 
         self.W = []
@@ -183,16 +197,16 @@ class ActiveLearningByLearning(QueryStrategy):
             )
         return
 
+    @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
-        """Calculate the next query after updating the question asked with an
-        answer."""
+        # Calculate the next query after updating the question asked with an
+        # answer.
         ask_idx = self.unlabeled_invert_id_idx[entry_id]
         self.W.append(1./self.query_dist[ask_idx])
         self.queried_hist_.append(entry_id)
 
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
-        """Except for the initial query, it returns the id of the data albl
-        wants to query."""
         dataset = self.dataset
         try:
             unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
@@ -202,7 +216,7 @@ class ActiveLearningByLearning(QueryStrategy):
 
         while self.budget_used < self.T:
             self.calc_query()
-            ask_idx = np.random.choice(
+            ask_idx = self.random_state_.choice(
                         np.arange(len(self.unlabeled_invert_id_idx)),
                         size=1,
                         p=self.query_dist
@@ -214,7 +228,6 @@ class ActiveLearningByLearning(QueryStrategy):
                 return ask_id
             else:
                 self.update(ask_id, dataset.data[ask_id][1])
-
 
         raise ValueError("Out of query budget")
 

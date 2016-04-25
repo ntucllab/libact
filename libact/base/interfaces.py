@@ -2,37 +2,13 @@
 Base interfaces for use in the package.
 The package works according to the interfaces defined below.
 """
+from six import with_metaclass
 
 from abc import ABCMeta, abstractmethod
 from functools import wraps
 
 
-class BaseABCMeta(type):
-    @classmethod
-    def __prepare__(metacls, name, bases, **kwargs):
-        # Construct temporary dummy class to figure out MRO
-        mro = type('_', bases, {}).__mro__[1:]
-        assert mro[-1] == object
-        mro = mro[:-1]
-
-        def _inherit_docstring(fn):
-            if fn.__doc__ is None:
-                # go through parent classes
-                for clas in mro:
-                    parent_fn = getattr(clas, fn.__name__, None)
-                    if parent_fn is None:
-                        continue
-                    fn.__doc__ = parent_fn.__doc__
-                    break
-
-            return fn
-
-        classdict = dict()
-        classdict['_inherit_docstring'] = _inherit_docstring
-        return classdict
-
-
-class QueryStrategy(metaclass=BaseABCMeta):
+class QueryStrategy(with_metaclass(ABCMeta, object)):
     """Pool-based query strategy
 
     A QueryStrategy advices on which unlabeled data to be queried next given
@@ -75,7 +51,7 @@ class QueryStrategy(metaclass=BaseABCMeta):
         pass
 
 
-class Labeler(metaclass=BaseABCMeta):
+class Labeler(with_metaclass(ABCMeta, object)):
     """Label the queries made by QueryStrategies
 
     Assign labels to the samples queried by QueryStrategies.
@@ -97,7 +73,7 @@ class Labeler(metaclass=BaseABCMeta):
         pass
 
 
-class Model(metaclass=BaseABCMeta):
+class Model(with_metaclass(ABCMeta, object)):
     """Classification Model
 
     A Model returns a class-predicting function for future samples after

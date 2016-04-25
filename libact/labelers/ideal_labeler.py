@@ -5,6 +5,8 @@ Ideal/Noiseless labeler that returns true label
 import numpy as np
 
 from libact.base.interfaces import Labeler
+from libact.utils import inherit_docstring_from
+
 
 class IdealLabeler(Labeler):
     """
@@ -24,6 +26,6 @@ class IdealLabeler(Labeler):
         self.X = X
         self.y = y
 
-    @_inherit_docstring
+    @inherit_docstring_from(Labeler)
     def label(self, feature):
         return self.y[np.where([np.array_equal(x, feature) for x in self.X])[0][0]]

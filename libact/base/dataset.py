@@ -4,9 +4,12 @@ Datasets consists of data used for training, represented by a list of
 (feature, label) tuples.
 May be exported in different formats for application on other libraries.
 """
+from __future__ import unicode_literals
 
 import random
 import numpy as np
+
+from libact.utils import zip
 
 
 class Dataset(object):
