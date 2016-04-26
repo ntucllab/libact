@@ -12,6 +12,7 @@ from libact.utils import inherit_docstring_from, zip
 
 
 class VarianceReduction(QueryStrategy):
+
     """Variance Reduction
 
     This class implements Variance Reduction active learning algorithm [1]_.
@@ -80,20 +81,22 @@ class VarianceReduction(QueryStrategy):
 
         return unlabeled_entry_ids[errors.index(min(errors))]
 
+
 def _Phi(sigma, PI, X, epi, ex, label_count, feature_count):
-	ret = estVar(sigma, PI, X, epi, ex)
-	return ret
+    ret = estVar(sigma, PI, X, epi, ex)
+    return ret
+
 
 def _E(args):
-	X, y, qx, clf, label_count, sigma, model = args
-	sigmoid = lambda x: 1 / (1 + np.exp(-x))
-	query_point = sigmoid(clf.predict_real([qx]))
-	feature_count = len(X[0])
-	ret = 0.0
-	for i in range(label_count):
-		clf_ = copy.copy(model)
-		clf_.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
-		PI = sigmoid(clf_.predict_real(np.vstack((X, [qx]))))
-		ret += query_point[-1][i] * _Phi(sigma, PI[:-1], X, PI[-1], qx,
-				label_count, feature_count)
-	return ret
+    X, y, qx, clf, label_count, sigma, model = args
+    sigmoid = lambda x: 1 / (1 + np.exp(-x))
+    query_point = sigmoid(clf.predict_real([qx]))
+    feature_count = len(X[0])
+    ret = 0.0
+    for i in range(label_count):
+        clf_ = copy.copy(model)
+        clf_.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
+        PI = sigmoid(clf_.predict_real(np.vstack((X, [qx]))))
+        ret += query_point[-1][i] * _Phi(sigma, PI[:-1], X, PI[-1], qx,
+                                         label_count, feature_count)
+    return ret

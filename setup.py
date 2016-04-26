@@ -33,7 +33,7 @@ else:
             extra_link_args=extra_link_args,
             extra_compile_args=['-std=c11'],
             include_dirs=include_dirs,
-            ),
+        ),
         Extension(
             "libact.query_strategies._hintsvm",
             sources=["libact/query_strategies/_hintsvm.pyx",
@@ -42,8 +42,8 @@ else:
             include_dirs=[numpy.get_include(),
                           "libact/query_strategies/src/hintsvm/"],
             extra_compile_args=['-lstdc++'],
-            ),
-        ])
+        ),
+    ])
     cmdclasses = {'build_ext': build_ext}
 
 
@@ -55,7 +55,7 @@ setup(
     author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
     author_email='lsc36x@gmail.com',
     url='https://github.com/ntucllab/libact',
-    cmdclass = cmdclasses,
+    cmdclass=cmdclasses,
     classifiers=[
         "Topic :: Scientific/Engineering",
         "Programming Language :: Python :: 2.7",
@@ -69,7 +69,7 @@ setup(
         'libact.labelers',
         'libact.query_strategies',
         'libact.utils',
-        ],
+    ],
     package_dir={
         'libact': 'libact',
         'libact.base': 'libact/base',
@@ -77,6 +77,6 @@ setup(
         'libact.labelers': 'libact/labelers',
         'libact.query_strategies': 'libact/query_strategies',
         'libact.utils': 'libact/utils',
-        },
+    },
     ext_modules=extensions,
-    )
+)

@@ -14,6 +14,7 @@ from libact.base.interfaces import QueryStrategy
 
 
 class QUIRE(QueryStrategy):
+
     """Querying Informative and Representative Examples (QUIRE)
 
     Query the most informative and representative examples where the metrics
@@ -68,30 +69,31 @@ class QUIRE(QueryStrategy):
         super(QUIRE, self).__init__(*args, **kwargs)
         self.Uindex = [
             idx for idx, _ in self.dataset.get_unlabeled_entries()
-            ]
+        ]
         self.Lindex = [
             idx for idx in range(len(self.dataset)) if idx not in self.Uindex
-            ]
+        ]
         self.lmbda = kwargs.pop('lambda', 1.)
         X, self.y = zip(*self.dataset.get_entries())
         self.y = list(self.y)
         self.kernel = kwargs.pop('kernel', 'rbf')
         if self.kernel == 'rbf':
-            self.K = rbf_kernel(X=X, Y=X, gamma = kwargs.pop('gamma', 1.))
+            self.K = rbf_kernel(X=X, Y=X, gamma=kwargs.pop('gamma', 1.))
         elif self.kernel == 'poly':
-            self.K = polynomial_kernel(X=X, Y=X, coef0 = kwargs.pop('coef0', 1),\
-                degree = kwargs.pop('degree', 3), gamma = kwargs.pop('gamma', 1.))
+            self.K = polynomial_kernel(X=X, Y=X, coef0=kwargs.pop('coef0', 1),
+                                       degree=kwargs.pop('degree', 3), gamma=kwargs.pop('gamma', 1.))
         elif self.kernel == 'linear':
             self.K = linear_kernel(X=X, Y=X)
         elif hasattr(self.kernel, '__call__'):
             self.K = self.kernel(X=np.array(X), Y=np.array(X))
         else:
             raise NotImplementedError
-        
+
         if not isinstance(self.K, np.ndarray):
             raise TypeError('K should be an ndarray')
         if self.K.shape != (len(X), len(X)):
-            raise ValueError('kernel should have size (%d, %d)' %(len(X), len(X)))
+            raise ValueError(
+                'kernel should have size (%d, %d)' % (len(X), len(X)))
         self.L = np.linalg.inv(self.K + self.lmbda * np.eye(len(X)))
 
     def update(self, entry_id, label):
@@ -123,19 +125,19 @@ class QUIRE(QueryStrategy):
             Uindex_r.remove(each_index)
             iList_r = iList[:]
             iList_r.remove(i)
-            inv_Luu = inv_Laa[np.ix_(iList_r, iList_r)] - 1/inv_Laa[i, i] * \
+            inv_Luu = inv_Laa[np.ix_(iList_r, iList_r)] - 1 / inv_Laa[i, i] * \
                 np.dot(inv_Laa[iList_r, i], inv_Laa[iList_r, i].T)
             tmp = np.dot(
-                      L[each_index][Lindex] - \
-                          np.dot(
-                              np.dot(
-                                  L[each_index][Uindex_r],
-                                  inv_Luu
-                              ),
-                              L[np.ix_(Uindex_r, Lindex)]
-                          ),
-                      y_labeled,
-                  )
+                L[each_index][Lindex] -
+                np.dot(
+                    np.dot(
+                        L[each_index][Uindex_r],
+                        inv_Luu
+                    ),
+                    L[np.ix_(Uindex_r, Lindex)]
+                ),
+                y_labeled,
+            )
             eva = L[each_index][each_index] - \
                 det_Laa / L[each_index][each_index] + 2 * np.abs(tmp)
 

@@ -10,7 +10,9 @@ import sklearn.svm
 
 from libact.base.interfaces import ContinuousModel
 
+
 class SVM(ContinuousModel):
+
     """C-Support Vector Machine Classifier
 
     References
@@ -35,7 +37,7 @@ class SVM(ContinuousModel):
             logger.warn("SVM model support only 'ovr' for predict_real.")
 
         dvalue = self.model.decision_function(feature, *args, **kwargs)
-        if len(np.shape(dvalue)) == 1: # n_classes == 2
+        if len(np.shape(dvalue)) == 1:  # n_classes == 2
             return np.vstack((-dvalue, dvalue)).T
         else:
             return dvalue

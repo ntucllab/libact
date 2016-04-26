@@ -9,6 +9,7 @@ from libact.utils import inherit_docstring_from
 
 
 class InteractiveLabeler(Labeler):
+
     """Interactive Labeler
 
     InteractiveLabeler is a Labeler object that shows the feature through image

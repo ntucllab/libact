@@ -25,17 +25,19 @@ def run_qs(trn_ds, qs, truth, quota):
         ret.append(ask_id)
     return np.array(ret)
 
+
 class RealdataTestCase(unittest.TestCase):
 
     def setUp(self):
         dataset_filepath = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'datasets/heart_scale')
-        self.X, self.y = import_libsvm_sparse(dataset_filepath).format_sklearn()
+        self.X, self.y = import_libsvm_sparse(
+            dataset_filepath).format_sklearn()
         self.quota = 10
 
     def test_quire(self):
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
+                         np.concatenate([self.y[:5], [None] * (len(self.y) - 5)]))
         qs = QUIRE(trn_ds)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
@@ -46,15 +48,15 @@ class RealdataTestCase(unittest.TestCase):
             return np.dot(X, Y.T)
         np.random.seed(1126)
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
-        qs = QUIRE(trn_ds, kernel = my_kernel)
+                         np.concatenate([self.y[:5], [None] * (len(self.y) - 5)]))
+        qs = QUIRE(trn_ds, kernel=my_kernel)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([9, 227, 176, 110,  52, 117, 228, 205, 103, 175]))
 
     def test_RandomSampling(self):
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
+                         np.concatenate([self.y[:5], [None] * (len(self.y) - 5)]))
         qs = RandomSampling(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
@@ -62,7 +64,7 @@ class RealdataTestCase(unittest.TestCase):
 
     def test_HintSVM(self):
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:5], [None]*(len(self.y)-5)]))
+                         np.concatenate([self.y[:5], [None] * (len(self.y) - 5)]))
         qs = HintSVM(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
@@ -70,7 +72,7 @@ class RealdataTestCase(unittest.TestCase):
 
     def test_QueryByCommittee(self):
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
+                         np.concatenate([self.y[:10], [None] * (len(self.y) - 10)]))
         qs = QueryByCommittee(trn_ds,
                               models=[LogisticRegression(C=1.0),
                                       LogisticRegression(C=0.01),
@@ -83,7 +85,7 @@ class RealdataTestCase(unittest.TestCase):
     def test_UcertaintySamplingLc(self):
         random.seed(1126)
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
+                         np.concatenate([self.y[:10], [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='lc',
                                  model=LogisticRegression())
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
@@ -93,7 +95,7 @@ class RealdataTestCase(unittest.TestCase):
     def test_UcertaintySamplingSm(self):
         random.seed(1126)
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
+                         np.concatenate([self.y[:10], [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='sm',
                                  model=LogisticRegression())
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
@@ -102,14 +104,15 @@ class RealdataTestCase(unittest.TestCase):
 
     def test_ActiveLearningByLearning(self):
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:10], [None]*(len(self.y)-10)]))
+                         np.concatenate([self.y[:10], [None] * (len(self.y) - 10)]))
         qs = ActiveLearningByLearning(trn_ds, T=self.quota,
-                query_strategies=[
-                    UncertaintySampling(trn_ds, model=LogisticRegression()),
-                    HintSVM(trn_ds, random_state=1126)],
-                model=LogisticRegression(),
-                random_state=1126
-            )
+                                      query_strategies=[
+                                          UncertaintySampling(
+                                              trn_ds, model=LogisticRegression()),
+                                          HintSVM(trn_ds, random_state=1126)],
+                                      model=LogisticRegression(),
+                                      random_state=1126
+                                      )
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([173, 103, 133, 184, 187, 147, 251, 83, 93, 33]))

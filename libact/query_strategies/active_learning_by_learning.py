@@ -13,7 +13,9 @@ import numpy as np
 from libact.base.interfaces import QueryStrategy
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
+
 class ActiveLearningByLearning(QueryStrategy):
+
     """Active Learning By Learning (ALBL) query strategy.
 
     ALBL is an active learning algorithm that adaptively choose among existing
@@ -108,7 +110,7 @@ class ActiveLearningByLearning(QueryStrategy):
         if self.query_strategies_ is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'query_strategies'"
-                )
+            )
         elif not self.query_strategies_:
             raise ValueError("query_strategies list is empty")
 
@@ -126,7 +128,7 @@ class ActiveLearningByLearning(QueryStrategy):
         if self.T is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'T'"
-                )
+            )
 
         self.unlabeled_entry_ids, X_pool = \
             zip(*self.dataset.get_unlabeled_entries())
@@ -139,7 +141,7 @@ class ActiveLearningByLearning(QueryStrategy):
             raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin and (self.pmin < 1./(len(self.query_strategies_)+self.uniform_sampler) or self.pmin < 0):
+        if self.pmin and (self.pmin < 1. / (len(self.query_strategies_) + self.uniform_sampler) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
                              "1/len(n_active_algorithm)")
 
@@ -158,7 +160,7 @@ class ActiveLearningByLearning(QueryStrategy):
         if self.model is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
-                )
+            )
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
@@ -202,7 +204,7 @@ class ActiveLearningByLearning(QueryStrategy):
         # Calculate the next query after updating the question asked with an
         # answer.
         ask_idx = self.unlabeled_invert_id_idx[entry_id]
-        self.W.append(1./self.query_dist[ask_idx])
+        self.W.append(1. / self.query_dist[ask_idx])
         self.queried_hist_.append(entry_id)
 
     @inherit_docstring_from(QueryStrategy)
@@ -217,10 +219,10 @@ class ActiveLearningByLearning(QueryStrategy):
         while self.budget_used < self.T:
             self.calc_query()
             ask_idx = self.random_state_.choice(
-                        np.arange(len(self.unlabeled_invert_id_idx)),
-                        size=1,
-                        p=self.query_dist
-                    )[0]
+                np.arange(len(self.unlabeled_invert_id_idx)),
+                size=1,
+                p=self.query_dist
+            )[0]
             ask_id = self.unlabeled_entry_ids[ask_idx]
 
             if ask_id in unlabeled_entry_ids:
@@ -233,6 +235,7 @@ class ActiveLearningByLearning(QueryStrategy):
 
 
 class Exp4P():
+
     """A multi-armed bandit algorithm Exp4.P.
 
     For the Exp4.P used in ALBL, the number of arms (actions) and number of
@@ -294,7 +297,7 @@ class Exp4P():
         if self.query_strategies_ is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'query_strategies'"
-                )
+            )
         elif not self.query_strategies_:
             raise ValueError("query_strategies list is empty")
 
@@ -332,7 +335,7 @@ class Exp4P():
             raise TypeError(
                 "__init__() missing required keyword-only argument:"
                 "'unlabeled_invert_id_idx'"
-                )
+            )
 
     def __next__(self, reward, ask_id, lbl):
         """For Python3 compatibility of generator."""
@@ -345,9 +348,8 @@ class Exp4P():
         if reward == -1:
             return next(self.exp4p_gen)
         else:
-        # TODO exception on reward in [0, 1]
+            # TODO exception on reward in [0, 1]
             return self.exp4p_gen.send((reward, ask_id, lbl))
-
 
     def exp4p(self):
         """The generator which implements the main part of Exp4.P.
@@ -371,7 +373,7 @@ class Exp4P():
 
         """
         while True:
-            #TODO probabilistic active learning algorithm
+            # TODO probabilistic active learning algorithm
             # len(self.unlabeled_invert_id_idx) is the number of unlabeled data
             query = np.zeros((self.N, len(self.unlabeled_invert_id_idx)))
             if self.uniform_sampler:
@@ -397,9 +399,9 @@ class Exp4P():
             #vhat = np.sum(advice / np.tile(p, (self.N, 1)), axis=1)
             vhat = 1 / p
             self.w = self.w * np.exp(
-                    self.pmin / 2 * (yhat + vhat*np.sqrt(
-                        np.log(self.N/self.delta) / self.K / self.T)
-                        )
-                    )
+                self.pmin / 2 * (yhat + vhat * np.sqrt(
+                    np.log(self.N / self.delta) / self.K / self.T)
+                )
+            )
 
         raise StopIteration

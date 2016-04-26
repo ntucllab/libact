@@ -7,6 +7,7 @@ from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 
 class RandomSampling(QueryStrategy):
+
     """Random sampling
 
     This class implements the random query strategy. A random entry from the

@@ -12,6 +12,7 @@ from libact.utils import inherit_docstring_from, zip
 
 
 class UncertaintySampling(QueryStrategy):
+
     """Uncertainty Sampling
 
     This class implements Uncertainty Sampling active learning algorithm [1]_.
@@ -66,19 +67,19 @@ class UncertaintySampling(QueryStrategy):
         if self.model is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
-                )
+            )
         if not isinstance(self.model, ContinuousModel):
             raise TypeError(
                 "model has to be a ContinuousModel"
-                )
+            )
         self.model.train(self.dataset)
 
         self.method = kwargs.pop('method', 'lc')
         if self.method not in ['lc', 'sm']:
             raise TypeError(
-                "supported methods are ['lc', 'sm'], the given one is: " + \
+                "supported methods are ['lc', 'sm'], the given one is: " +
                 self.method
-                )
+            )
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):

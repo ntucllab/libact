@@ -9,6 +9,7 @@ from libact.utils import inherit_docstring_from
 
 
 class IdealLabeler(Labeler):
+
     """
     Provide the errorless/noiseless label to any feature vectors being queried.
 
@@ -21,7 +22,7 @@ class IdealLabeler(Labeler):
 
     def __init__(self, dataset, **kwargs):
         X, y = zip(*dataset.get_entries())
-        #make sure the input dataset is fully labeled
+        # make sure the input dataset is fully labeled
         assert((np.array(y) != np.array(None)).all())
         self.X = X
         self.y = y

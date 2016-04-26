@@ -19,7 +19,7 @@ class LogisticRegression(ContinuousModel):
 
     def predict_real(self, feature, *args, **kwargs):
         dvalue = self.model.decision_function(feature, *args, **kwargs)
-        if len(np.shape(dvalue)) == 1: # n_classes == 2
+        if len(np.shape(dvalue)) == 1:  # n_classes == 2
             return np.vstack((-dvalue, dvalue)).T
         else:
             return dvalue

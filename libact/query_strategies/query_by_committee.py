@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class QueryByCommittee(QueryStrategy):
+
     """Query by committee
 
     Parameters
@@ -74,7 +75,7 @@ class QueryByCommittee(QueryStrategy):
         if models is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'models'"
-                )
+            )
         elif not models:
             raise ValueError("models list is empty")
 
@@ -114,16 +115,16 @@ class QueryByCommittee(QueryStrategy):
 
             # Using vote entropy to measure disagreement
             for lab in lab_count.keys():
-                ret[-1] -= lab_count[lab]/self.n_students * \
-                            math.log(float(lab_count[lab])/self.n_students)
+                ret[-1] -= lab_count[lab] / self.n_students * \
+                    math.log(float(lab_count[lab]) / self.n_students)
 
         return ret
 
     def _labeled_uniform_sample(self, sample_size):
         labeled_entries = self.dataset.get_labeled_entries()
         samples = [labeled_entries[
-                        self.random_state_.randint(0, len(labeled_entries))
-                    ]for _ in range(sample_size)]
+            self.random_state_.randint(0, len(labeled_entries))
+        ]for _ in range(sample_size)]
         return Dataset(*zip(*samples))
 
     def teach_students(self):
@@ -158,10 +159,10 @@ class QueryByCommittee(QueryStrategy):
             votes[:, i] = student.predict(X_pool)
 
         id_disagreement = [(i, dis) for i, dis in
-                zip(unlabeled_entry_ids, self.disagreement(votes))]
+                           zip(unlabeled_entry_ids, self.disagreement(votes))]
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
-                reverse=True)
+                              reverse=True)
         ask_id = self.random_state_.choice(
             [e[0] for e in disagreement if e[1] == disagreement[0][1]])
 

@@ -17,7 +17,7 @@ def init_toyexample(X, y):
 
 def run_qs(trn_ds, lbr, model, qs, quota):
     qseq = []
-    for i in range(quota) :
+    for i in range(quota):
         ask_id = qs.make_query()
         X, y = zip(*trn_ds.data)
         lb = lbr.label(X[ask_id])
@@ -38,24 +38,26 @@ class UncertaintySamplingTestCase(unittest.TestCase):
 
     def test_uncertainty_lc(self):
         trn_ds = init_toyexample(self.X, self.y)
-        qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
+        qs = UncertaintySampling(
+            trn_ds, method='lc', model=LogisticRegression())
         model = LogisticRegression()
         qseq = run_qs(trn_ds, self.lbr, model, qs, self.quota)
-        assert_array_equal(qseq, np.array([6,7,8,9]))
+        assert_array_equal(qseq, np.array([6, 7, 8, 9]))
 
     def test_uncertainty_sm(self):
         trn_ds = init_toyexample(self.X, self.y)
-        qs = UncertaintySampling(trn_ds, method='sm', model=LogisticRegression())
+        qs = UncertaintySampling(
+            trn_ds, method='sm', model=LogisticRegression())
         model = LogisticRegression()
         qseq = run_qs(trn_ds, self.lbr, model, qs, self.quota)
-        assert_array_equal(qseq, np.array([6,7,8,9]))
+        assert_array_equal(qseq, np.array([6, 7, 8, 9]))
 
     def test_quire(self):
         trn_ds = init_toyexample(self.X, self.y)
         qs = QUIRE(trn_ds)
         model = LogisticRegression()
         qseq = run_qs(trn_ds, self.lbr, model, qs, self.quota)
-        assert_array_equal(qseq, np.array([6,7,9,8]))
+        assert_array_equal(qseq, np.array([6, 7, 9, 8]))
 
 
 if __name__ == '__main__':

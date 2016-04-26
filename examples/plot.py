@@ -55,7 +55,7 @@ def main():
     dataset_filepath = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), 'diabetes.txt')
     test_size = 0.33    # the percentage of samples in the dataset that will be
-                        # randomly selected and assigned to the test set
+    # randomly selected and assigned to the test set
     n_labeled = 10      # number of samples that are initially labeled
 
     # Load dataset

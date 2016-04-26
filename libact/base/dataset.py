@@ -13,6 +13,7 @@ from libact.utils import zip
 
 
 class Dataset(object):
+
     """libact dataset object
 
     Parameters
@@ -176,7 +177,7 @@ class Dataset(object):
         return [
             (idx, entry[0]) for idx, entry in enumerate(self.data)
             if entry[1] is None
-            ]
+        ]
 
     def labeled_uniform_sample(self, sample_size, replace=True):
         """Returns a Dataset object with labeled data only, which is
@@ -191,7 +192,7 @@ class Dataset(object):
             samples = [
                 random.choice(self.get_labeled_entries())
                 for _ in range(sample_size)
-                ]
+            ]
         else:
             samples = random.sample(self.get_labeled_entries(), sample_size)
         return Dataset(*zip(*samples))

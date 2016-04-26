@@ -7,6 +7,7 @@ from libact.base.dataset import Dataset
 from libact.models import LogisticRegression
 from libact.query_strategies import VarianceReduction
 
+
 def run_qs(trn_ds, qs, truth, quota):
     ret = []
     for _ in range(quota):
@@ -15,6 +16,7 @@ def run_qs(trn_ds, qs, truth, quota):
 
         ret.append(ask_id)
     return np.array(ret)
+
 
 class VarianceReductionTestCase(unittest.TestCase):
 
@@ -25,7 +27,7 @@ class VarianceReductionTestCase(unittest.TestCase):
 
     def test_VarianceReduction(self):
         trn_ds = Dataset(self.X,
-                         np.concatenate([self.y[:2], [None]*(len(self.y)-2)]))
+                         np.concatenate([self.y[:2], [None] * (len(self.y) - 2)]))
         qs = VarianceReduction(trn_ds, model=LogisticRegression(), sigma=0.1)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq, np.array([4, 5, 2, 3]))
