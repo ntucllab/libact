@@ -1,12 +1,11 @@
 import unittest
 
-from numpy.testing import assert_array_equal
 import numpy as np
+from numpy.testing import assert_array_equal
 
-from libact.base.interfaces import QueryStrategy, ContinuousModel
-from libact.base.dataset import Dataset, import_libsvm_sparse
-from libact.models import *
-from libact.query_strategies import *
+from libact.base.dataset import Dataset
+from libact.models import LogisticRegression
+from libact.query_strategies import UncertaintySampling, QUIRE
 from libact.labelers import IdealLabeler
 
 
@@ -17,11 +16,11 @@ def init_toyexample(X, y):
 
 def run_qs(trn_ds, lbr, model, qs, quota):
     qseq = []
-    for i in range(quota):
+    for _ in range(quota):
         ask_id = qs.make_query()
-        X, y = zip(*trn_ds.data)
-        lb = lbr.label(X[ask_id])
-        trn_ds.update(ask_id, lb)
+        X, _ = zip(*trn_ds.data)
+        lbl = lbr.label(X[ask_id])
+        trn_ds.update(ask_id, lbl)
         qseq.append(ask_id)
     return np.array(qseq)
 
