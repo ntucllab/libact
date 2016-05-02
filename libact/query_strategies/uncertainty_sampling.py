@@ -24,9 +24,11 @@ class UncertaintySampling(QueryStrategy):
 
     method: {'lc', 'sm'}, optional (default='lc')
         least confidence (lc), it queries the instance whose posterior
-        probability of being positive is nearest 0.5 (for binary classification);
+        probability of being positive is nearest 0.5 (for binary
+        classification);
         smallest margin (sm), it queries the instance whose posterior
-        probability gap between the most and the second probable labels is minimal;
+        probability gap between the most and the second probable labels is
+        minimal;
 
 
     Attributes
@@ -37,7 +39,8 @@ class UncertaintySampling(QueryStrategy):
 
     Examples
     --------
-    Here is an example of declaring a UncertaintySampling query_strategy object:
+    Here is an example of declaring a UncertaintySampling query_strategy
+    object:
 
     .. code-block:: python
 

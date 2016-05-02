@@ -30,8 +30,7 @@ class HintSVM(QueryStrategy):
     p : float, >0 and <=1, optional (default=.5)
         The probability to select an instance from unlabeld pool to hint pool.
 
-    random_state : {int, np.random.RandomState instance, None},\
-            optional (default=None)
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.

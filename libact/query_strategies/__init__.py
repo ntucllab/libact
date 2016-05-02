@@ -4,9 +4,9 @@ Concrete query strategy classes.
 from __future__ import absolute_import
 
 import os
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+ON_RTD = os.environ.get('READTHEDOCS', None) == 'True'
 import logging
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 from .active_learning_by_learning import ActiveLearningByLearning
 from .hintsvm import HintSVM
@@ -15,6 +15,6 @@ from .query_by_committee import QueryByCommittee
 from .quire import QUIRE
 from .random_sampling import RandomSampling
 # don't import c extentions when on readthedocs server
-if not on_rtd:
+if not ON_RTD:
     from ._variance_reduction import estVar
 from .variance_reduction import VarianceReduction

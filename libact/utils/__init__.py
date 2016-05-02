@@ -4,13 +4,13 @@ import sys
 import numpy as np
 
 # Syntax sugar.
-_ver = sys.version_info
+_VER = sys.version_info
 #: Python 2.x?
-is_py2 = (_ver[0] == 2)
+IS_PY2 = (_VER[0] == 2)
 #: Python 3.x?
-is_py3 = (_ver[0] == 3)
+IS_PY3 = (_VER[0] == 3)
 
-if is_py2:
+if IS_PY2:
     from future_builtins import zip
 
 __all__ = ['inherit_docstring_from', 'seed_random_state', 'zip']

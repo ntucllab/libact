@@ -15,7 +15,7 @@ from libact.base.interfaces import QueryStrategy
 import libact.models
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class QueryByCommittee(QueryStrategy):
@@ -29,8 +29,7 @@ class QueryByCommittee(QueryStrategy):
         or class names of libact Model classes to determine the models to be
         included in the committee to vote for each unlabeled instance.
 
-    random_state : {int, np.random.RandomState instance, None},\
-            optional (default=None)
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.
@@ -138,7 +137,7 @@ class QueryByCommittee(QueryStrategy):
             bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
                 bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
-                logger.warning('There is student receiving only one label,'
+                LOGGER.warning('There is student receiving only one label,'
                                're-sample the bag.')
             student.train(bag)
 

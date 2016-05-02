@@ -1,14 +1,12 @@
+"""Random Sampling
 """
-"""
-import numpy as np
-
 from libact.base.interfaces import QueryStrategy
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 
 class RandomSampling(QueryStrategy):
 
-    """Random sampling
+    r"""Random sampling
 
     This class implements the random query strategy. A random entry from the
     unlabeled pool is returned for each query.
@@ -22,7 +20,7 @@ class RandomSampling(QueryStrategy):
 
     Attributes
     ----------
-    random_states\\_ : np.random.RandomState instance
+    random_states\_ : np.random.RandomState instance
         The random number generator using.
 
     Examples

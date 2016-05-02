@@ -3,7 +3,7 @@
 An interface for scikit-learn's C-Support Vector Classifier model.
 """
 import logging
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 import numpy as np
 import sklearn.svm
@@ -30,11 +30,12 @@ class SVM(ContinuousModel):
         return self.model.predict(feature, *args, **kwargs)
 
     def score(self, testing_dataset, *args, **kwargs):
-        return self.model.score(*(testing_dataset.format_sklearn() + args), **kwargs)
+        return self.model.score(*(testing_dataset.format_sklearn() + args),
+                                **kwargs)
 
     def predict_real(self, feature, *args, **kwargs):
         if self.model.decision_function_shape != 'ovr':
-            logger.warn("SVM model support only 'ovr' for predict_real.")
+            LOGGER.warn("SVM model support only 'ovr' for predict_real.")
 
         dvalue = self.model.decision_function(feature, *args, **kwargs)
         if len(np.shape(dvalue)) == 1:  # n_classes == 2

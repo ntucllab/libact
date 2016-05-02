@@ -38,7 +38,10 @@ bad-functions=map,filter
 # x, y, X, Y - vector maxtrix of features and labels.
 # P, p - probability distribution
 # qs - query strategry
-good-names=i,j,k,_,X,Y,x,y,P,p,qs
+# w, W - weight vector
+# N - number of instances
+# T, K - number of iterations
+good-names=i,j,k,_,X,Y,x,y,P,p,qs,w,W,N,T,K
 
 # Regular expression matching correct attribute names
 attr-rgx=[a-z_][a-z0-9_]{2,30}$

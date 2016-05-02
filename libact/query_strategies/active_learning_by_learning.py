@@ -29,7 +29,7 @@ class ActiveLearningByLearning(QueryStrategy):
         Query budget, the maximal number of queries to be made.
 
     query_strategies : list of :py:mod:`libact.query_strategies`\
-            object instance
+    object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
         Note that these query_strategies should share the same dataset
@@ -42,7 +42,7 @@ class ActiveLearningByLearning(QueryStrategy):
         Determining whether to include uniform random sample as one of arms.
 
     pmin : float, 0<pmin< :math:`\frac{1}{len(query\_strategies)}`,\
-            optional (default= :math:`\frac{\sqrt{\log{N}}}{KT}`)
+                  optional (default= :math:`\frac{\sqrt{\log{N}}}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms). N = K =
         number of query_strategies, T is the number of query budgets.
@@ -50,16 +50,14 @@ class ActiveLearningByLearning(QueryStrategy):
     model : :py:mod:`libact.models` object instance
         The learning model used for the task.
 
-    random_state : {int, np.random.RandomState instance, None},\
-            optional (default=None)
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.
 
     Attributes
     ----------
-    query_strategies\_ : list of :py:mod:`libact.query_strategies` object\
-            instance
+    query_strategies\_ : list of :py:mod:`libact.query_strategies` object instance
         The active learning algorithm instances.
 
     exp4p\_ : instance of Exp4P object
@@ -267,8 +265,7 @@ class Exp4P(object):
     delta : float, >0, optional (default=0.1)
         A parameter.
 
-    pmin : float, 0<pmin<1/len(query_strategies),\
-            optional (default= :math:`\frac{\sqrt{log(N)}}{KT}`)
+    pmin : float, 0<pmin<1/len(query_strategies), optional (default= :math:`\frac{\sqrt{log(N)}}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data), N = K = number of query_strategies, T is the maximum
         number of rounds.

@@ -1,9 +1,21 @@
-from libact.base.interfaces import ContinuousModel
-import sklearn.linear_model
+"""
+This module includes a class for interfacing scikit-learn's logistic
+regression model.
+"""
 import numpy as np
+import sklearn.linear_model
+
+from libact.base.interfaces import ContinuousModel
 
 
 class LogisticRegression(ContinuousModel):
+
+    """Logistic Regression Classifier
+
+    References
+    ----------
+    http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
+    """
 
     def __init__(self, *args, **kwargs):
         self.model = sklearn.linear_model.LogisticRegression(*args, **kwargs)
