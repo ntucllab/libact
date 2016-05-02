@@ -8,7 +8,8 @@ This module contains a class that implements an active learning algorithm
 import bisect
 
 import numpy as np
-from sklearn.metrics.pairwise import *
+from sklearn.metrics.pairwise import linear_kernel, polynomial_kernel,\
+    rbf_kernel
 
 from libact.base.interfaces import QueryStrategy
 
@@ -23,13 +24,14 @@ class QUIRE(QueryStrategy):
     Parameters
     ----------
     lambda: float, optional (default=1.0)
-        A regularization parameter used in the regularization learning framework.
+        A regularization parameter used in the regularization learning
+        framework.
 
     kernel : {'linear', 'poly', 'rbf', callable}, optional (default='rbf')
         Specifies the kernel type to be used in the algorithm.
         It must be one of 'linear', 'poly', 'rbf', or a callable.
-        If a callable is given it is used to pre-compute the kernel matrix 
-        from data matrices; that matrix should be an array of shape 
+        If a callable is given it is used to pre-compute the kernel matrix
+        from data matrices; that matrix should be an array of shape
         ``(n_samples, n_samples)``.
 
     degree : int, optional (default=3)
@@ -80,8 +82,11 @@ class QUIRE(QueryStrategy):
         if self.kernel == 'rbf':
             self.K = rbf_kernel(X=X, Y=X, gamma=kwargs.pop('gamma', 1.))
         elif self.kernel == 'poly':
-            self.K = polynomial_kernel(X=X, Y=X, coef0=kwargs.pop('coef0', 1),
-                                       degree=kwargs.pop('degree', 3), gamma=kwargs.pop('gamma', 1.))
+            self.K = polynomial_kernel(X=X,
+                                       Y=X,
+                                       coef0=kwargs.pop('coef0', 1),
+                                       degree=kwargs.pop('degree', 3),
+                                       gamma=kwargs.pop('gamma', 1.))
         elif self.kernel == 'linear':
             self.K = linear_kernel(X=X, Y=X)
         elif hasattr(self.kernel, '__call__'):
