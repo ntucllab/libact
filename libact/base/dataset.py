@@ -32,7 +32,9 @@ class Dataset(object):
 
     """
 
-    def __init__(self, X=[], y=[]):
+    def __init__(self, X=None, y=None):
+        if X is None: X = []
+        if y is None: y = []
         self.data = list(zip(X, y))
         self.modified = True
         self._update_callback = set()
