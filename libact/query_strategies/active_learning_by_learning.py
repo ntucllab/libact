@@ -16,7 +16,7 @@ from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 class ActiveLearningByLearning(QueryStrategy):
 
-    """Active Learning By Learning (ALBL) query strategy.
+    r"""Active Learning By Learning (ALBL) query strategy.
 
     ALBL is an active learning algorithm that adaptively choose among existing
     query strategies to decide which data to make query. It utilizes Exp4.P, a
@@ -28,7 +28,8 @@ class ActiveLearningByLearning(QueryStrategy):
     T : integer
         Query budget, the maximal number of queries to be made.
 
-    query_strategies : list of :py:mod:`libact.query_strategies` object instance
+    query_strategies : list of :py:mod:`libact.query_strategies`\
+            object instance
         The active learning algorithms used in ALBL, which will be both the
         the arms in the multi-armed bandit algorithm Exp4.P.
         Note that these query_strategies should share the same dataset
@@ -40,7 +41,8 @@ class ActiveLearningByLearning(QueryStrategy):
     uniform_sampler : {True, False}, optional (default=True)
         Determining whether to include uniform random sample as one of arms.
 
-    pmin : float, 0<pmin< :math:`\\frac{1}{len(query\_strategies)}`, optional (default= :math:`\\frac{\\sqrt{\\log{N}}}{KT}`)
+    pmin : float, 0<pmin< :math:`\frac{1}{len(query\_strategies)}`,\
+            optional (default= :math:`\frac{\sqrt{\log{N}}}{KT}`)
         Parameter for Exp4.P. The minimal probability for random selection of
         the arms (aka the underlying active learning algorithms). N = K =
         number of query_strategies, T is the number of query budgets.
@@ -48,23 +50,25 @@ class ActiveLearningByLearning(QueryStrategy):
     model : :py:mod:`libact.models` object instance
         The learning model used for the task.
 
-    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+    random_state : {int, np.random.RandomState instance, None},\
+            optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.
 
     Attributes
     ----------
-    query_strategies\\_ : list of :py:mod:`libact.query_strategies` object instance
+    query_strategies\_ : list of :py:mod:`libact.query_strategies` object\
+            instance
         The active learning algorithm instances.
 
-    exp4p\\_ : instance of Exp4P object
+    exp4p\_ : instance of Exp4P object
         The multi-armed bandit instance.
 
-    queried_hist\\_ : list of integer
+    queried_hist\_ : list of integer
         A list of entry_id of the dataset which is queried in the past.
 
-    random_states\\_ : np.random.RandomState instance
+    random_states\_ : np.random.RandomState instance
         The random number generator using.
 
     Examples
@@ -80,22 +84,22 @@ class ActiveLearningByLearning(QueryStrategy):
        from libact.models import LogisticRegression
 
        qs = ActiveLearningByLearning(
-                   dataset, # Dataset object
-                   query_strategies=[
-                       UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
-                       UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
-                       HintSVM(dataset)
-                       ],
-                   model=LogisticRegression()
-                   )
+            dataset, # Dataset object
+            query_strategies=[
+                UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
+                UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
+                HintSVM(dataset)
+                ],
+            model=LogisticRegression()
+        )
 
     The :code:`query_strategies` parameter is a list of
     :code:`libact.query_strategies` object instances where each of their
     associated dataset must be the same :code:`Dataset` instance. ALBL combines
     the result of these query strategies and generate its own suggestion of
     which sample to query.  ALBL will adaptively *learn* from each of the
-    decision it made, using the given supervised learning model in :code:`model`
-    parameter to evaluate its IW-ACC.
+    decision it made, using the given supervised learning model in
+    :code:`model` parameter to evaluate its IW-ACC.
 
     References
     ----------
@@ -109,7 +113,8 @@ class ActiveLearningByLearning(QueryStrategy):
         self.query_strategies_ = kwargs.pop('query_strategies', None)
         if self.query_strategies_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'query_strategies'"
+                "__init__() missing required keyword-only argument: "
+                "'query_strategies'"
             )
         elif not self.query_strategies_:
             raise ValueError("query_strategies list is empty")
@@ -130,18 +135,19 @@ class ActiveLearningByLearning(QueryStrategy):
                 "__init__() missing required keyword-only argument: 'T'"
             )
 
-        self.unlabeled_entry_ids, X_pool = \
+        self.unlabeled_entry_ids, _ = \
             zip(*self.dataset.get_unlabeled_entries())
         self.unlabeled_invert_id_idx = {}
         for i, entry in enumerate(self.dataset.get_unlabeled_entries()):
             self.unlabeled_invert_id_idx[entry[0]] = i
 
         self.uniform_sampler = kwargs.pop('uniform_sampler', True)
-        if type(self.uniform_sampler) != type(True):
+        if not isinstance(self.uniform_sampler, bool):
             raise ValueError("'uniform_sampler' should be {True, False}")
 
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin and (self.pmin < 1. / (len(self.query_strategies_) + self.uniform_sampler) or self.pmin < 0):
+        n_algorithms = (len(self.query_strategies_) + self.uniform_sampler)
+        if self.pmin and (self.pmin < (1. / n_algorithms) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
                              "1/len(n_active_algorithm)")
 
@@ -178,10 +184,13 @@ class ActiveLearningByLearning(QueryStrategy):
         # reward function: Importance-Weighted-Accuracy (IW-ACC) (tau, f)
         reward = 0.
         for i in range(len(self.queried_hist_)):
-            reward += self.W[i] *\
-                (model.predict(self.dataset.data[
-                    self.queried_hist_[i]][0].reshape(1, -1))[0] ==
-                    self.dataset.data[self.queried_hist_[i]][1])
+            reward += self.W[i] * (
+                model.predict(
+                    self.dataset.data[
+                        self.queried_hist_[i]][0].reshape(1, -1)
+                    )[0] ==
+                self.dataset.data[self.queried_hist_[i]][1]
+            )
         reward /= (self.dataset.len_labeled() + self.dataset.len_unlabeled())
         reward /= self.T
         return reward
@@ -211,7 +220,7 @@ class ActiveLearningByLearning(QueryStrategy):
     def make_query(self):
         dataset = self.dataset
         try:
-            unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+            unlabeled_entry_ids, _ = zip(*dataset.get_unlabeled_entries())
         except ValueError:
             # might be no more unlabeled data left
             return
@@ -234,16 +243,16 @@ class ActiveLearningByLearning(QueryStrategy):
         raise ValueError("Out of query budget")
 
 
-class Exp4P():
+class Exp4P(object):
 
-    """A multi-armed bandit algorithm Exp4.P.
+    r"""A multi-armed bandit algorithm Exp4.P.
 
     For the Exp4.P used in ALBL, the number of arms (actions) and number of
-    experts are equal to the number of active learning algorithms wanted to use.
-    The arms (actions) are the active learning algorithms, where is inputed from
-    parameter 'query_strategies'. There is no need for the input of experts, the
-    advice of the kth expert are always equal e_k, where e_k is the kth column
-    of the identity matrix.
+    experts are equal to the number of active learning algorithms wanted to
+    use. The arms (actions) are the active learning algorithms, where is
+    inputed from parameter 'query_strategies'. There is no need for the input
+    of experts, the advice of the kth expert are always equal e_k, where e_k is
+    the kth column of the identity matrix.
 
     Parameters
     ----------
@@ -258,7 +267,8 @@ class Exp4P():
     delta : float, >0, optional (default=0.1)
         A parameter.
 
-    pmin : float, 0<pmin<1/len(query_strategies), optional (default= :math:`\\frac{\\sqrt{log(N)}}{KT}`)
+    pmin : float, 0<pmin<1/len(query_strategies),\
+            optional (default= :math:`\frac{\sqrt{log(N)}}{KT}`)
         The minimal probability for random selection of the arms (aka the
         unlabeled data), N = K = number of query_strategies, T is the maximum
         number of rounds.
@@ -278,7 +288,7 @@ class Exp4P():
     N : int
         The number of arms (actions) in this exp4.p instance.
 
-    query_models\\_ : list of :py:mod:`libact.query_strategies` object instance
+    query_models\_ : list of :py:mod:`libact.query_strategies` object instance
         The underlying active learning algorithm instances.
 
     References
@@ -296,7 +306,8 @@ class Exp4P():
         self.query_strategies_ = kwargs.pop('query_strategies', None)
         if self.query_strategies_ is None:
             raise TypeError(
-                "__init__() missing required keyword-only argument: 'query_strategies'"
+                "__init__() missing required keyword-only argument: "
+                "'query_strategies'"
             )
         elif not self.query_strategies_:
             raise ValueError("query_strategies list is empty")
@@ -312,7 +323,7 @@ class Exp4P():
             self.N = len(self.query_strategies_)
 
         # weight vector to each query_strategies, shape = (N, )
-        self.w = np.array([1. for i in range(self.N)])
+        self.w = np.array([1. for _ in range(self.N)])
 
         # max iters
         self.T = kwargs.pop('T', 100)
@@ -325,7 +336,7 @@ class Exp4P():
 
         # p_min in [0, 1/n_arms]
         self.pmin = kwargs.pop('pmin', None)
-        if self.pmin == None:
+        if self.pmin is None:
             self.pmin = np.sqrt(np.log(self.N) / self.K / self.T)
 
         self.exp4p_gen = self.exp4p()
@@ -386,21 +397,21 @@ class Exp4P():
             p = (1 - self.K * self.pmin) * self.w / W + self.pmin
 
             # query vector, shape= = (self.n_unlabeled, )
-            q = np.dot(p, query)
+            query_vector = np.dot(p, query)
 
-            reward, ask_id, lbl = yield q
+            reward, ask_id, _ = yield query_vector
             ask_idx = self.unlabeled_invert_id_idx[ask_id]
 
-            rhat = reward * query[:, ask_idx] / q[ask_idx]
+            rhat = reward * query[:, ask_idx] / query_vector[ask_idx]
 
             # The original advice vector in Exp4.P in ALBL is a identity matrix
-            #yhat = np.dot(advice, rhat)
             yhat = rhat
-            #vhat = np.sum(advice / np.tile(p, (self.N, 1)), axis=1)
             vhat = 1 / p
             self.w = self.w * np.exp(
-                self.pmin / 2 * (yhat + vhat * np.sqrt(
-                    np.log(self.N / self.delta) / self.K / self.T)
+                self.pmin / 2 * (
+                    yhat + vhat * np.sqrt(
+                        np.log(self.N / self.delta) / self.K / self.T
+                    )
                 )
             )
 
