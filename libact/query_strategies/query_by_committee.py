@@ -5,7 +5,6 @@ algorithm.
 """
 from __future__ import division
 
-from functools import cmp_to_key
 import logging
 import math
 
@@ -21,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class QueryByCommittee(QueryStrategy):
 
-    """Query by committee
+    r"""Query by committee
 
     Parameters
     ----------
@@ -30,7 +29,8 @@ class QueryByCommittee(QueryStrategy):
         or class names of libact Model classes to determine the models to be
         included in the committee to vote for each unlabeled instance.
 
-    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+    random_state : {int, np.random.RandomState instance, None},\
+            optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.
@@ -40,7 +40,7 @@ class QueryByCommittee(QueryStrategy):
     students : list, shape = (len(models))
         A list of the model instances used in this algorithm.
 
-    random_states\\_ : np.random.RandomState instance
+    random_states\_ : np.random.RandomState instance
         The random number generator using.
 
     Examples
@@ -64,8 +64,8 @@ class QueryByCommittee(QueryStrategy):
     References
     ----------
     .. [1] Seung, H. Sebastian, Manfred Opper, and Haim Sompolinsky. "Query by
-           committee." Proceedings of the fifth annual workshop on Computational
-           learning theory. ACM, 1992.
+           committee." Proceedings of the fifth annual workshop on
+           Computational learning theory. ACM, 1992.
     """
 
     def __init__(self, *args, **kwargs):
@@ -84,7 +84,7 @@ class QueryByCommittee(QueryStrategy):
 
         self.students = list()
         for model in models:
-            if type(model) is str:
+            if isinstance(model, str):
                 self.students.append(getattr(libact.models, model)())
             else:
                 self.students.append(model)
@@ -121,6 +121,7 @@ class QueryByCommittee(QueryStrategy):
         return ret
 
     def _labeled_uniform_sample(self, sample_size):
+        """sample labeled entries uniformly"""
         labeled_entries = self.dataset.get_labeled_entries()
         samples = [labeled_entries[
             self.random_state_.randint(0, len(labeled_entries))
@@ -134,11 +135,9 @@ class QueryByCommittee(QueryStrategy):
         """
         dataset = self.dataset
         for student in self.students:
-            #bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
             bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
                 bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
-                #bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
                 logger.warning('There is student receiving only one label,'
                                're-sample the bag.')
             student.train(bag)

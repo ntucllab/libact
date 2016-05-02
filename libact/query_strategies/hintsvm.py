@@ -14,7 +14,7 @@ from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 class HintSVM(QueryStrategy):
 
-    """Hinted Support Vector Machine
+    r"""Hinted Support Vector Machine
 
     Hinted Support Vector Machine is an active learning algorithm within the
     hined sampling framework with an extended support vector machine.
@@ -30,7 +30,8 @@ class HintSVM(QueryStrategy):
     p : float, >0 and <=1, optional (default=.5)
         The probability to select an instance from unlabeld pool to hint pool.
 
-    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+    random_state : {int, np.random.RandomState instance, None},\
+            optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.
@@ -64,7 +65,7 @@ class HintSVM(QueryStrategy):
 
     Attributes
     ----------
-    random_states\\_ : np.random.RandomState instance
+    random_states\_ : np.random.RandomState instance
         The random number generator using.
 
     Examples
@@ -136,16 +137,13 @@ class HintSVM(QueryStrategy):
             *dataset.get_unlabeled_entries())
         labeled_pool, y = zip(*dataset.get_labeled_entries())
 
-        cl = self.cl
-        ch = self.ch
-        p = self.p
         hint_pool_idx = self.random_state_.choice(
-            len(unlabeled_pool), int(len(unlabeled_pool) * p))
+            len(unlabeled_pool), int(len(unlabeled_pool) * self.p))
         hint_pool = np.array(unlabeled_pool)[hint_pool_idx]
 
         weight = [1.0 for _ in range(len(labeled_pool))] +\
-                 [(ch / cl) for i in range(len(hint_pool))]
-        y = list(y) + [0 for i in range(len(hint_pool))]
+                 [(self.ch / self.cl) for _ in range(len(hint_pool))]
+        y = list(y) + [0 for _ in range(len(hint_pool))]
         X = [x.tolist() for x in labeled_pool] +\
             [x.tolist() for x in hint_pool]
 

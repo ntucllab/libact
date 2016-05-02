@@ -27,7 +27,8 @@ class VarianceReduction(QueryStrategy):
         1/sigma is added to the diagonal of the Fisher information matrix as a
         regularization term.
 
-    optimality : {'trace', 'determinant', 'eigenvalue'}, optional (default='trace')
+    optimality : {'trace', 'determinant', 'eigenvalue'},\
+            optional (default='trace')
         The type of optimal design.  The options are the trace, determinant, or
         maximum eigenvalue of the inverse Fisher information matrix.
         Only 'trace' are supported now.
@@ -48,10 +49,10 @@ class VarianceReduction(QueryStrategy):
            Wisconsin, Madison 52.55-66 (2010): 11.
     """
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(VarianceReduction, self).__init__(*args, **kwargs)
         model = kwargs.pop('model', None)
-        if type(model) is str:
+        if isinstance(model, str):
             self.model = getattr(libact.models, model)()
         else:
             self.model = model
