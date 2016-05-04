@@ -26,17 +26,19 @@ Documentation for the latest release is hosted [here](http://libact.readthedocs.
 
 # Basic Dependencies
 
-Python3 dependencies
+* Python 2.7, 3.3, 3.4, 3.5
+
+* Python dependencies
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-Debian (>= 7) / Ubuntu (>= 14.04)
+* Debian (>= 7) / Ubuntu (>= 14.04)
 ```
 sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
 ```
 
-MacOS
+* MacOS
 ```
 brew tap homebrew/science
 brew install openblas
@@ -44,40 +46,31 @@ brew install openblas
 
 # Installation
 
-One of the query strategies (`hintsvm`) depends on the HintSVM package that requires special installation. If you are not using the strategy, please simply follow the section on general installation. Otherwise please follow the section on HintSVM.
-
-## General Installation
-After resolving the dependencies, it should be fairly simple to install the package in your home directory:
-
-```
-python setup.py install --user
-```
-
-To install for all users on Unix/Linux:
-```
-python setup.py build
-sudo python setup.py install
-```
-
-Or via pip: (for all users):
+After resolving the dependencies, you may install the package via pip (for all users):
 ```
 sudo pip install libact
 ```
 
-Pip install in home directory:
+or pip install in home directory:
 ```
 pip install --user libact
 ```
 
-## Special Installation for HintSVM
+or pip install from github repository for latest source:
+```
+pip install git+https://github.com/ntucllab/libact.git
+```
 
-For HintSVM, you would have to install the [hintsvm package](https://github.com/ntucllab/hintsvm) first.
+To build and install from souce in your home directory:
+```
+python setup.py install --user
+```
 
-Before running, you need to make sure the path to the library and
-python code of `hintsvm` are set in the environment variables:
-
-    export LD_LIBRARY_PATH=/path/to/hintsvm:$LD_LIBRARY_PATH
-    export PYTHONPATH=/path/to/hintsvm/python:$PYTHONPATH
+To build and install from souce for all users on Unix/Linux:
+```
+python setup.py build
+sudo python setup.py install
+```
 
 # Usage
 
@@ -102,6 +95,27 @@ Available examples:
     the pool-based active learning scenario. Each query of an unlabeled dataset is then equivalent to revealing one labeled example in the original data set.
   - `examples/label_digits.py`: This example shows how to use libact in the case
     that you want a human to label the selected sample for your algorithm.
+
+# Running tests
+
+To run the test suite:
+
+```
+python setup.py test
+```
+
+To run pylint, install pylint through ```pip install pylint``` and run the following command in root directory:
+
+```
+pylint libact
+```
+
+To measure the test code coverage, install coverage through ```pip install coverage``` and run the following commands in root directory:
+
+```
+coverage run --source libact --omit */tests/* setup.py test
+coverage report
+```
 
 # Acknowledgments
 
