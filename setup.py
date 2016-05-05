@@ -49,11 +49,12 @@ else:
 
 setup(
     name='libact',
-    version='0.1.1',
+    version='0.1.2',
     description='Pool-based active learning in Python',
     long_description='Pool-based active learning in Python',
-    author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
-    author_email='lsc36x@gmail.com',
+    author='Y.-Y. Yang, S.-C. Lee, Y.-A. Chung, T.-E. Wu, H.-T. Lin',
+    author_email='b01902066@csie.ntu.edu.tw, b01902010@csie.ntu.edu.tw, '
+        'b01902040@csie.ntu.edu.tw, r00942129@ntu.edu.tw, htlin@csie.ntu.edu.tw',
     url='https://github.com/ntucllab/libact',
     cmdclass=cmdclasses,
     classifiers=[
