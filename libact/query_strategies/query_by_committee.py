@@ -5,7 +5,6 @@ algorithm.
 """
 from __future__ import division
 
-from functools import cmp_to_key
 import logging
 import math
 
@@ -16,11 +15,12 @@ from libact.base.interfaces import QueryStrategy
 import libact.models
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class QueryByCommittee(QueryStrategy):
-    """Query by committee
+
+    r"""Query by committee
 
     Parameters
     ----------
@@ -39,7 +39,7 @@ class QueryByCommittee(QueryStrategy):
     students : list, shape = (len(models))
         A list of the model instances used in this algorithm.
 
-    random_states\\_ : np.random.RandomState instance
+    random_states\_ : np.random.RandomState instance
         The random number generator using.
 
     Examples
@@ -63,8 +63,8 @@ class QueryByCommittee(QueryStrategy):
     References
     ----------
     .. [1] Seung, H. Sebastian, Manfred Opper, and Haim Sompolinsky. "Query by
-           committee." Proceedings of the fifth annual workshop on Computational
-           learning theory. ACM, 1992.
+           committee." Proceedings of the fifth annual workshop on
+           Computational learning theory. ACM, 1992.
     """
 
     def __init__(self, *args, **kwargs):
@@ -74,7 +74,7 @@ class QueryByCommittee(QueryStrategy):
         if models is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'models'"
-                )
+            )
         elif not models:
             raise ValueError("models list is empty")
 
@@ -83,7 +83,7 @@ class QueryByCommittee(QueryStrategy):
 
         self.students = list()
         for model in models:
-            if type(model) is str:
+            if isinstance(model, str):
                 self.students.append(getattr(libact.models, model)())
             else:
                 self.students.append(model)
@@ -114,16 +114,17 @@ class QueryByCommittee(QueryStrategy):
 
             # Using vote entropy to measure disagreement
             for lab in lab_count.keys():
-                ret[-1] -= lab_count[lab]/self.n_students * \
-                            math.log(float(lab_count[lab])/self.n_students)
+                ret[-1] -= lab_count[lab] / self.n_students * \
+                    math.log(float(lab_count[lab]) / self.n_students)
 
         return ret
 
     def _labeled_uniform_sample(self, sample_size):
+        """sample labeled entries uniformly"""
         labeled_entries = self.dataset.get_labeled_entries()
         samples = [labeled_entries[
-                        self.random_state_.randint(0, len(labeled_entries))
-                    ]for _ in range(sample_size)]
+            self.random_state_.randint(0, len(labeled_entries))
+        ]for _ in range(sample_size)]
         return Dataset(*zip(*samples))
 
     def teach_students(self):
@@ -133,12 +134,10 @@ class QueryByCommittee(QueryStrategy):
         """
         dataset = self.dataset
         for student in self.students:
-            #bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
             bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
             while bag.get_num_of_labels() != dataset.get_num_of_labels():
                 bag = self._labeled_uniform_sample(int(dataset.len_labeled()))
-                #bag = dataset.labeled_uniform_sample(int(dataset.len_labeled()))
-                logger.warning('There is student receiving only one label,'
+                LOGGER.warning('There is student receiving only one label,'
                                're-sample the bag.')
             student.train(bag)
 
@@ -158,10 +157,10 @@ class QueryByCommittee(QueryStrategy):
             votes[:, i] = student.predict(X_pool)
 
         id_disagreement = [(i, dis) for i, dis in
-                zip(unlabeled_entry_ids, self.disagreement(votes))]
+                           zip(unlabeled_entry_ids, self.disagreement(votes))]
 
         disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
-                reverse=True)
+                              reverse=True)
         ask_id = self.random_state_.choice(
             [e[0] for e in disagreement if e[1] == disagreement[0][1]])
 

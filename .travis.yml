@@ -34,6 +34,7 @@ before_install:
   - travis_wait 20 pip install -r requirements.txt
   - pip install coverage
   - pip install codecov
+  - pip install pylint
 install:
   - ./setup.py build_ext --inplace
 script:
@@ -41,4 +42,5 @@ script:
   - coverage run --source libact --omit */tests/* setup.py test
   - coverage report
 after_success:
+  - pylint libact
   - codecov

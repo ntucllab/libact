@@ -5,15 +5,16 @@ The package works according to the interfaces defined below.
 from six import with_metaclass
 
 from abc import ABCMeta, abstractmethod
-from functools import wraps
 
 
 class QueryStrategy(with_metaclass(ABCMeta, object)):
+
     """Pool-based query strategy
 
     A QueryStrategy advices on which unlabeled data to be queried next given
     a pool of labeled and unlabeled data.
     """
+
     def __init__(self, dataset, **kwargs):
         self._dataset = dataset
         dataset.on_update(self.update)
@@ -52,6 +53,7 @@ class QueryStrategy(with_metaclass(ABCMeta, object)):
 
 
 class Labeler(with_metaclass(ABCMeta, object)):
+
     """Label the queries made by QueryStrategies
 
     Assign labels to the samples queried by QueryStrategies.
@@ -74,6 +76,7 @@ class Labeler(with_metaclass(ABCMeta, object)):
 
 
 class Model(with_metaclass(ABCMeta, object)):
+
     """Classification Model
 
     A Model returns a class-predicting function for future samples after
@@ -118,7 +121,8 @@ class Model(with_metaclass(ABCMeta, object)):
         Parameters
         ----------
         testing_dataset : Dataset object
-            The testing dataset used to measure the perforance of the trained model.
+            The testing dataset used to measure the perforance of the trained
+            model.
 
         Returns
         -------
@@ -129,6 +133,7 @@ class Model(with_metaclass(ABCMeta, object)):
 
 
 class ContinuousModel(Model):
+
     """Classification Model with intermediate continuous output
 
     A continuous classification model is able to output a real-valued vector
@@ -140,11 +145,11 @@ class ContinuousModel(Model):
 
         Returns the confidence score for each (sample, class) combination.
 
-        The larger the value for entry (sample=x, class=k) is, the more confident
-        the model is about the sample x belonging to the class k.
+        The larger the value for entry (sample=x, class=k) is, the more
+        confident the model is about the sample x belonging to the class k.
 
-        Take Logistic Regression as example, the return value is the signed dis-
-        tance of that sample to the hyperplane.
+        Take Logistic Regression as example, the return value is the signed
+        distance of that sample to the hyperplane.
 
         Parameters
         ----------
@@ -154,6 +159,7 @@ class ContinuousModel(Model):
         Returns
         -------
         X : array-like, shape (n_samples, n_classes)
-            Each entry is the confidence scores per (sample, class) combination.
+            Each entry is the confidence scores per (sample, class)
+            combination.
         """
         pass

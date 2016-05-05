@@ -13,7 +13,8 @@ from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 
 class HintSVM(QueryStrategy):
-    """Hinted Support Vector Machine
+
+    r"""Hinted Support Vector Machine
 
     Hinted Support Vector Machine is an active learning algorithm within the
     hined sampling framework with an extended support vector machine.
@@ -35,10 +36,10 @@ class HintSVM(QueryStrategy):
         random_state is the random number generate.
 
     kernel : {'linear', 'poly', 'rbf', 'sigmoid'}, optional (default='linear')
-		linear: u'\*v
-		poly: (gamma\*u'\*v + coef0)^degree
-		rbf: exp(-gamma\*|u-v|^2)
-		sigmoid: tanh(gamma\*u'\*v + coef0)
+                linear: u'\*v
+                poly: (gamma\*u'\*v + coef0)^degree
+                rbf: exp(-gamma\*|u-v|^2)
+                sigmoid: tanh(gamma\*u'\*v + coef0)
 
     degree : int, optional (default=3)
         Parameter for kernel function.
@@ -63,7 +64,7 @@ class HintSVM(QueryStrategy):
 
     Attributes
     ----------
-    random_states\\_ : np.random.RandomState instance
+    random_states\_ : np.random.RandomState instance
         The random number generator using.
 
     Examples
@@ -110,7 +111,7 @@ class HintSVM(QueryStrategy):
             raise ValueError(
                 'Parameter p should be greater than or equal to 0 and less '
                 'than or equal to 1.'
-                )
+            )
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
@@ -135,16 +136,13 @@ class HintSVM(QueryStrategy):
             *dataset.get_unlabeled_entries())
         labeled_pool, y = zip(*dataset.get_labeled_entries())
 
-        cl = self.cl
-        ch = self.ch
-        p = self.p
         hint_pool_idx = self.random_state_.choice(
-            len(unlabeled_pool), int(len(unlabeled_pool)*p))
+            len(unlabeled_pool), int(len(unlabeled_pool) * self.p))
         hint_pool = np.array(unlabeled_pool)[hint_pool_idx]
 
         weight = [1.0 for _ in range(len(labeled_pool))] +\
-                 [(ch/cl) for i in range(len(hint_pool))]
-        y = list(y) + [0 for i in range(len(hint_pool))]
+                 [(self.ch / self.cl) for _ in range(len(hint_pool))]
+        y = list(y) + [0 for _ in range(len(hint_pool))]
         X = [x.tolist() for x in labeled_pool] +\
             [x.tolist() for x in hint_pool]
 

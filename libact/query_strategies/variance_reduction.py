@@ -12,6 +12,7 @@ from libact.utils import inherit_docstring_from, zip
 
 
 class VarianceReduction(QueryStrategy):
+
     """Variance Reduction
 
     This class implements Variance Reduction active learning algorithm [1]_.
@@ -26,7 +27,8 @@ class VarianceReduction(QueryStrategy):
         1/sigma is added to the diagonal of the Fisher information matrix as a
         regularization term.
 
-    optimality : {'trace', 'determinant', 'eigenvalue'}, optional (default='trace')
+    optimality : {'trace', 'determinant', 'eigenvalue'},\
+            optional (default='trace')
         The type of optimal design.  The options are the trace, determinant, or
         maximum eigenvalue of the inverse Fisher information matrix.
         Only 'trace' are supported now.
@@ -47,10 +49,10 @@ class VarianceReduction(QueryStrategy):
            Wisconsin, Madison 52.55-66 (2010): 11.
     """
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(VarianceReduction, self).__init__(*args, **kwargs)
         model = kwargs.pop('model', None)
-        if type(model) is str:
+        if isinstance(model, str):
             self.model = getattr(libact.models, model)()
         else:
             self.model = model
@@ -80,20 +82,22 @@ class VarianceReduction(QueryStrategy):
 
         return unlabeled_entry_ids[errors.index(min(errors))]
 
+
 def _Phi(sigma, PI, X, epi, ex, label_count, feature_count):
-	ret = estVar(sigma, PI, X, epi, ex)
-	return ret
+    ret = estVar(sigma, PI, X, epi, ex)
+    return ret
+
 
 def _E(args):
-	X, y, qx, clf, label_count, sigma, model = args
-	sigmoid = lambda x: 1 / (1 + np.exp(-x))
-	query_point = sigmoid(clf.predict_real([qx]))
-	feature_count = len(X[0])
-	ret = 0.0
-	for i in range(label_count):
-		clf_ = copy.copy(model)
-		clf_.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
-		PI = sigmoid(clf_.predict_real(np.vstack((X, [qx]))))
-		ret += query_point[-1][i] * _Phi(sigma, PI[:-1], X, PI[-1], qx,
-				label_count, feature_count)
-	return ret
+    X, y, qx, clf, label_count, sigma, model = args
+    sigmoid = lambda x: 1 / (1 + np.exp(-x))
+    query_point = sigmoid(clf.predict_real([qx]))
+    feature_count = len(X[0])
+    ret = 0.0
+    for i in range(label_count):
+        clf_ = copy.copy(model)
+        clf_.train(Dataset(np.vstack((X, [qx])), np.append(y, i)))
+        PI = sigmoid(clf_.predict_real(np.vstack((X, [qx]))))
+        ret += query_point[-1][i] * _Phi(sigma, PI[:-1], X, PI[-1], qx,
+                                         label_count, feature_count)
+    return ret

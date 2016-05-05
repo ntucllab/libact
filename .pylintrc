@@ -1,0 +1,139 @@
+[REPORTS]
+
+# Set the output format. Available formats are text, parseable, colorized, msvs
+# (visual studio) and html.
+output-format=colorized
+
+# Tells whether to display a full report or only the messages
+reports=yes
+
+# Python expression which should return a note less than 10 (10 is the highest
+# note). You have access to the variables errors warning, statement which
+# respectively contain the number of errors / warnings messages and the total
+# number of statements analyzed. This is used by the global evaluation report
+# (RP0004).
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+
+
+[VARIABLES]
+
+# List of additional names supposed to be defined in builtins. Remember that
+# you should avoid to define new builtins when possible.
+additional-builtins=zip
+
+# List of strings which can identify a callback function by name. A callback
+# name must start or end with one of those strings.
+callbacks=cb_,_cb
+
+
+[BASIC]
+
+# List of builtins function names that should not be used, separated by a comma
+bad-functions=map,filter
+
+# Good variable names which should always be accepted, separated by a comma
+# x, y, X, Y - vector maxtrix of features and labels.
+# P, p - probability distribution
+# qs - query strategry
+# w, W - weight vector
+# N - number of instances
+# T, K - number of iterations
+good-names=i,j,k,_,X,Y,x,y,P,p,qs,w,W,N,T,K
+
+# Regular expression matching correct attribute names
+attr-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Naming hint for attribute names
+attr-name-hint=[a-z_][a-z0-9_]{2,30}$
+
+# Regular expression matching correct variable names
+# start with X imply its a matrix for features
+variable-rgx=[a-z_X][a-z0-9_]{2,30}$
+
+# Naming hint for variable names
+variable-name-hint=[a-z_X][a-z0-9_]{2,30}$
+
+# Regular expression which should only match function or class names that do
+# not require a docstring.
+no-docstring-rgx=^_
+
+# Minimum line length for functions/classes that require docstrings, shorter
+# ones are exempt.
+docstring-min-length=-1
+
+
+[TYPECHECK]
+
+# List of module names for which member attributes should not be checked
+# (useful for modules/projects where namespaces are manipulated during runtime
+# and thus existing member attributes cannot be deduced by static analysis. It
+# supports qualified module names, as well as Unix pattern matching.
+ignored-modules=numpy,matplotlib,future_builtins
+
+# List of classes names for which member attributes should not be checked
+# (useful for classes with attributes dynamically set). This supports can work
+# with qualified names.
+ignored-classes=
+
+# List of members which are set dynamically and missed by pylint inference
+# system, and so shouldn't trigger E1101 when accessed. Python regular
+# expressions are accepted.
+generated-members=
+
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=79
+
+# List of optional constructs for which whitespace checking is disabled. `dict-
+# separator` is used to allow tabulation in dicts, etc.: {1  : 1,\n222: 2}.
+# `trailing-comma` allows a space between comma and closing bracket: (a, ).
+# `empty-line` allows space-only lines.
+no-space-check=trailing-comma,dict-separator
+
+# Maximum number of lines in a module
+max-module-lines=1000
+
+# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
+# tab).
+indent-string='    '
+
+# Number of spaces of indent required inside a hanging or continued line.
+indent-after-paren=4
+
+# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
+expected-line-ending-format=LF
+
+
+[DESIGN]
+
+# Maximum number of arguments for function / method
+max-args=15
+
+# sometimes more locals can handle computation more efficiently
+max-locals=30
+
+# Maximum number of attributes for a class (see R0902).
+max-attributes=15
+
+
+[MESSAGES CONTROL]
+
+# R0903 - Not enough public methods
+# E0611 - No name %r in module %r (countless false-positives)
+# E1101, E1103 - %s %r has no %r member (countless false-positives)
+# F0401 - Unable to import %r (error for c extensions)
+disable=R0903,E0611,E1101,E1103,F0401
+
+
+[CLASSES]
+
+# List of method names used to declare (i.e. assign) instance attributes.
+defining-attr-methods=__init__,__new__,setUp
+
+# List of valid names for the first argument in a class method.
+valid-classmethod-first-arg=cls
+
+# List of valid names for the first argument in a metaclass class method.
+valid-metaclass-classmethod-first-arg=mcs
