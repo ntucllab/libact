@@ -4,12 +4,16 @@ Datasets consists of data used for training, represented by a list of
 (feature, label) tuples.
 May be exported in different formats for application on other libraries.
 """
+from __future__ import unicode_literals
 
 import random
 import numpy as np
 
+from libact.utils import zip
+
 
 class Dataset(object):
+
     """libact dataset object
 
     Parameters
@@ -28,7 +32,9 @@ class Dataset(object):
 
     """
 
-    def __init__(self, X=[], y=[]):
+    def __init__(self, X=None, y=None):
+        if X is None: X = []
+        if y is None: y = []
         self.data = list(zip(X, y))
         self.modified = True
         self._update_callback = set()
@@ -173,7 +179,7 @@ class Dataset(object):
         return [
             (idx, entry[0]) for idx, entry in enumerate(self.data)
             if entry[1] is None
-            ]
+        ]
 
     def labeled_uniform_sample(self, sample_size, replace=True):
         """Returns a Dataset object with labeled data only, which is
@@ -188,7 +194,7 @@ class Dataset(object):
             samples = [
                 random.choice(self.get_labeled_entries())
                 for _ in range(sample_size)
-                ]
+            ]
         else:
             samples = random.sample(self.get_labeled_entries(), sample_size)
         return Dataset(*zip(*samples))

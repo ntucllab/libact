@@ -1,5 +1,6 @@
 language: python
 python:
+  - "2.7"
   - "3.3"
   - "3.4"
   - "3.5"
@@ -14,6 +15,10 @@ matrix:
     - os: osx           # Python 3 not supported in Travis OSX environment
     - python: "nightly" # SciPy bug
 
+cache:
+  directories:
+    - $HOME/.cache/pip
+
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       brew update;
@@ -25,8 +30,17 @@ before_install:
       sudo apt-get install -y python3-dev;
     fi
   - python -V
-  - pip install -r requirements.txt
+  - travis_retry pip install --upgrade pip wheel   # get pip >= 7, which caches built packages
+  - travis_wait 20 pip install -r requirements.txt
+  - pip install coverage
+  - pip install codecov
+  - pip install pylint
 install:
   - ./setup.py build_ext --inplace
 script:
   - python -m unittest -v
+  - coverage run --source libact --omit */tests/* setup.py test
+  - coverage report
+after_success:
+  - pylint libact
+  - codecov

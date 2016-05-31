@@ -23,6 +23,7 @@ static PyMethodDef module_methods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "_variance_reduction",  /* m_name */
@@ -46,6 +47,12 @@ PyMODINIT_FUNC PyInit__variance_reduction(void){
 
     return m;
 }
+#else
+PyMODINIT_FUNC init_variance_reduction(void){
+    PyObject *module = Py_InitModule("_variance_reduction", module_methods);
+    import_array();
+}
+#endif
 
 double* matrix_mul(double* a, double* b, int m1, int n1, int m2, int n2){
     double *ret = (double*) malloc(m1 * n2 * sizeof(double));
@@ -116,6 +123,7 @@ void pinv(double** X, int labs, int dims){
             X[i][j] = ret_pinv[i*n + j];
 
     free(ret);
+    free(ret_pinv);
     free(work);
     free(a);
     free(s);
@@ -167,21 +175,9 @@ static PyObject *varRedu_estVar(PyObject *self, PyObject *args)
     }
     double *ePI =  (double*) PyArray_DATA(ePI_array);
     double *eX  =  (double*) PyArray_DATA(eX_array);
-    
+
     double **retF = Fisher(ePI, eX, sigma, labs, dims);
     double **retA = A(PI, X, labs, dims, n_pool);
-
-    for(int i=0; i<dims*labs; i++){
-        for(int j=0; j<dims*labs; j++){
-            if(isnan(retF[i][j])){
-                printf("F: %f\n", retF[i][j]);
-            }
-            if(isnan(retA[i][j])){
-                printf("A: %f\n", retA[i][j]);
-            }
-        }
-    }
-
 
     pinv(retF, labs, dims);
 

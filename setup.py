@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from distutils.core import setup, Extension
 import os
+from setuptools import setup, Extension
 import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -29,11 +29,11 @@ else:
     extensions = cythonize([
         Extension(
             "libact.query_strategies._variance_reduction",
-            ["libact/query_strategies/variance_reduction.c"],
+            ["libact/query_strategies/src/variance_reduction/variance_reduction.c"],
             extra_link_args=extra_link_args,
             extra_compile_args=['-std=c11'],
             include_dirs=include_dirs,
-            ),
+        ),
         Extension(
             "libact.query_strategies._hintsvm",
             sources=["libact/query_strategies/_hintsvm.pyx",
@@ -42,35 +42,42 @@ else:
             include_dirs=[numpy.get_include(),
                           "libact/query_strategies/src/hintsvm/"],
             extra_compile_args=['-lstdc++'],
-            ),
-        ])
+        ),
+    ])
     cmdclasses = {'build_ext': build_ext}
 
 
 setup(
     name='libact',
-    version='0.1.1',
+    version='0.1.2',
     description='Pool-based active learning in Python',
     long_description='Pool-based active learning in Python',
-    author='Y.-A. Chung, S.-C. Lee, T.-E. Wu, Y.-Y. Yang, H.-T. Lin',
-    author_email='lsc36x@gmail.com',
+    author='Y.-Y. Yang, S.-C. Lee, Y.-A. Chung, T.-E. Wu, H.-T. Lin',
+    author_email='b01902066@csie.ntu.edu.tw, b01902010@csie.ntu.edu.tw, '
+        'b01902040@csie.ntu.edu.tw, r00942129@ntu.edu.tw, htlin@csie.ntu.edu.tw',
     url='https://github.com/ntucllab/libact',
-    cmdclass = cmdclasses,
+    cmdclass=cmdclasses,
     classifiers=[
-        "Topic :: Scientific/Engineering"
+        "Topic :: Scientific/Engineering",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
     ],
-
+    test_suite='libact',
     packages=[
+        'libact',
         'libact.base',
         'libact.models',
         'libact.labelers',
         'libact.query_strategies',
-        ],
+        'libact.utils',
+    ],
     package_dir={
+        'libact': 'libact',
         'libact.base': 'libact/base',
         'libact.models': 'libact/models',
         'libact.labelers': 'libact/labelers',
         'libact.query_strategies': 'libact/query_strategies',
-        },
+        'libact.utils': 'libact/utils',
+    },
     ext_modules=extensions,
-    )
+)

@@ -1,32 +1,59 @@
 """ Uncertainty Sampling
 
-This module contains a class that implements two of the most well-known uncertainty sampling
-query strategies, which are least confidence and smallest margin (margin sampling).
+This module contains a class that implements two of the most well-known
+uncertainty sampling query strategies: the least confidence method and the
+smallest margin method (margin sampling).
 
 """
 import numpy as np
 
 from libact.base.interfaces import QueryStrategy, ContinuousModel
+from libact.utils import inherit_docstring_from, zip
 
 
 class UncertaintySampling(QueryStrategy):
+
     """Uncertainty Sampling
 
     This class implements Uncertainty Sampling active learning algorithm [1]_.
 
     Parameters
     ----------
-    model: libact.model.* object instance
-        The base model used for trainin, this model should support predict_real.
+    model: :py:class:`libact.base.interfaces.ContinuousModel` object instance
+        The base model used for training.
 
     method: {'lc', 'sm'}, optional (default='lc')
         least confidence (lc), it queries the instance whose posterior
-        probability of being positive is nearest 0.5 (for binary classification);
+        probability of being positive is nearest 0.5 (for binary
+        classification);
         smallest margin (sm), it queries the instance whose posterior
-        probability gap between the most and the second probable labels is minimal;
+        probability gap between the most and the second probable labels is
+        minimal;
+
 
     Attributes
     ----------
+    model: :py:class:`libact.base.interfaces.ContinuousModel` object instance
+        The model trained in last query.
+
+
+    Examples
+    --------
+    Here is an example of declaring a UncertaintySampling query_strategy
+    object:
+
+    .. code-block:: python
+
+       from libact.query_strategies import UncertaintySampling
+       from libact.models import LogisticRegression
+
+       qs = UncertaintySampling(
+                dataset, # Dataset object
+                model=LogisticRegression(C=0.1)
+            )
+
+    Note that the model given in the :code:`model` parameter must be a
+    :py:class:`ContinuousModel` which supports predict_real method.
 
 
     References
@@ -37,32 +64,28 @@ class UncertaintySampling(QueryStrategy):
     """
 
     def __init__(self, *args, **kwargs):
-        """Currently only LogisticRegression is supported."""
         super(UncertaintySampling, self).__init__(*args, **kwargs)
 
         self.model = kwargs.pop('model', None)
         if self.model is None:
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
-                )
+            )
         if not isinstance(self.model, ContinuousModel):
             raise TypeError(
                 "model has to be a ContinuousModel"
-                )
+            )
         self.model.train(self.dataset)
 
         self.method = kwargs.pop('method', 'lc')
         if self.method not in ['lc', 'sm']:
             raise TypeError(
-                "supported methods are ['lc', 'sm'], the given one is: " + \
+                "supported methods are ['lc', 'sm'], the given one is: " +
                 self.method
-                )
+            )
 
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
-        """
-        Choices for method (default 'lc'):
-        'lc' (Least Confident), 'sm' (Smallest Margin)
-        """
         dataset = self.dataset
         self.model.train(dataset)
 
@@ -84,7 +107,3 @@ class UncertaintySampling(QueryStrategy):
             ask_id = np.argmin(margin)
 
         return unlabeled_entry_ids[ask_id]
-
-    def get_model(self):
-        """Returns the model used by the last query"""
-        return self.model

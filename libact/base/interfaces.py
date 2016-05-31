@@ -2,33 +2,37 @@
 Base interfaces for use in the package.
 The package works according to the interfaces defined below.
 """
+from six import with_metaclass
 
 from abc import ABCMeta, abstractmethod
 
 
-class QueryStrategy(metaclass=ABCMeta):
+class QueryStrategy(with_metaclass(ABCMeta, object)):
+
     """Pool-based query strategy
 
-    A QueryStrategy advices on which unlabeled data to be queried next given 
+    A QueryStrategy advices on which unlabeled data to be queried next given
     a pool of labeled and unlabeled data.
     """
+
     def __init__(self, dataset, **kwargs):
         self._dataset = dataset
         dataset.on_update(self.update)
 
     @property
     def dataset(self):
+        """The Dataset object that is associated with this QueryStrategy."""
         return self._dataset
 
     def update(self, entry_id, label):
-        """Update the internal states of the QueryStrategy after each queried 
+        """Update the internal states of the QueryStrategy after each queried
         sample being labeled.
 
         Parameters
         ----------
         entry_id : int
             The index of the newly labeled sample.
-            
+
         label : float
             The label of the queried sample.
         """
@@ -37,9 +41,9 @@ class QueryStrategy(metaclass=ABCMeta):
     @abstractmethod
     def make_query(self):
         """Return the index of the sample to be queried and labeled. Read-only.
-        
+
         No modification to the internal states.
-        
+
         Returns
         -------
         ask_id : int
@@ -48,20 +52,21 @@ class QueryStrategy(metaclass=ABCMeta):
         pass
 
 
-class Labeler(metaclass=ABCMeta):
+class Labeler(with_metaclass(ABCMeta, object)):
+
     """Label the queries made by QueryStrategies
-    
+
     Assign labels to the samples queried by QueryStrategies.
     """
     @abstractmethod
     def label(self, feature):
-        """Return the class labels for the input feature array. 
-    
+        """Return the class labels for the input feature array.
+
         Parameters
         ----------
         feature : array-like, shape (n_features,)
             The feature vector whose label is to queried.
-            
+
         Returns
         -------
         label : int
@@ -70,16 +75,17 @@ class Labeler(metaclass=ABCMeta):
         pass
 
 
-class Model(metaclass=ABCMeta):
+class Model(with_metaclass(ABCMeta, object)):
+
     """Classification Model
 
-    A Model returns a class-predicting function for future samples after 
+    A Model returns a class-predicting function for future samples after
     trained on a training dataset.
     """
     @abstractmethod
     def train(self, dataset, *args, **kwargs):
-        """Train a model according to the given training dataset. 
-        
+        """Train a model according to the given training dataset.
+
         Parameters
         ----------
         dataset : Dataset object
@@ -89,18 +95,18 @@ class Model(metaclass=ABCMeta):
         -------
         self : object
             Returns self.
-        """        
+        """
         pass
 
     @abstractmethod
     def predict(self, feature, *args, **kwargs):
         """Predict the class labels for the input samples
-        
+
         Parameters
         ----------
         feature : array-like, shape (n_samples, n_features)
             The unlabeled samples whose labels are to be predicted.
-            
+
         Returns
         -------
         y_pred : array-like, shape (n_samples,)
@@ -111,11 +117,12 @@ class Model(metaclass=ABCMeta):
     @abstractmethod
     def score(self, testing_dataset, *args, **kwargs):
         """Return the mean accuracy on the test dataset
-        
+
         Parameters
         ----------
         testing_dataset : Dataset object
-            The testing dataset used to measure the perforance of the trained model.
+            The testing dataset used to measure the perforance of the trained
+            model.
 
         Returns
         -------
@@ -126,23 +133,24 @@ class Model(metaclass=ABCMeta):
 
 
 class ContinuousModel(Model):
+
     """Classification Model with intermediate continuous output
-    
+
     A continuous classification model is able to output a real-valued vector
     for each features provided.
     """
     @abstractmethod
     def predict_real(self, feature, *args, **kwargs):
-        """Predict confidence scores for samples. 
-        
+        """Predict confidence scores for samples.
+
         Returns the confidence score for each (sample, class) combination.
-        
-        The larger the value for entry (sample=x, class=k) is, the more confident 
-        the model is about the sample x belonging to the class k.
-        
-        Take Logistic Regression as example, the return value is the signed dis-
-        tance of that sample to the hyperplane.
-        
+
+        The larger the value for entry (sample=x, class=k) is, the more
+        confident the model is about the sample x belonging to the class k.
+
+        Take Logistic Regression as example, the return value is the signed
+        distance of that sample to the hyperplane.
+
         Parameters
         ----------
         feature : array-like, shape (n_samples, n_features)
@@ -151,6 +159,7 @@ class ContinuousModel(Model):
         Returns
         -------
         X : array-like, shape (n_samples, n_classes)
-            Each entry is the confidence scores per (sample, class) combination.        
+            Each entry is the confidence scores per (sample, class)
+            combination.
         """
         pass

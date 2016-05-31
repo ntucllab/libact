@@ -29,14 +29,15 @@ def split_train_test(n_classes):
     from sklearn.datasets import load_digits
 
     n_labeled = 5
-    digits = load_digits(n_class=n_classes) # consider binary case
+    digits = load_digits(n_class=n_classes)  # consider binary case
     X = digits.data
     y = digits.target
     print(np.shape(X))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     while len(np.unique(y_train[:n_labeled])) < n_classes:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.33)
 
     trn_ds = Dataset(X_train, np.concatenate(
         [y_train[:n_labeled], [None] * (len(y_train) - n_labeled)]))
@@ -98,9 +99,9 @@ def main():
         model.train(trn_ds2)
         E_out2 = np.append(E_out2, 1 - model.score(tst_ds))
 
-        ax.set_xlim((0, i+1))
+        ax.set_xlim((0, i + 1))
         ax.set_ylim((0, max(max(E_out1), max(E_out2)) + 0.2))
-        query_num = np.arange(0, i+2)
+        query_num = np.arange(0, i + 2)
         p1.set_xdata(query_num)
         p1.set_ydata(E_out1)
         p2.set_xdata(query_num)

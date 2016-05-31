@@ -1,5 +1,7 @@
 import unittest
+
 import numpy as np
+
 from libact.base.dataset import Dataset
 
 
@@ -96,7 +98,7 @@ class TestDatasetMethods(unittest.TestCase):
                 if (
                     entry_s[0] is entry[0] and entry_s[1] == entry[1]
                     and idx not in used_indexes
-                    ):
+                ):
                     used_indexes.add(idx)
                     break
             else:
