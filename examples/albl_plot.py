@@ -65,7 +65,7 @@ def main():
     results = []
 
     for T in range(20): # repeat the experiment 20 times
-        print("%dth experiment" % T+1)
+        print("%dth experiment" % (T+1))
 
         trn_ds, tst_ds, y_train, fully_labeled_trn_ds = \
             split_train_test(dataset_filepath, test_size, n_labeled)
