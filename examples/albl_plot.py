@@ -5,7 +5,6 @@ learning algorithms.
 """
 
 import copy
-import json
 import os
 
 import numpy as np
@@ -24,8 +23,6 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota):
     E_in, E_out = [], []
 
     for _ in range(quota):
-        # Standard usage of libact objects
-        print(qs, _)
         ask_id = qs.make_query()
         X, _ = zip(*trn_ds.data)
         lb = lbr.label(X[ask_id])
@@ -68,7 +65,8 @@ def main():
     results = []
 
     for T in range(20): # repeat the experiment 20 times
-        # Load dataset
+        print("%dth experiment" % T+1)
+
         trn_ds, tst_ds, y_train, fully_labeled_trn_ds = \
             split_train_test(dataset_filepath, test_size, n_labeled)
         trn_ds2 = copy.deepcopy(trn_ds)
@@ -78,11 +76,11 @@ def main():
         lbr = IdealLabeler(fully_labeled_trn_ds)
 
         quota = len(y_train) - n_labeled    # number of samples to query
-        #quota=50
 
         # Comparing UncertaintySampling strategy with RandomSampling.
         # model is the base learner, e.g. LogisticRegression, SVM ... etc.
-        qs = UncertaintySampling(trn_ds, model=SVM(decision_function_shape='ovr'))
+        qs = UncertaintySampling(trn_ds,
+                                 model=SVM(decision_function_shape='ovr'))
         model = SVM(kernel='linear', decision_function_shape='ovr')
         _, E_out_1 = run(trn_ds, tst_ds, lbr, model, qs, quota)
         results.append(E_out_1.tolist())
@@ -95,7 +93,6 @@ def main():
         qs3 = QUIRE(trn_ds3)
         model = SVM(kernel='linear', decision_function_shape='ovr')
         _, E_out_3 = run(trn_ds3, tst_ds, lbr, model, qs3, quota)
-        #E_out_3 = E_out_2
         results.append(E_out_3.tolist())
 
         qs4 = HintSVM(trn_ds4, cl=1.0, ch=1.0)
@@ -104,23 +101,20 @@ def main():
         results.append(E_out_4.tolist())
 
         qs5 = ActiveLearningByLearning(trn_ds5,
-                query_strategies=[
-                    UncertaintySampling(trn_ds5,
-                        model=SVM(kernel='linear',
-                                  decision_function_shape='ovr')),
-                    QUIRE(trn_ds5),
-                    HintSVM(trn_ds5, cl=1.0, ch=1.0),
-                ],
-                T=quota,
-                uniform_sampler=True,
-                model=SVM(kernel='linear', decision_function_shape='ovr')
+                    query_strategies=[
+                        UncertaintySampling(trn_ds5,
+                                            model=SVM(kernel='linear',
+                                            decision_function_shape='ovr')),
+                        QUIRE(trn_ds5),
+                        HintSVM(trn_ds5, cl=1.0, ch=1.0),
+                    ],
+                    T=quota,
+                    uniform_sampler=True,
+                    model=SVM(kernel='linear', decision_function_shape='ovr')
                 )
         model = SVM(kernel='linear', decision_function_shape='ovr')
         _, E_out_5 = run(trn_ds5, tst_ds, lbr, model, qs5, quota)
         results.append(E_out_5.tolist())
-
-        #with open('results/%s_%d.json' % (ds_name, T), 'w') as f:
-        #    json.dump(results, f)
 
     result = []
     for i in range(5):
