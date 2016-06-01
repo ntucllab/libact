@@ -1,29 +1,26 @@
 Overview
 ========
 
-`libact` is a framework to make `active learning
-<https://en.wikipedia.org/wiki/Active_learning_(machine_learning)>`_ easy for
-user to apply to real world problem. Currently `libact` supports only pool-based
-active learning problems. For a active learning problem, there is a labeled set,
-unlabeled set, oracle and a supervised learning model. During the querying
-state, active learning algorithm will choose a data point from the unlabeled set
-and ask the oracle for its label. The goal for active learning algorithm is to
-make the given supervied learning model performs better with less labeled data.
+`libact` is a Python package designed to make `active learning
+<https://en.wikipedia.org/wiki/Active_learning_(machine_learning)>`_ easier for real-world users. The package not only implements several popular active learning strategies, but also features the active-learning-by-learning meta-algorithm that assists the users to automatically select the best strategy
+on the fly. Furthermore, the package provides a unified interface for implementing more strategies, models and application-specific labelers. The package is open-source along with issue trackers on github, and can be easily installed from Python Package Index repository.
 
-`libact` is consitituded of the following parts:
+
+Currently `libact` supports pool-based active learning problems, which consists
+of a set of labeled examples, a set of unlabeled examples, a supervised learning model, and an labeling oracle. In each iteration of active learning, the algorithm (also called a query strategy) queries the oracle to label an unlabeled example. The model can then be improved by the newly-labeled example.
+The goal is to use as few queries as possible for the model to achieve decent learning performance. Based on the components above,
+we designed the following four interfaces for `libact`.
 
 Dataset
 -------
-:py:class:`libact.base.dataset.Dataset` object stores the labeled set
-and unlabeled set. When Dataset is created it assigned a index to each sample.
-Both unlabeled samples and labeled samples shares a same set of indexs. When a
-label is retrieved from Labeler (oracle), it uses the update method to assign
-the label to a unlabeled sample. The sample index will be used to identify which
-sample to update.
+A :py:class:`libact.base.dataset.Dataset` object stores the labeled set
+and unlabeled set. Each unlabeled or labeled example within a Dataset object is assigned with a unique identifier. After retrieving the label for an unlabeled example 
+from the Labeler (the oracle to be discussed below), the update method is used to 
+assign the label to the example, referenced by its identifier.
 
 Internally, Dataset also maintains a callback queue. The method on_update can be
 used to register callback functions, which will be called after each update to
-the Dataset.
+the Dataset. The callback functions can be used for active learning algorithms that need to update their internal states after querying the oracle.
 
 Labeler
 -------
