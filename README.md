@@ -95,6 +95,8 @@ Available examples:
     the pool-based active learning scenario. Each query of an unlabeled dataset is then equivalent to revealing one labeled example in the original data set.
   - `examples/label_digits.py`: This example shows how to use libact in the case
     that you want a human to label the selected sample for your algorithm.
+  - `examples/albl_plot.py`: This example compares the performance of ALBL
+    with other active learning algorithms.
 
 # Running tests
 
