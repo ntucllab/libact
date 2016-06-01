@@ -6,7 +6,7 @@ Overview
 on the fly. Furthermore, the package provides a unified interface for implementing more strategies, models and application-specific labelers. The package is open-source along with issue trackers on github, and can be easily installed from Python Package Index repository.
 
 
-Currently `libact` supports pool-based active learning problems, which consists
+Currently `libact` supports pool-based active learning problems, which consist
 of a set of labeled examples, a set of unlabeled examples, a supervised learning model, and an labeling oracle. In each iteration of active learning, the algorithm (also called a query strategy) queries the oracle to label an unlabeled example. The model can then be improved by the newly-labeled example.
 The goal is to use as few queries as possible for the model to achieve decent learning performance. Based on the components above,
 we designed the following four interfaces for `libact`.
@@ -24,32 +24,22 @@ the Dataset. The callback functions can be used for active learning algorithms t
 
 Labeler
 -------
-:py:class:`libact.base.interfaces.Labeler` object plays the role as an oracle in
-the given problem. After retrieveing the sample to be queried, pass the samepl
-(feature) to the label method, it will return the label from oracle.
+A :py:class:`libact.base.interfaces.Labeler` object plays the role of the oracle in
+the given active learning problem. Its label method takes in an unlabeled example and returns the retrieved label.
 
 QueryStrategy
 -------------
-:py:class:`libact.base.interfaces.QueryStrategy` objects are the
-implementation of active learning algorithms.  Each QueryStrategy object is
-associated with a Dataset object, when Dataset object gets its update with a
-label for unlabeled data, it will trigger the update method under QueryStrategy
-object. The update method can be used to update the internal states in
-QueryStrategy. There is also another method under QueryStrategy called
-make_query. This method returns the unlabeled sample's index with this active
-learning algorithm wants to query.
+A :py:class:`libact.base.interfaces.QueryStrategy` object represents 
+an active learning algorithm. 
+Each QueryStrategy object is associated with a Dataset object. When a QueryStrategy object is initialized, it will automatically register its update
+method as a callback function to the associated Dataset to be informed of any Dataset updates. The make_query method of a QueryStrategy object returns
+the identifier of an unlabeled example that the object (active learning algorithm) wants to query.
 
 Model
 -----
-:py:class:`libact.base.interfaces.Model` objects are the implementation of
-classification algorithms. It has method train and predict just like the
-classification algorithms in `scikit-learn <http://scikit-learn.org/>`_ has fit
-and predict. The only difference is that the train method takes in an Dataset
-instance, which will train the model with only the labeled samples.
+A :py:class:`libact.base.interfaces.Model` object represents a supervised classifiation algorithm. It contains train and predict methods, just like the fit and predict methods of the classification algorithms in `scikit-learn <http://scikit-learn.org/>`_. Note that the train method of Model only takes the labeled examples within Dataset for learning.
 
-:py:class:`libact.base.interfaces.ContinuousModel` are the classification
-algorithms that supports continuous predictions, which has the predict_real
-method.
+A :py:class:`libact.base.interfaces.ContinuousModel` object represents an algorithm that supports continuous outputs during predictions, which includes an additional predict_real method.
 
 Example Usage
 -------------
@@ -59,15 +49,13 @@ Here is an example usage of `libact`:
    :linenos:
 
    # declare Dataset instance, X is the feature, y is the label (None if unlabeled)
-   ds = Dataset(X, y)
-   qs = QueryStrategy(trn_ds) # declare a QueryStrategy instance
-   lbr = Labeler() # declare Labeler instance
+   dataset = Dataset(X, y)
+   query_strategy = QueryStrategy(dataset) # declare a QueryStrategy instance
+   labler = Labeler() # declare Labeler instance
    model = Model() # declare model instance
 
-   for i in range(quota): # loop through the number of chances to ask oracle for label
-       ask_id = qs.make_query() # let the specified QueryStrategy suggest a data to query
-       X, _ = zip(*ds.data) # retrieve feature from Dataset
-       lb = lbr.label(X[ask_id]) # query the label of unlabeled sample from labeler instance
-       ds.update(ask_id, lb) # update the dataset with newly queried sample
-       model.train(ds) # train model with newly updated Dataset
-
+   for _ in range(quota): # loop through the number of queries
+       query_id = query_strategy.make_query() # let the specified QueryStrategy suggest a data to query
+       lbl = labeler.label(dataset.data[query_id][0]) # query the label of the example at query_id
+       dataset.update(query_id, lbl) # update the dataset with newly-labeled example
+       model.train(dataset) #train model with newly-updated Dataset
