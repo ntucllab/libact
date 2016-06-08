@@ -9,17 +9,19 @@ authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin
 
 # Introduction
 
-`libact` is a python package designed to make active learning easier for real-world users. The package not only implements several popular active learning strategies, but also features the [active learning by learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf) meta-strategy that allows the machine to automatically *learn* the best strategy on the fly. The package is designed for easy extension in terms of strategies, models and labelers. In particular, `libact` models can be easily obtained by interfacing with the models in [`scikit-learn`](http://scikit-learn.org/).
-
-Comments on the package is welcomed at (temporarily) `htlin@csie.ntu.edu.tw`. If you find this package useful, please cite the original works (see Reference of each strategy) as well as (temporarily)
+`libact` is a Python package designed to make active learning easier for
+real-world users. The package not only implements several popular active learning strategies, but also features the [active-learning-by-learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf)
+meta-algorithm that assists the users to automatically select the best strategy
+on the fly. Furthermore, the package provides a unified interface for implementing more strategies, models and application-specific labelers. The package is open-source along with issue trackers on github, and can be easily installed from Python Package Index repository.
 
 Documentation for the latest release is hosted [here](http://libact.readthedocs.org/en/latest/).
+Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. If you find this package useful, please cite the original works (see Reference of each strategy) as well as (temporarily)
 
 ```
-@Misc{libact,
-  author =   {Yu-An Chung and Shao-Chuan Lee and Yao-Yuan Yang and Tung-En Wu and Hsuan-Tien Lin},
-  title =    {Pool-based Active Learning in Python},
-  howpublished = {\url{https://github.com/ntucllab/libact}},
+@TechReport{libact,
+  author =   {Yao-Yuan Yang and Yu-An Chung and Shao-Chuan Lee and Tung-En Wu and Hsuan-Tien Lin},
+  title =    {libact: Pool-based Active Learning in Python},
+  url = {https://github.com/ntucllab/libact},
   year = {2015}
 }
 ```
