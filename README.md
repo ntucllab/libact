@@ -40,10 +40,9 @@ pip install -r requirements.txt
 sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
 ```
 
-* MacOS
+* macOS
 ```
-brew tap homebrew/science
-brew install openblas
+brew install homebrew/science/openblas
 ```
 
 # Installation
