@@ -3,6 +3,7 @@
 This module includes an InteractiveLabeler.
 """
 import matplotlib.pyplot as plt
+from six.moves import input
 
 from libact.base.interfaces import Labeler
 from libact.utils import inherit_docstring_from
@@ -36,10 +37,7 @@ class InteractiveLabeler(Labeler):
 
         if self.label_name is not None:
             banner += str(self.label_name) + ' '
-        
-        try: input = raw_input  # input fix for python 2.x
-        except NameError: pass
-            
+
         lbl = input(banner)
 
         while (self.label_name is not None) and (lbl not in self.label_name):
