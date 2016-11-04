@@ -55,6 +55,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx_gallery.gen_gallery',
     'numpydoc',
 ]
 
@@ -323,6 +324,11 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
+sphinx_gallery_conf = {
+    # path to your examples scripts
+	'examples_dirs' : '../examples',
+    # path where to save gallery generated examples
+    'gallery_dirs'  : 'auto_examples'}
 
 # Skip private members in this project, which start with an underscore (_).
 def skip_private_member(app, what, name, obj, skip, options):
