@@ -24,6 +24,7 @@ Table of Contents
 
   overview.rst
   examples/examples.rst
+  auto_examples/index
   active_learning_by_learning.rst
   dev_with_libact.rst
   api_reference.rst
