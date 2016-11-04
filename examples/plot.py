@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+=================================================
+Compare two acitive learning algorithms with plot
+=================================================
+
 The script helps guide the users to quickly understand how to use
 libact by going through a simple active learning task with clear
 descriptions.

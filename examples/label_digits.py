@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+=======================================
+Labeling digits with InteractiveLabeler
+=======================================
+
 This script simulates real world use of active learning algorithms. Which in the
 start, there are only a small fraction of samples are labeled. During active
 learing process active learning algorithm (QueryStrategy) will choose a sample

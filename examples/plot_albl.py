@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+====================================================
+Comparing ALBL with other active learning algorithms
+====================================================
+
 The script runs experiments to compare the performance of ALBL and other active
 learning algorithms.
 """

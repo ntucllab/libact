@@ -1,30 +1,35 @@
 #!/usr/bin/env python3
-#
-# The script is used for downloading the three datasets used by the examples.
-#
-# All three datasets come from LIBSVM website, and are stored in LIBSVM format.
-# For more details, please refer to the following link:
-# https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html
-#
-# Besides, all three datasets are for binary classification, since most of the
-# state-of-the-arts active learning algorithms (query strategies) are only
-# suitable for binary classification.
-#
-# The following table describes some informations about
-# the three datasets: australian, diabetes, and heart.
-#
-# +------------+-----+----+
-# |   dataset  |  N  |  D |
-# +============+=====+====+
-# | australian | 690 | 14 |
-# +------------+-----+----+
-# |  diabetes  | 768 |  8 |
-# +------------+-----+----+
-# |    heart   | 270 | 13 |
-# +------------+-----+----+
-#
-# N is the number of samples, and D is the dimension of the input feature.
-# labels y \in {-1, +1}
+"""
+=====================================
+A script to download example datasets
+=====================================
+
+The script is used for downloading the three datasets used by the examples.
+
+All three datasets come from LIBSVM website, and are stored in LIBSVM format.
+For more details, please refer to the following link:
+https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html
+
+Besides, all three datasets are for binary classification, since most of the
+state-of-the-arts active learning algorithms (query strategies) are only
+suitable for binary classification.
+
+The following table describes some informations about
+the three datasets: australian, diabetes, and heart.
+
++------------+-----+----+
+|   dataset  |  N  |  D |
++============+=====+====+
+| australian | 690 | 14 |
++------------+-----+----+
+|  diabetes  | 768 |  8 |
++------------+-----+----+
+|    heart   | 270 | 13 |
++------------+-----+----+
+
+N is the number of samples, and D is the dimension of the input feature.
+labels y \in {-1, +1}
+"""
 
 import os
 import urllib.request
