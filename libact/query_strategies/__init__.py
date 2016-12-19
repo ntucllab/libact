@@ -14,6 +14,7 @@ from .uncertainty_sampling import UncertaintySampling
 from .query_by_committee import QueryByCommittee
 from .quire import QUIRE
 from .random_sampling import RandomSampling
+from .density_weighted_uncertainty_sampling import DWUS
 # don't import c extentions when on readthedocs server
 if not ON_RTD:
     from ._variance_reduction import estVar

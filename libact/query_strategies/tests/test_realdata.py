@@ -14,7 +14,7 @@ import numpy as np
 from libact.base.dataset import Dataset, import_libsvm_sparse
 from libact.models import LogisticRegression
 from libact.query_strategies import ActiveLearningByLearning, HintSVM,\
-    QueryByCommittee, QUIRE, RandomSampling, UncertaintySampling
+    QueryByCommittee, QUIRE, RandomSampling, UncertaintySampling, DWUS
 from .utils import run_qs
 
 
@@ -116,6 +116,15 @@ class RealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([173, 103, 133, 184, 187, 147, 251, 83, 93, 33]))
+
+    def test_ActiveLearningByLearning(self):
+        trn_ds = Dataset(self.X,
+                         np.concatenate([self.y[:10],
+                                         [None] * (len(self.y) - 10)]))
+        qs = DWUS(trn_ds, random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(
+            qseq, np.array([30, 179, 104, 186, 28, 65, 142, 62, 257, 221]))
 
 
 if __name__ == '__main__':

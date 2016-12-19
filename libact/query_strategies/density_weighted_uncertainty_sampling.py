@@ -1,17 +1,20 @@
 """Density Weighted Uncertainty Sampling (DWUS)
 """
+from __future__ import division
+
 import numpy as np
 from sklearn.cluster import KMeans
-
-from libact.base.interfaces import QueryStrategy
 from scipy.optimize import minimize
 from scipy.stats import multivariate_normal
+
+from libact.base.interfaces import QueryStrategy
+from libact.utils import inherit_docstring_from, seed_random_state, zip
 
 
 class DWUS(QueryStrategy):
     """Density Weighted Uncertainty Sampling (DWUS)
 
-    We use the KMeans algorithm for clustering instead of Kmediod for now.
+    We use the KMeans algorithm for clustering instead of the Kmediod for now.
 
     Support binary case and LogisticRegression only.
 
@@ -33,6 +36,15 @@ class DWUS(QueryStrategy):
     C : float, default: 1.
         Regularization term for logistic regression.
 
+    kmeans_param : dict, default: {}
+        Parameter for sklearn.cluster.KMeans.
+        see, http://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
+
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+        If int or None, random_state is passed as parameter to generate
+        np.random.RandomState instance. if np.random.RandomState instance,
+        random_state is the random number generate.
+
     Attributes
     ----------
     kmeans_ : sklearn.cluster.KMeans object
@@ -41,6 +53,16 @@ class DWUS(QueryStrategy):
     p_x : ndarray, shape=(n_labeled + n_unlabeled, )
         The density estimate for each x. Its order is the same as dataset.data.
 
+    Examples
+    --------
+    Here is an example of how to declare a DWUS query_strategy object:
+
+    .. code-block:: python
+
+       from libact.query_strategies import DWUS
+       from libact.models import LogisticRegression
+
+       qs = DWUS(dataset)
 
     References
     ----------
@@ -59,8 +81,14 @@ class DWUS(QueryStrategy):
         self.max_iter = kwargs.pop('max_iter', 100)
         self.tol = kwargs.pop('tol', 1e-4)
         self.C = kwargs.pop('C', 1.)
+        random_state = kwargs.pop('random_state', None)
+        self.random_state_ = seed_random_state(random_state)
+        kmeans_param = kwargs.pop('kmeans_param', {})
+        if 'random_state' not in kmeans_param:
+            kmeans_param['random_state'] = self.random_state_
 
-        self.kmeans_ = KMeans(n_clusters=self.n_clusts)
+        self.kmeans_ = KMeans(n_clusters=self.n_clusts,
+                              **kmeans_param)
         all_x = np.array([xy[0] for xy in self.dataset.data])
 
         # Cluster the data.
@@ -94,6 +122,7 @@ class DWUS(QueryStrategy):
 
         self.p_x = np.dot(p_x_k, P_k).reshape(-1)
 
+    @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         unlabeled_entry_ids, _ = zip(*self.dataset.get_unlabeled_entries())
         labeled_entry_ids = np.array([eid
@@ -164,8 +193,6 @@ class DensityWeightedLogisticRegression(object):
     ----------
     self.w_ : ndarray, shape=(n_features + 1, )
         Logistic regression parameter, the last element is the bias term.
-
-
     """
 
     def __init__(self, density_estimate, centers, C):
@@ -211,5 +238,5 @@ class DensityWeightedLogisticRegression(object):
             sigmoid = lambda t: 1. / (1. + np.exp(-t))
             return sigmoid(np.dot(self.centers, self.w_[:-1]) + self.w_[-1])
         else:
-            # the model is not trained
+            # TODO the model is not trained
             pass
