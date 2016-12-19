@@ -43,6 +43,8 @@ class BinaryRelevance():
             Retuen self.
         """
         X, Y = dataset.format_sklearn()
+        X = np.array(X)
+        Y = np.array(Y)
 
         self.n_labels_ = np.shape(Y)[1]
         self.n_features_ = np.shape(X)[1]

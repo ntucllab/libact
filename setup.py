@@ -67,8 +67,10 @@ setup(
         'libact',
         'libact.base',
         'libact.models',
+        'libact.models.multilabel',
         'libact.labelers',
         'libact.query_strategies',
+        'libact.query_strategies.multilabel',
         'libact.utils',
     ],
     package_dir={
