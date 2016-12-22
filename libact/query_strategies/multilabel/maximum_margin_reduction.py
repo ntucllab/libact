@@ -45,6 +45,17 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
 
     Examples
     --------
+    Here is an example of declaring a MMC query_strategy object:
+
+    .. code-block:: python
+
+       from libact.query_strategies.multilabel import MMC
+       from sklearn.linear_model import LogisticRegression
+
+       qs = MMC(
+                dataset, # Dataset object
+                br_base=LogisticRegression()
+            )
 
     References
     ----------
