@@ -22,6 +22,10 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
     base_learner : :py:mod:`libact.query_strategies` object instance
         The base learner for binary relavance, should support predict_proba
 
+    br_base : sklearn classifier, optional (default=sklearn.svm.SVC(kernel='linear', probability=True))
+        The base learner for the binary relevance in MMC.
+        Should support predict_proba.
+
     logreg_param : dict, optional (default={})
         Setting the parameter for the logistic regression that are used to
         predict the number of labels for a given feature vector. Parameter
@@ -57,6 +61,9 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
         self.logreg_param = kwargs.pop('logreg_param', {})
         self.logistic_regression_ = LogisticRegression(**self.logreg_param)
 
+        self.br_base = kwargs.pop('br_base',
+                                  SVC(kernel='linear', probability=True))
+
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
 
@@ -83,7 +90,7 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
             if len(np.unique(lbl_num)) == 1:
                 clf = DummyClf()
             else:
-                clf = SVC(kernel='linear', probability=True)
+                clf = copy.deepcopy(self.br_base)
             clf.fit(labeled_pool, lbl_num)
             labeled_proba.append(clf.predict_proba(labeled_pool)[:, 1])
             unlabeled_proba.append(clf.predict_proba(X_pool)[:, 1])
