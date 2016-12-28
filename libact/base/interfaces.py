@@ -163,3 +163,27 @@ class ContinuousModel(Model):
             combination.
         """
         pass
+
+
+class ProbabilisticModel(Model):
+
+    """Classification Model with probability output
+
+    A probabilistic classification model is able to output a real-valued vector
+    for each features provided.
+    """
+    @abstractmethod
+    def predict_proba(self, feature, *args, **kwargs):
+        """Predict probability estimate for samples.
+
+        Parameters
+        ----------
+        feature : array-like, shape (n_samples, n_features)
+            The samples whose probability estimation are to be predicted.
+
+        Returns
+        -------
+        X : array-like, shape (n_samples, n_classes)
+            Each entry is the prabablity estimate for each class.
+        """
+        pass
