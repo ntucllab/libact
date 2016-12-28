@@ -10,7 +10,7 @@ from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 
 from libact.base.dataset import Dataset
-from libact.models import SklearnAdapter
+from libact.models import SklearnAdapter, SklearnProbaAdapter
 
 
 class IrisTestCase(unittest.TestCase):
@@ -37,8 +37,17 @@ class IrisTestCase(unittest.TestCase):
             adapter.score(Dataset(self.X_test, self.y_test)),
             clf.score(self.X_test, self.y_test))
 
+    def check_proba(self, adapter, clf):
+        adapter.train(Dataset(self.X_train, self.y_train))
+        clf.fit(self.X_train, self.y_train)
+
+        assert_array_equal(adapter.predict_proba(self.X_train),
+                           clf.predict_proba(self.X_train))
+        assert_array_equal(adapter.predict_real(self.X_train),
+                           clf.predict_proba(self.X_train))
+
     def test_adapt_logistic_regression(self):
-        adapter = SklearnAdapter(LogisticRegression(random_state=1126))
+        adapter = SklearnProbaAdapter(LogisticRegression(random_state=1126))
         clf = LogisticRegression(random_state=1126)
         self.check_functions(adapter, clf)
 
