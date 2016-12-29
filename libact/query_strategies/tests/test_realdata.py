@@ -117,7 +117,7 @@ class RealdataTestCase(unittest.TestCase):
         assert_array_equal(
             qseq, np.array([173, 103, 133, 184, 187, 147, 251, 83, 93, 33]))
 
-    def test_ActiveLearningByLearning(self):
+    def test_DensityWeightedUncertaintySampling(self):
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
