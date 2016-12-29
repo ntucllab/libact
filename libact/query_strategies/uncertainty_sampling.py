@@ -7,7 +7,8 @@ smallest margin method (margin sampling).
 """
 import numpy as np
 
-from libact.base.interfaces import QueryStrategy, ContinuousModel
+from libact.base.interfaces import QueryStrategy, ContinuousModel, \
+    ProbabilisticModel
 from libact.utils import inherit_docstring_from, zip
 
 
@@ -71,9 +72,10 @@ class UncertaintySampling(QueryStrategy):
             raise TypeError(
                 "__init__() missing required keyword-only argument: 'model'"
             )
-        if not isinstance(self.model, ContinuousModel):
+        if not isinstance(self.model, ContinuousModel) and \
+                not isinstance(self.model, ProbabilisticModel):
             raise TypeError(
-                "model has to be a ContinuousModel"
+                "model has to be a ContinuousModel or ProbabilisticModel"
             )
         self.model.train(self.dataset)
 
@@ -91,14 +93,17 @@ class UncertaintySampling(QueryStrategy):
 
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
+        if isinstance(self.model, ContinuousModel):
+            dvalue = self.model.predict_real(X_pool)
+        elif isinstance(self.model, ProbabilisticModel):
+            dvalue = self.model.predict_proba(X_pool)
+
         if self.method == 'lc':  # least confident
             ask_id = np.argmin(
-                np.max(self.model.predict_real(X_pool), axis=1)
+                np.max(dvalue, axis=1)
             )
 
         elif self.method == 'sm':  # smallest margin
-            dvalue = self.model.predict_real(X_pool)
-
             if np.shape(dvalue)[1] > 2:
                 # Find 2 largest decision values
                 dvalue = -(np.partition(-dvalue, 2, axis=1)[:, :2])

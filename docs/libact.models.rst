@@ -4,6 +4,14 @@ libact.models package
 Submodules
 ----------
 
+libact.models.sklearn_adapter module
+----------------------------------------
+
+.. automodule:: libact.models.sklearn_adapter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.models.logistic_regression module
 ----------------------------------------
 
