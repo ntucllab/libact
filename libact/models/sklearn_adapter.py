@@ -48,7 +48,7 @@ class SklearnAdapter(Model):
                                 **kwargs)
 
 
-class SklearnProbaAdapter(ContinuousModel, ProbabilisticModel):
+class SklearnProbaAdapter(ProbabilisticModel):
     """Implementation of the scikit-learn classifier to libact model interface.
     It should support predict_proba method.
 

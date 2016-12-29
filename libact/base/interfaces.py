@@ -165,13 +165,16 @@ class ContinuousModel(Model):
         pass
 
 
-class ProbabilisticModel(Model):
+class ProbabilisticModel(ContinuousModel):
 
     """Classification Model with probability output
 
     A probabilistic classification model is able to output a real-valued vector
     for each features provided.
     """
+    def predict_real(self, feature, *args, **kwargs):
+        return self.predict_proba(feature, *args, **kwargs)
+
     @abstractmethod
     def predict_proba(self, feature, *args, **kwargs):
         """Predict probability estimate for samples.
