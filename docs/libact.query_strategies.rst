@@ -16,6 +16,14 @@ libact.query_strategies.active_learning_by_learning module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.active_learning_with_cost_embedding module
+-------------------------------------------------
+
+.. automodule:: libact.query_strategies.active_learning_with_cost_embedding
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.hintsvm module
 --------------------------------------
 
