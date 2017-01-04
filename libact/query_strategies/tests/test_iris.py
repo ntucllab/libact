@@ -35,17 +35,18 @@ class IrisTestCase(unittest.TestCase):
         np.fill_diagonal(cost_matrix, 0)
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
-        qs = ALCE(ds, cost_matrix, LinearRegression())
+        qs = ALCE(ds, cost_matrix, LinearRegression(), random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(
-            qseq, np.array([106, 118, 141,  43,  80,  99,  65,  26,  60,  86]))
+            qseq, np.array([106, 118, 141, 43, 66, 34, 98, 99, 80, 105]))
 
     def test_alce_lr_embed5(self):
         cost_matrix = np.random.RandomState(1126).rand(3, 3)
         np.fill_diagonal(cost_matrix, 0)
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
-        qs = ALCE(ds, cost_matrix, LinearRegression(), embed_dim=5)
+        qs = ALCE(ds, cost_matrix, LinearRegression(), embed_dim=5,
+                random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(
-            qseq, np.array([106, 118, 141,  43,  66,  85,  34,  72,  58,  99]))
+            qseq, np.array([16, 63, 34, 122, 38, 35, 17, 24, 43, 18]))

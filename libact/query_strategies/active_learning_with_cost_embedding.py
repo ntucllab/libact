@@ -27,6 +27,9 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
     mds_params : dict, optional
         http://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html
 
+    nn_params : dict, optional
+        http://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html
+
     embed_dim : int, optional (default: None)
         if is None, embed_dim = n_classes
 
@@ -51,20 +54,21 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
            IEEE International Conference on Data Mining (ICDM), 2016
     """
     def __init__(self, dataset, cost_matrix, base_regressor, embed_dim=None,
-            mds_params={}, random_state=None):
+            mds_params={}, nn_params={}, random_state=None):
         super(ActiveLearningWithCostEmbedding, self).__init__(dataset)
 
         self.cost_matrix = cost_matrix
         self.base_regressor = base_regressor
 
         self.n_classes = len(cost_matrix)
-        self.regressors = [copy.deepcopy(self.base_regressor)
-                           for i in range(self.n_classes)]
-        self.nn_ = NearestNeighbors(n_neighbors=1)
         if embed_dim is None:
             self.embed_dim = self.n_classes
         else:
             self.embed_dim = embed_dim
+        self.regressors = [copy.deepcopy(self.base_regressor)
+                           for i in range(self.embed_dim)]
+
+        self.random_state_ = seed_random_state(random_state)
 
         self.mds_params = {
             'metric': False,
@@ -74,11 +78,14 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
             'eps': 1e-6,
             'dissimilarity': "precomputed",
             'n_init': 8,
-            'n_jobs': 1
+            'n_jobs': 1,
+            'random_state': self.random_state_
         }
         self.mds_params.update(mds_params)
 
-        self.random_state_ = seed_random_state(random_state)
+        self.nn_params = {}
+        self.nn_params.update(nn_params)
+        self.nn_ = NearestNeighbors(n_neighbors=1, **self.nn_params)
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
@@ -86,9 +93,13 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
         unlabeled_entry_ids, pool_X = zip(*dataset.get_unlabeled_entries())
         X, y = zip(*dataset.get_labeled_entries())
 
-        dissimilarity_matrix = np.zeros((2*self.embed_dim, 2*self.embed_dim))
-        dissimilarity_matrix[:self.embed_dim, self.embed_dim:] = self.cost_matrix.T
-        dissimilarity_matrix[self.embed_dim:, :self.embed_dim] = self.cost_matrix
+        #The input class should be 0-n_classes
+        self.classes_ = np.unique(y)
+        y = np.array([np.where(self.classes_ == i)[0][0] for i in y])
+
+        dissimilarity_matrix = np.zeros((2*self.n_classes, 2*self.n_classes))
+        dissimilarity_matrix[:self.n_classes, self.n_classes:] = self.cost_matrix.T
+        dissimilarity_matrix[self.n_classes:, :self.n_classes] = self.cost_matrix
         mds_ = MDSP(**self.mds_params)
         embedding = mds_.fit(dissimilarity_matrix).embedding_
 
