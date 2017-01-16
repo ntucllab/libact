@@ -14,7 +14,6 @@ from .uncertainty_sampling import UncertaintySampling
 from .query_by_committee import QueryByCommittee
 from .quire import QUIRE
 from .random_sampling import RandomSampling
-from .active_learning_with_cost_embedding import ActiveLearningWithCostEmbedding
 from .density_weighted_uncertainty_sampling import DWUS
 # don't import c extentions when on readthedocs server
 if not ON_RTD:

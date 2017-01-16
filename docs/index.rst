@@ -25,6 +25,7 @@ Table of Contents
   overview.rst
   examples/examples.rst
   active_learning_by_learning.rst
+  cost_sensitive_multiclass.rst
   dev_with_libact.rst
   api_reference.rst
 

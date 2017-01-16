@@ -10,7 +10,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LinearRegression
 
 from libact.base.dataset import Dataset
-from libact.query_strategies import ActiveLearningWithCostEmbedding as ALCE
+from libact.query_strategies.multiclass import ActiveLearningWithCostEmbedding as ALCE
 from .utils import run_qs
 
 

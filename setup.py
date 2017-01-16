@@ -71,6 +71,7 @@ setup(
         'libact.labelers',
         'libact.query_strategies',
         'libact.query_strategies.multilabel',
+        'libact.query_strategies.multiclass',
         'libact.utils',
     ],
     package_dir={
@@ -79,6 +80,7 @@ setup(
         'libact.models': 'libact/models',
         'libact.labelers': 'libact/labelers',
         'libact.query_strategies': 'libact/query_strategies',
+        'libact.query_strategies.multiclass': 'libact/query_strategies/multiclass',
         'libact.utils': 'libact/utils',
     },
     ext_modules=extensions,

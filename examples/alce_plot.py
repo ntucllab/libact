@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cost-Senstive Multi-Class Active Learning`
+Cost-Senstive Multi-Class Active Learning
 """
 
 import copy
@@ -14,7 +14,7 @@ from sklearn.linear_model import LinearRegression
 # libact classes
 from libact.base.dataset import Dataset, import_libsvm_sparse
 from libact.models import LogisticRegression
-from libact.query_strategies import ActiveLearningWithCostEmbedding as ALCE
+from libact.query_strategies.multiclass import ActiveLearningWithCostEmbedding as ALCE
 from libact.query_strategies import UncertaintySampling, RandomSampling
 from libact.labelers import IdealLabeler
 from libact.utils import calc_cost
@@ -94,6 +94,17 @@ def main():
     print("Uncertainty: ", E_out_1[::20].tolist())
     print("Random: ", E_out_2[::20].tolist())
     print("ALCE: ", E_out_3[::20].tolist())
+
+    query_num = np.arange(1, quota + 1)
+    plt.plot(query_num, E_out_1[0], 'g', label='Uncertainty sampling')
+    plt.plot(query_num, E_out_2[1], 'k', label='Random')
+    plt.plot(query_num, E_out_3[2], 'r', label='ALCE')
+    plt.xlabel('Number of Queries')
+    plt.ylabel('Error')
+    plt.title('Experiment Result')
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+               fancybox=True, shadow=True, ncol=5)
+    plt.show()
 
 
 if __name__ == '__main__':
