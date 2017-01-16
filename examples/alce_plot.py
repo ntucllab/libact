@@ -7,13 +7,14 @@ import copy
 import os
 
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 import sklearn.datasets
-from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
 
 # libact classes
 from libact.base.dataset import Dataset, import_libsvm_sparse
-from libact.models import LogisticRegression
+from libact.models import SVM, LogisticRegression
 from libact.query_strategies.multiclass import ActiveLearningWithCostEmbedding as ALCE
 from libact.query_strategies import UncertaintySampling, RandomSampling
 from libact.labelers import IdealLabeler
@@ -75,20 +76,20 @@ def main():
     cost_matrix = np.random.RandomState(1126).rand(n_classes, n_classes)
     np.fill_diagonal(cost_matrix, 0)
 
-    quota = 500    # number of samples to query
+    quota = 300    # number of samples to query
 
     # Comparing UncertaintySampling strategy with RandomSampling.
     # model is the base learner, e.g. LogisticRegression, SVM ... etc.
-    qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
-    model = LogisticRegression()
+    qs = UncertaintySampling(trn_ds, method='lc', model=SVM())
+    model = SVM()
     E_in_1, E_out_1 = run(trn_ds, tst_ds, lbr, model, qs, quota, cost_matrix)
 
     qs2 = RandomSampling(trn_ds2)
-    model = LogisticRegression()
+    model = SVM()
     E_in_2, E_out_2 = run(trn_ds2, tst_ds, lbr, model, qs2, quota, cost_matrix)
 
-    qs3 = ALCE(trn_ds3, cost_matrix, LinearRegression())
-    model = LogisticRegression()
+    qs3 = ALCE(trn_ds3, cost_matrix, SVR())
+    model = SVM()
     E_in_3, E_out_3 = run(trn_ds3, tst_ds, lbr, model, qs3, quota, cost_matrix)
 
     print("Uncertainty: ", E_out_1[::20].tolist())
@@ -96,13 +97,13 @@ def main():
     print("ALCE: ", E_out_3[::20].tolist())
 
     query_num = np.arange(1, quota + 1)
-    plt.plot(query_num, E_out_1[0], 'g', label='Uncertainty sampling')
-    plt.plot(query_num, E_out_2[1], 'k', label='Random')
-    plt.plot(query_num, E_out_3[2], 'r', label='ALCE')
+    plt.plot(query_num, E_out_1, 'g', label='Uncertainty sampling')
+    plt.plot(query_num, E_out_2, 'k', label='Random')
+    plt.plot(query_num, E_out_3, 'r', label='ALCE')
     plt.xlabel('Number of Queries')
     plt.ylabel('Error')
     plt.title('Experiment Result')
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.5),
                fancybox=True, shadow=True, ncol=5)
     plt.show()
 
