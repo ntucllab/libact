@@ -28,7 +28,7 @@ class Mock(MagicMock):
 
 MOCK_MODULES = ['scipy', 'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
-                'sklearn.metrics.pairwise',
+                'sklearn.metrics.pairwise', 'sklearn.cluster',
                 # c extensions
                 'libact.query_strategies._hintsvm',
                 'libact.query_strategies._variance_reduction']

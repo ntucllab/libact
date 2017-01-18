@@ -16,22 +16,23 @@ class SklearnAdapter(Model):
     Here is an example of using SklearnAdapter to classify the iris dataset:
 
     .. code-block:: python
-      from sklearn import datasets
-      from sklearn.cross_validation import train_test_split
-      from sklearn.linear_model import LogisticRegression
 
-      from libact.base.dataset import Dataset
-      from libact.models import SklearnAdapter
+       from sklearn import datasets
+       from sklearn.cross_validation import train_test_split
+       from sklearn.linear_model import LogisticRegression
 
-      iris = datasets.load_iris()
-      X = iris.data
-      y = iris.target
-      X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+       from libact.base.dataset import Dataset
+       from libact.models import SklearnAdapter
 
-      adapter = SklearnAdapter(LogisticRegression(random_state=1126))
+       iris = datasets.load_iris()
+       X = iris.data
+       y = iris.target
+       X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
-      adapter.train(Dataset(X_train, y_train))
-      adapter.predict(X_test)
+       adapter = SklearnAdapter(LogisticRegression(random_state=1126))
+
+       adapter.train(Dataset(X_train, y_train))
+       adapter.predict(X_test)
     """
 
     def __init__(self, clf):
