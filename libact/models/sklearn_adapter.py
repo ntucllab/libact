@@ -51,7 +51,8 @@ class SklearnAdapter(Model):
 
 class SklearnProbaAdapter(ProbabilisticModel):
     """Implementation of the scikit-learn classifier to libact model interface.
-    It should support predict_proba method.
+    It should support predict_proba method and predict_real is default to return
+    predict_proba.
 
     Parameters
     ----------
@@ -63,22 +64,24 @@ class SklearnProbaAdapter(ProbabilisticModel):
     Here is an example of using SklearnAdapter to classify the iris dataset:
 
     .. code-block:: python
-      from sklearn import datasets
-      from sklearn.cross_validation import train_test_split
-      from sklearn.linear_model import LogisticRegression
 
-      from libact.base.dataset import Dataset
-      from libact.models import SklearnAdapter
+       from sklearn import datasets
+       from sklearn.cross_validation import train_test_split
+       from sklearn.linear_model import LogisticRegression
 
-      iris = datasets.load_iris()
-      X = iris.data
-      y = iris.target
-      X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+       from libact.base.dataset import Dataset
+       from libact.models import SklearnProbaAdapter
 
-      adapter = SklearnAdapter(LogisticRegression(random_state=1126))
+       iris = datasets.load_iris()
+       X = iris.data
+       y = iris.target
+       X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
-      adapter.train(Dataset(X_train, y_train))
-      adapter.predict(X_test)
+       adapter = SklearnProbaAdapter(LogisticRegression(random_state=1126))
+
+       adapter.train(Dataset(X_train, y_train))
+       adapter.predict(X_test)
+       adapter.predict_proba(X_test)
     """
 
     def __init__(self, clf):

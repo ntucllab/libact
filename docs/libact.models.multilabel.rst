@@ -1,5 +1,5 @@
 libact.models.multilabel package
-=====================
+================================
 
 Submodules
 ----------
@@ -13,7 +13,7 @@ libact.models.multilabel.binary_relevance module
     :show-inheritance:
 
 libact.models.multilabel.dummy_clf module
--------------------------------
+-----------------------------------------
 
 .. automodule:: libact.models.multilabel.dummy_clf
     :members:

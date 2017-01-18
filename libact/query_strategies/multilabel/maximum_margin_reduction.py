@@ -13,7 +13,7 @@ from libact.models.multilabel import BinaryRelevance, DummyClf
 
 
 class MaximumLossReductionMaximalConfidence(QueryStrategy):
-    """Maximum loss reduction with Maximal Confidence (MMC)
+    r"""Maximum loss reduction with Maximal Confidence (MMC)
 
     This algorithm is designed to use binary relavance with SVM as base model.
 
@@ -39,7 +39,7 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
 
     Attributes
     ----------
-    logistic_regression_ : :py:mod:`libact.models.LogisticRegression` object instance
+    logistic_regression\_ : :py:mod:`libact.models.LogisticRegression` object instance
         The model used to predict the number of label in each instance.
         Should support multi-class classification.
 
