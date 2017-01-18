@@ -34,7 +34,7 @@ class BinaryRelevance():
 
         Attributes
         ----------
-        clfs_ : list of :py:mod:`libact.models` object instances
+        clfs\_ : list of :py:mod:`libact.models` object instances
             Classifier instances.
 
         Returns
