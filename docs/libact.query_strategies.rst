@@ -4,6 +4,10 @@ libact.query_strategies package
 Submodules
 ----------
 
+.. toctree::
+
+    libact.query_strategies.multilabel
+
 libact.query_strategies.active_learning_by_learning module
 ----------------------------------------------------------
 
