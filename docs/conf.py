@@ -26,7 +26,8 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
         return Mock()
 
-MOCK_MODULES = ['scipy', 'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
+MOCK_MODULES = ['scipy', 'scipy.optimize',
+                'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
                 'sklearn.metrics.pairwise', 'sklearn.cluster',
                 # c extensions
