@@ -56,7 +56,17 @@ def split_train_test(test_size, n_labeled):
     tst_ds = Dataset(X_tst, y_tst)
     fully_labeled_trn_ds = Dataset(X_trn, y_trn)
 
-    return trn_ds, tst_ds, y_trn, fully_labeled_trn_ds
+    count = np.bincount(y)
+    cost_matrix = np.zeros((len(target), len(target)), dtype='float')
+    random_state = np.random.RandomState(1126)
+    for i in range(len(target)):
+        for j in range(len(target)):
+            if i == j:
+                cost_matrix[i][j] = 0.
+            else:
+                cost_matrix[i][j] = 2000 * random_state.rand() * float(count[i]) / count[j]
+
+    return trn_ds, tst_ds, y_trn, fully_labeled_trn_ds, cost_matrix
 
 
 def main():
@@ -66,30 +76,30 @@ def main():
     n_labeled = 10      # number of samples that are initially labeled
 
     # Load dataset
-    trn_ds, tst_ds, y_train, fully_labeled_trn_ds = \
+    trn_ds, tst_ds, y_train, fully_labeled_trn_ds, cost_matrix = \
         split_train_test(test_size, n_labeled)
     trn_ds2 = copy.deepcopy(trn_ds)
     trn_ds3 = copy.deepcopy(trn_ds)
     lbr = IdealLabeler(fully_labeled_trn_ds)
     n_classes = len(np.unique(y_train)) # = 7
 
-    cost_matrix = np.random.RandomState(1126).rand(n_classes, n_classes)
-    np.fill_diagonal(cost_matrix, 0)
+    #cost_matrix = np.random.RandomState(1126).rand(n_classes, n_classes)
 
     quota = 300    # number of samples to query
 
     # Comparing UncertaintySampling strategy with RandomSampling.
     # model is the base learner, e.g. LogisticRegression, SVM ... etc.
-    qs = UncertaintySampling(trn_ds, method='lc', model=SVM())
-    model = SVM()
+    qs = UncertaintySampling(trn_ds, method='lc',
+                             model=SVM(decision_function_shape='ovr'))
+    model = SVM(decision_function_shape='ovr')
     E_in_1, E_out_1 = run(trn_ds, tst_ds, lbr, model, qs, quota, cost_matrix)
 
     qs2 = RandomSampling(trn_ds2)
-    model = SVM()
+    model = SVM(decision_function_shape='ovr')
     E_in_2, E_out_2 = run(trn_ds2, tst_ds, lbr, model, qs2, quota, cost_matrix)
 
     qs3 = ALCE(trn_ds3, cost_matrix, SVR())
-    model = SVM()
+    model = SVM(decision_function_shape='ovr')
     E_in_3, E_out_3 = run(trn_ds3, tst_ds, lbr, model, qs3, quota, cost_matrix)
 
     print("Uncertainty: ", E_out_1[::20].tolist())

@@ -103,8 +103,8 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
         mds_ = MDSP(**self.mds_params)
         embedding = mds_.fit(dissimilarity_matrix).embedding_
 
-        class_embed = embedding[:self.embed_dim, :]
-        self.nn_.fit(embedding[self.embed_dim:, :])
+        class_embed = embedding[:self.n_classes, :]
+        self.nn_.fit(embedding[self.n_classes:, :])
 
         pred_embed = np.zeros((len(pool_X), self.embed_dim))
         for i in range(self.embed_dim):
