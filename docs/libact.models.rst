@@ -4,6 +4,10 @@ libact.models package
 Submodules
 ----------
 
+.. toctree::
+
+    libact.models.multilabel
+
 libact.models.sklearn_adapter module
 ----------------------------------------
 
