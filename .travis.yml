@@ -1,9 +1,10 @@
 language: python
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
+  - "3.7-dev"
   - "nightly"
 os:
   - linux
@@ -13,7 +14,9 @@ dist: trusty
 matrix:
   allow_failures:
     - os: osx           # Python 3 not supported in Travis OSX environment
-    - python: "nightly" # SciPy bug
+    - python:
+      - "nightly" # SciPy bug
+      - "3.7-dev"
 
 cache:
   directories:
