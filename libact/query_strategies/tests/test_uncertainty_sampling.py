@@ -4,7 +4,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from libact.base.dataset import Dataset
-from libact.models import LogisticRegression, SVM
+from libact.models import LogisticRegression, SVM, Perceptron
 from libact.query_strategies import UncertaintySampling, QUIRE
 from libact.labelers import IdealLabeler
 
@@ -59,10 +59,19 @@ class UncertaintySamplingTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, self.lbr, model, qs, self.quota)
         assert_array_equal(qseq, np.array([6, 7, 8, 9]))
 
-    def test_uncertainty_entropy_continuous_model(self):
+    def test_uncertainty_entropy_exceptions(self):
         trn_ds = init_toyexample(self.X, self.y)
+
         with self.assertRaises(TypeError):
             qs = UncertaintySampling(trn_ds, method='entropy', model=SVM())
+
+        with self.assertRaises(TypeError):
+            qs = UncertaintySampling(
+                    trn_ds, method='entropy', model=Perceptron())
+
+        with self.assertRaises(TypeError):
+            qs = UncertaintySampling(
+                    trn_ds, method='not_exist', model=LogisticRegression())
 
     def test_quire(self):
         trn_ds = init_toyexample(self.X, self.y)
