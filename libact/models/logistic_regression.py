@@ -5,10 +5,10 @@ regression model.
 import numpy as np
 import sklearn.linear_model
 
-from libact.base.interfaces import ContinuousModel
+from libact.base.interfaces import ProbabilisticModel
 
 
-class LogisticRegression(ContinuousModel):
+class LogisticRegression(ProbabilisticModel):
 
     """Logistic Regression Classifier
 
@@ -35,3 +35,7 @@ class LogisticRegression(ContinuousModel):
             return np.vstack((-dvalue, dvalue)).T
         else:
             return dvalue
+
+    def predict_proba(self, feature, *args, **kwargs):
+        return self.model.predict_proba(feature, *args, **kwargs)
+
