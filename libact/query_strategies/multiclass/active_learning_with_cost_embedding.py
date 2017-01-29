@@ -93,13 +93,13 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
         unlabeled_entry_ids, pool_X = zip(*dataset.get_unlabeled_entries())
         X, y = zip(*dataset.get_labeled_entries())
 
-        #The input class should be 0-n_classes
+        # The input class should be 0-n_classes
         self.classes_ = np.unique(y)
         y = np.array([np.where(self.classes_ == i)[0][0] for i in y])
 
         dissimilarity_matrix = np.zeros((2*self.n_classes, 2*self.n_classes))
-        dissimilarity_matrix[:self.n_classes, self.n_classes:] = self.cost_matrix.T
-        dissimilarity_matrix[self.n_classes:, :self.n_classes] = self.cost_matrix
+        dissimilarity_matrix[:self.n_classes, self.n_classes:] = self.cost_matrix
+        dissimilarity_matrix[self.n_classes:, :self.n_classes] = self.cost_matrix.T
         mds_ = MDSP(**self.mds_params)
         embedding = mds_.fit(dissimilarity_matrix).embedding_
 
