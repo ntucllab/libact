@@ -194,14 +194,9 @@ class QueryByCommittee(QueryStrategy):
             for i, student in enumerate(self.students):
                 votes[:, i] = student.predict(X_pool)
 
-            id_disagreement = [(i, dis) for i, dis in
-                               zip(unlabeled_entry_ids,
-                                   self._vote_disagreement(votes))]
-
-            disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
-                                  reverse=True)
-            ask_id = self.random_state_.choice(
-                [e[0] for e in disagreement if e[1] == disagreement[0][1]])
+            vote_entropy = self._vote_disagreement(votes)
+            ask_idx = self.random_state_.choice(
+                    np.where(np.isclose(vote_entropy, np.max(vote_entropy)))[0])
 
         elif self.disagreement == 'kl_divergence':
             proba = []
@@ -212,6 +207,5 @@ class QueryByCommittee(QueryStrategy):
             avg_kl = self._kl_divergence_disagreement(proba)
             ask_idx = self.random_state_.choice(
                     np.where(np.isclose(avg_kl, np.max(avg_kl)))[0])
-            ask_id = unlabeled_entry_ids[ask_idx]
 
-        return ask_id
+        return unlabeled_entry_ids[ask_idx]
