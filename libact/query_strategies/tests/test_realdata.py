@@ -66,11 +66,12 @@ class RealdataTestCase(unittest.TestCase):
         assert_array_equal(
             qseq, np.array([24, 235, 228, 209, 18, 143, 119, 90, 149, 207]))
 
-    def test_QueryByCommittee(self):
+    def test_query_by_committee_vote(self):
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = QueryByCommittee(trn_ds,
+                              disagreement='vote',
                               models=[LogisticRegression(C=1.0),
                                       LogisticRegression(C=0.01),
                                       LogisticRegression(C=100)],
@@ -78,6 +79,20 @@ class RealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([267, 210, 229, 220, 134, 252, 222, 142, 245, 228]))
+
+    def test_query_by_committee_kl_divergence(self):
+        trn_ds = Dataset(self.X,
+                         np.concatenate([self.y[:10],
+                                         [None] * (len(self.y) - 10)]))
+        qs = QueryByCommittee(trn_ds,
+                              disagreement='kl_divergence',
+                              models=[LogisticRegression(C=1.0),
+                                      LogisticRegression(C=0.01),
+                                      LogisticRegression(C=100)],
+                              random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(
+            qseq, np.array([228, 111, 162, 243, 213, 122, 110, 108, 156, 37]))
 
     def test_UcertaintySamplingLc(self):
         random.seed(1126)
