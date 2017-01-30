@@ -11,7 +11,7 @@ import math
 import numpy as np
 
 from libact.base.dataset import Dataset
-from libact.base.interfaces import QueryStrategy
+from libact.base.interfaces import QueryStrategy, ProbabilisticModel
 import libact.models
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
@@ -28,6 +28,11 @@ class QueryByCommittee(QueryStrategy):
         This parameter accepts a list of initialized libact Model instances,
         or class names of libact Model classes to determine the models to be
         included in the committee to vote for each unlabeled instance.
+
+    disagreement : ['vote', 'kl_divergence'], optional (default='vote')
+        Sets the method for measuring disagreement between models.
+        'vote' represents vote entropy.
+        kl_divergence requires models being ProbabilisticModel
 
     random_state : {int, np.random.RandomState instance, None}, optional (default=None)
         If int or None, random_state is passed as parameter to generate
@@ -70,6 +75,9 @@ class QueryByCommittee(QueryStrategy):
     def __init__(self, *args, **kwargs):
         super(QueryByCommittee, self).__init__(*args, **kwargs)
 
+        self.disagreement = kwargs.pop('disagreement', 'vote')
+
+
         models = kwargs.pop('models', None)
         if models is None:
             raise TypeError(
@@ -77,6 +85,15 @@ class QueryByCommittee(QueryStrategy):
             )
         elif not models:
             raise ValueError("models list is empty")
+
+        if self.disagreement == 'kl_divergence':
+            for model in models:
+                if not isinstance(model, ProbabilisticModel):
+                    raise TypeError(
+                        "Given disagreement set as 'kl_divergence', all models"
+                        "should be ProbabilisticModel."
+                    )
+
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
@@ -90,10 +107,10 @@ class QueryByCommittee(QueryStrategy):
         self.n_students = len(self.students)
         self.teach_students()
 
-    def disagreement(self, votes):
+    def _vote_disagreement(self, votes):
         """
         Return the disagreement measurement of the given number of votes.
-        It uses the vote entropy to measure the disagreement.
+        It uses the vote vote to measure the disagreement.
 
         Parameters
         ----------
@@ -118,6 +135,26 @@ class QueryByCommittee(QueryStrategy):
                     math.log(float(lab_count[lab]) / self.n_students)
 
         return ret
+
+    def _kl_divergence_disagreement(self, proba):
+        """
+        Calculate the Kullback-Leibler (KL) divergence disaagreement measure.
+
+        Parameters
+        ----------
+        proba : array-like, shape=(n_samples, n_students, n_class)
+
+        Returns
+        -------
+        disagreement : list of float, shape=(n_samples)
+            The kl_divergence of the given probability.
+        """
+        n_students = np.shape(proba)[1]
+        consensus = np.mean(proba, axis=1) # shape=(n_samples, n_class)
+        # average probability of each class across all students
+        consensus = np.tile(consensus, (n_students, 1, 1)).transpose(1, 0, 2)
+        kl = np.sum(proba * np.log(proba / consensus), axis=2)
+        return np.mean(kl, axis=1)
 
     def _labeled_uniform_sample(self, sample_size):
         """sample labeled entries uniformly"""
@@ -151,17 +188,24 @@ class QueryByCommittee(QueryStrategy):
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
-        # Let the trained students vote for unlabeled data
-        votes = np.zeros((len(X_pool), len(self.students)))
-        for i, student in enumerate(self.students):
-            votes[:, i] = student.predict(X_pool)
+        if self.disagreement == 'vote':
+            # Let the trained students vote for unlabeled data
+            votes = np.zeros((len(X_pool), len(self.students)))
+            for i, student in enumerate(self.students):
+                votes[:, i] = student.predict(X_pool)
 
-        id_disagreement = [(i, dis) for i, dis in
-                           zip(unlabeled_entry_ids, self.disagreement(votes))]
+            vote_entropy = self._vote_disagreement(votes)
+            ask_idx = self.random_state_.choice(
+                    np.where(np.isclose(vote_entropy, np.max(vote_entropy)))[0])
 
-        disagreement = sorted(id_disagreement, key=lambda id_dis: id_dis[1],
-                              reverse=True)
-        ask_id = self.random_state_.choice(
-            [e[0] for e in disagreement if e[1] == disagreement[0][1]])
+        elif self.disagreement == 'kl_divergence':
+            proba = []
+            for student in self.students:
+                proba.append(student.predict_proba(X_pool))
+            proba = np.array(proba).transpose(1, 0, 2).astype(float)
 
-        return ask_id
+            avg_kl = self._kl_divergence_disagreement(proba)
+            ask_idx = self.random_state_.choice(
+                    np.where(np.isclose(avg_kl, np.max(avg_kl)))[0])
+
+        return unlabeled_entry_ids[ask_idx]
