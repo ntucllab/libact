@@ -102,9 +102,9 @@ class UncertaintySampling(QueryStrategy):
 
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
-        if isinstance(self.model, ContinuousModel):
+        if isinstance(self.model, ProbabilisticModel):
             dvalue = self.model.predict_proba(X_pool)
-        elif isinstance(self.model, ProbabilisticModel):
+        elif isinstance(self.model, ContinuousModel):
             dvalue = self.model.predict_real(X_pool)
 
         if self.method == 'lc':  # least confident
