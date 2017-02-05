@@ -47,7 +47,7 @@ def split_train_test(n_classes):
 
 
 def main():
-    quota = 10  # ask human to label 30 samples
+    quota = 10  # ask human to label 10 samples
     n_classes = 5
     E_out1, E_out2 = [], []
 
