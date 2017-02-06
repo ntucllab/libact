@@ -7,12 +7,15 @@ import numpy as np
 
 from .dummy_clf import DummyClf
 from libact.base.dataset import Dataset
+from libact.base.interfaces import MultilabelModel
 
 
-class BinaryRelevance():
+class BinaryRelevance(MultilabelModel):
     r"""Binary Relevance
 
     base_clf : :py:mod:`libact.models` object instances
+    If wanting to use predict_proba, base_clf are required to support
+    predict_proba method.
 
     References
     ----------
@@ -108,3 +111,6 @@ class BinaryRelevance():
         for i in range(self.n_labels_):
             pred[:, i] = self.clfs_[i].predict_proba(X)[:, 1]
         return pred
+
+    def score(self, testing_dataset):
+        pass

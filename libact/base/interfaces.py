@@ -132,6 +132,15 @@ class Model(with_metaclass(ABCMeta, object)):
         pass
 
 
+class MultilabelModel(Model):
+    """Multilabel Classification Model
+
+    A Model returns a multilabel-predicting function for future samples after
+    trained on a training dataset.
+    """
+    pass
+
+
 class ContinuousModel(Model):
 
     """Classification Model with intermediate continuous output
