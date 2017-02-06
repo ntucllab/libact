@@ -113,10 +113,37 @@ class BinaryRelevance(MultilabelModel):
         return pred
 
     def score(self, testing_dataset, criterion='hamming'):
+        """Return the mean accuracy on the test dataset
+
+        Parameters
+        ----------
+        testing_dataset : Dataset object
+            The testing dataset used to measure the perforance of the trained
+            model.
+        criterion : ['hamming', 'f1']
+            instance-wise criterion.
+
+        Returns
+        -------
+        score : float
+            Mean accuracy of self.predict(X) wrt. y.
+        """
         # TODO check if data in dataset are all correct
         X, Y = testing_dataset.format_sklearn()
         if criterion == 'hamming':
             return np.mean(np.abs(self.predict(X) - Y).mean(axis=1))
+        elif criterion == 'f1':
+            Z = self.predict(X)
+            Z = Z.astype(int)
+            Y = Y.astype(int)
+            up = 2*np.sum(Z & Y, axis=1).astype(float)
+            down1 = np.sum(Z, axis=1)
+            down2 = np.sum(Y, axis=1)
+
+            down = (down1 + down2)
+            down[down==0] = 1.
+            up[down==0] = 1.
+            return np.mean(up / down)
         else:
             raise NotImplementedError(
                 "criterion '%s' not implemented" % criterion)
