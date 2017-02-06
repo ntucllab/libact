@@ -17,8 +17,10 @@ from sklearn.datasets import load_svmlight_file
 from sklearn.preprocessing import MultiLabelBinarizer
 
 from libact.base.dataset import Dataset, import_libsvm_sparse
-from libact.models import LogisticRegression
-from libact.query_strategies.multilabel import MMC
+from libact.models import LogisticRegression, SVM
+from libact.models.multilabel import BinaryRelevance
+from libact.query_strategies.multilabel import MMC, \
+        MultilabelWithAuxiliaryLearner
 from ...tests.utils import run_qs
 
 
@@ -40,6 +42,17 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([26, 178, 309, 717, 934, 854, 1430, 1222, 739, 1205]))
+
+    def test_multilabel_with_auxiliary_learner_hlr(self):
+        trn_ds = Dataset(self.X,
+                         self.y[:5] + [None] * (len(self.y) - 5))
+        qs = MultilabelWithAuxiliaryLearner(trn_ds,
+                main_learner=BinaryRelevance(LogisticRegression()),
+                auxiliary_learner=BinaryRelevance(SVM()),
+                criterion='hlr', random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(
+            qseq, np.array([701, 1403, 147, 897, 974, 1266, 870, 703, 292, 1146]))
 
 
 if __name__ == '__main__':

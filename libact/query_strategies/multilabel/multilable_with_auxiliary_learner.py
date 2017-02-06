@@ -17,12 +17,11 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
 
     Parameters
     ----------
-    main_learner : :py:mod:`libact.models.multilabel` object instance
-        The base learner for binary relavance, should support predict_proba
+    main_learner : :py:mod:`libact.base.interfaces.Model` object instance
+        The main multilabel learner.
 
     auxiliary_learner : :py:mod:`libact.models.multilabel` object instance
-        The base learner for the binary relevance in MMC.
-        Should support predict_proba.
+        The auxiliary multilabel learner
 
     criterion : ['hlr'], optional(default='hlr')
         hlr, hamming loss reduction
