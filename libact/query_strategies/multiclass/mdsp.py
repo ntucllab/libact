@@ -159,12 +159,12 @@ def _smacof_single_p(similarities, n_uq, metric=True, n_components=2, init=None,
         dis = np.sqrt((X ** 2).sum(axis=1)).sum()
         
         if verbose >= 2:
-            print('it: %d, stress %s' % (it, stress))
+            print('it: %d, stress %s' % (it, _stress))
         if old_stress is not None:
             if(old_stress - _stress / dis) < eps:
                 if verbose:
                     print('breaking at iteration %d with stress %s' % (it,
-                                                                       stress))
+                                                                       _stress))
                 break
         old_stress = _stress / dis
 

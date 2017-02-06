@@ -12,7 +12,6 @@ from .mdsp import MDSP
 
 
 class ActiveLearningWithCostEmbedding(QueryStrategy):
-
     """Active Learning with Cost Embedding (ALCE)
 
     Cost sensitive multi-class algorithm.
@@ -53,8 +52,15 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
            for Cost-sensitive Multiclass Active Learning", In Proceedings of the
            IEEE International Conference on Data Mining (ICDM), 2016
     """
-    def __init__(self, dataset, cost_matrix, base_regressor, embed_dim=None,
-            mds_params={}, nn_params={}, random_state=None):
+
+    def __init__(self,
+                 dataset,
+                 cost_matrix,
+                 base_regressor,
+                 embed_dim=None,
+                 mds_params={},
+                 nn_params={},
+                 random_state=None):
         super(ActiveLearningWithCostEmbedding, self).__init__(dataset)
 
         self.cost_matrix = cost_matrix
@@ -65,8 +71,9 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
             self.embed_dim = self.n_classes
         else:
             self.embed_dim = embed_dim
-        self.regressors = [copy.deepcopy(self.base_regressor)
-                           for i in range(self.embed_dim)]
+        self.regressors = [
+            copy.deepcopy(self.base_regressor) for _ in range(self.embed_dim)
+        ]
 
         self.random_state_ = seed_random_state(random_state)
 
@@ -87,33 +94,31 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
         self.nn_params.update(nn_params)
         self.nn_ = NearestNeighbors(n_neighbors=1, **self.nn_params)
 
+        dissimilarity = np.zeros((2 * self.n_classes, 2 * self.n_classes))
+        dissimilarity[:self.n_classes, self.n_classes:] = self.cost_matrix
+        dissimilarity[self.n_classes:, :self.n_classes] = self.cost_matrix.T
+        mds_ = MDSP(**self.mds_params)
+        embedding = mds_.fit(dissimilarity).embedding_
+
+        self.class_embed = embedding[:self.n_classes, :]
+        self.nn_.fit(embedding[self.n_classes:, :])
+
+
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
         unlabeled_entry_ids, pool_X = zip(*dataset.get_unlabeled_entries())
-        X, y = zip(*dataset.get_labeled_entries())
-
         # The input class should be 0-n_classes
-        self.classes_ = np.unique(y)
-        y = np.array([np.where(self.classes_ == i)[0][0] for i in y])
-
-        dissimilarity_matrix = np.zeros((2*self.n_classes, 2*self.n_classes))
-        dissimilarity_matrix[:self.n_classes, self.n_classes:] = self.cost_matrix
-        dissimilarity_matrix[self.n_classes:, :self.n_classes] = self.cost_matrix.T
-        mds_ = MDSP(**self.mds_params)
-        embedding = mds_.fit(dissimilarity_matrix).embedding_
-
-        class_embed = embedding[:self.n_classes, :]
-        self.nn_.fit(embedding[self.n_classes:, :])
+        X, y = zip(*dataset.get_labeled_entries())
 
         pred_embed = np.zeros((len(pool_X), self.embed_dim))
         for i in range(self.embed_dim):
-            self.regressors[i].fit(X, class_embed[y, i])
+            self.regressors[i].fit(X, self.class_embed[y, i])
             pred_embed[:, i] = self.regressors[i].predict(pool_X)
 
         dist, _ = self.nn_.kneighbors(pred_embed)
         dist = dist[:, 0]
 
         ask_idx = self.random_state_.choice(
-			np.where(np.isclose(dist, np.max(dist)))[0])
+            np.where(np.isclose(dist, np.max(dist)))[0])
         return unlabeled_entry_ids[ask_idx]
