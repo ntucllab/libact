@@ -60,7 +60,7 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
 
     def __init__(self, dataset, main_learner, auxiliary_learner,
             criterion='hlr', random_state=None):
-        super(MultilabelWithAuxiliaryLearner, self).__init__(*args, **kwargs)
+        super(MultilabelWithAuxiliaryLearner, self).__init__(dataset)
 
         self.n_labels = len(self.dataset.data[0][1])
 
@@ -78,17 +78,16 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
 
         main_clf = copy.deepcopy(self.main_learner)
-        main_clf.train(labeled_pool)
+        main_clf.train(dataset)
         aux_clf = copy.deepcopy(self.auxiliary_learner)
-        aux_clf.train(labeled_pool)
+        aux_clf.train(dataset)
 
         main_pred = main_clf.predict(X_pool)
-        aux_pred = auxiliary_clf.predict(X_pool)
+        aux_pred = aux_clf.predict(X_pool)
 
         if self.criterion == 'hlr':
             score = np.abs(main_pred - aux_pred).mean(axis=1)
 
-        ask_id = self.random_state_.choice(
-            np.where(score == np.max(score))[0], self.random_state_)
+        ask_id = self.random_state_.choice(np.where(score == np.max(score))[0])
 
         return unlabeled_entry_ids[ask_id]
