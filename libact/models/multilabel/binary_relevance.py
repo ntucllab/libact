@@ -112,5 +112,11 @@ class BinaryRelevance(MultilabelModel):
             pred[:, i] = self.clfs_[i].predict_proba(X)[:, 1]
         return pred
 
-    def score(self, testing_dataset):
-        pass
+    def score(self, testing_dataset, criterion='hamming'):
+        # TODO check if data in dataset are all correct
+        X, Y = testing_dataset.format_sklearn()
+        if criterion == 'hamming':
+            return np.mean(np.abs(self.predict(X) - Y).mean(axis=1))
+        else:
+            raise NotImplementedError(
+                "criterion '%s' not implemented" % criterion)
