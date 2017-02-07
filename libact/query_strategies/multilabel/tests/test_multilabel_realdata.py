@@ -40,8 +40,8 @@ class MultilabelRealdataTestCase(unittest.TestCase):
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MMC(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
-        assert_array_equal(
-            qseq, np.array([26, 178, 309, 717, 934, 854, 1430, 1222, 739, 1205]))
+        assert_array_equal(qseq,
+                np.array([26, 178, 309, 717, 934, 854, 1430, 1222, 739, 1205]))
 
     def test_multilabel_with_auxiliary_learner_hlr(self):
         trn_ds = Dataset(self.X,
@@ -49,10 +49,34 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
                 main_learner=BinaryRelevance(LogisticRegression()),
                 auxiliary_learner=BinaryRelevance(SVM()),
-                criterion='hlr', random_state=1126)
+                criterion='hlr',
+                random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
-        assert_array_equal(
-            qseq, np.array([701, 1403, 147, 897, 974, 1266, 870, 703, 292, 1146]))
+        assert_array_equal(qseq,
+                np.array([701, 1403, 147, 897, 974, 1266, 870, 703, 292, 1146]))
+
+    def test_multilabel_with_auxiliary_learner_shlr(self):
+        trn_ds = Dataset(self.X,
+                         self.y[:5] + [None] * (len(self.y) - 5))
+        qs = MultilabelWithAuxiliaryLearner(trn_ds,
+                main_learner=BinaryRelevance(LogisticRegression()),
+                auxiliary_learner=BinaryRelevance(SVM()),
+                criterion='shlr',
+                random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(qseq,
+                np.array([760, 939, 298, 668, 844, 546, 675, 172, 1169, 300]))
+
+    def test_multilabel_with_auxiliary_learner_mmr(self):
+        trn_ds = Dataset(self.X,
+                         self.y[:5] + [None] * (len(self.y) - 5))
+        qs = MultilabelWithAuxiliaryLearner(trn_ds,
+                main_learner=BinaryRelevance(LogisticRegression()),
+                auxiliary_learner=BinaryRelevance(SVM()),
+                criterion='mmr', random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(qseq,
+                np.array([760, 939, 298, 668, 844, 546, 675, 172, 1169, 300]))
 
 
 if __name__ == '__main__':

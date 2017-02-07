@@ -18,13 +18,26 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
     Parameters
     ----------
     main_learner : :py:mod:`libact.base.interfaces.Model` object instance
-        The main multilabel learner.
+        The main multilabel learner. 
+        For criterion 'shlr' and 'mmr', it is required to support predict_real
+        or predict_proba.
 
     auxiliary_learner : :py:mod:`libact.models.multilabel` object instance
-        The auxiliary multilabel learner
+        The auxiliary multilabel learner.
+        For criterion 'shlr' and 'mmr', it is required to support predict_real
+        or predict_proba.
 
-    criterion : ['hlr'], optional(default='hlr')
+    criterion : ['hlr', 'shlr', 'mmr'], optional(default='hlr')
+        The criterion for estimating the difference between main_learner and
+        auxiliary_learner.
         hlr, hamming loss reduction
+        shlr, soft hamming loss reduction
+        mmr, maximum margin reduction
+
+    b : float
+        parameter for criterion shlr.
+        It sets the score to be clipped between [-b, b] to remove influence of
+        extreme margin values.
 
     random_state : {int, np.random.RandomState instance, None}, optional (default=None)
         If int or None, random_state is passed as parameter to generate
@@ -58,7 +71,7 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
     """
 
     def __init__(self, dataset, main_learner, auxiliary_learner,
-            criterion='hlr', random_state=None):
+            criterion='hlr', b=1., random_state=None):
         super(MultilabelWithAuxiliaryLearner, self).__init__(dataset)
 
         self.n_labels = len(self.dataset.data[0][1])
@@ -66,9 +79,16 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
         self.main_learner = main_learner
         self.auxiliary_learner = auxiliary_learner
 
+        self.b = b
+
         self.random_state_ = seed_random_state(random_state)
 
         self.criterion = criterion
+        if self.criterion not in ['hlr', 'shlr', 'mmr']:
+            raise TypeError(
+                "supported criterion are ['lc', 'sm', 'entropy'], the given "
+                "one is: " + self.method
+            )
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
@@ -81,11 +101,34 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
         aux_clf = copy.deepcopy(self.auxiliary_learner)
         aux_clf.train(dataset)
 
-        main_pred = main_clf.predict(X_pool)
-        aux_pred = aux_clf.predict(X_pool)
-
         if self.criterion == 'hlr':
+            main_pred = main_clf.predict(X_pool)
+            aux_pred = aux_clf.predict(X_pool)
             score = np.abs(main_pred - aux_pred).mean(axis=1)
+        elif self.criterion in ['mmr', 'shlr']:
+            if 'predict_real' in dir(main_clf):
+                main_pred = main_clf.predict_real(X_pool)
+            elif 'predict_proba' in dir(main_clf):
+                main_pred = main_clf.predict_proba(X_pool)
+            else:
+                raise AttributeError("main_learner did not support either"
+                                     "'predict_real' or 'predict_proba'"
+                                     "method")
+
+            if 'predict_real' in dir(aux_clf):
+                aux_pred = aux_clf.predict_real(X_pool)
+            elif 'predict_proba' in dir(aux_clf):
+                aux_pred = aux_clf.predict_proba(X_pool)
+            else:
+                raise AttributeError("aux_learner did not support either"
+                                     "'predict_real' or 'predict_proba'"
+                                     "method")
+
+            if self.criterion == 'mmr':
+                score = (1. - main_pred * aux_pred) / 2.
+            elif self.criterion == 'shlr':
+                b = self.b
+                score = (b - np.clip(main_pred * aux_pred, -b, b)) / 2. / b
 
         ask_id = self.random_state_.choice(np.where(score == np.max(score))[0])
 
