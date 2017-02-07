@@ -47,7 +47,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
-                main_learner=BinaryRelevance(LogisticRegression()),
+                major_learner=BinaryRelevance(LogisticRegression()),
                 auxiliary_learner=BinaryRelevance(SVM()),
                 criterion='hlr',
                 random_state=1126)
@@ -59,24 +59,26 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
-                main_learner=BinaryRelevance(LogisticRegression()),
+                major_learner=BinaryRelevance(LogisticRegression()),
                 auxiliary_learner=BinaryRelevance(SVM()),
                 criterion='shlr',
+                b=1.,
                 random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
-                np.array([760, 939, 298, 668, 844, 546, 675, 172, 1169, 300]))
+                np.array([1258, 805, 459, 550, 783, 964, 736, 1004, 38, 750]))
 
     def test_multilabel_with_auxiliary_learner_mmr(self):
         trn_ds = Dataset(self.X,
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
-                main_learner=BinaryRelevance(LogisticRegression()),
+                major_learner=BinaryRelevance(LogisticRegression()),
                 auxiliary_learner=BinaryRelevance(SVM()),
-                criterion='mmr', random_state=1126)
+                criterion='mmr',
+                random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
-                np.array([760, 939, 298, 668, 844, 546, 675, 172, 1169, 300]))
+                np.array([1258, 1461, 231, 1198, 1498, 1374, 955, 1367, 265, 144]))
 
 
 if __name__ == '__main__':
