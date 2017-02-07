@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cost-Senstive Multi-Class Active Learning
+Multi-label Active Learning
 """
 
 import copy
