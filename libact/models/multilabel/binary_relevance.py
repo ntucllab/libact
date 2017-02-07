@@ -88,6 +88,30 @@ class BinaryRelevance(MultilabelModel):
             pred[:, i] = self.clfs_[i].predict(X)
         return pred
 
+    def predict_real(self, X):
+        r"""Predict the probability of being 1 for each label.
+
+        Parameters
+        ----------
+        X : array-like, shape=(n_samples, n_features)
+            Feature vector.
+
+        Returns
+        -------
+        pred : numpy array, shape=(n_samples, n_labels)
+            Predicted probability of each label.
+        """
+        X = np.asarray(X)
+        if self.clfs_ is None:
+            raise ValueError("Train before prediction")
+        if X.shape[1] != self.n_features_:
+            raise ValueError('given feature size does not match')
+
+        pred = np.zeros((X.shape[0], self.n_labels_))
+        for i in range(self.n_labels_):
+            pred[:, i] = self.clfs_[i].predict_real(X)[:, 1]
+        return pred
+
     def predict_proba(self, X):
         r"""Predict the probability of being 1 for each label.
 
