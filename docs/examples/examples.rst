@@ -8,4 +8,4 @@ Here are some examples of using `libact`:
 
   plot.rst
   label_digits.rst
-
+  multilabel_active_learning.rst

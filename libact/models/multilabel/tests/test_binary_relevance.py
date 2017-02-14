@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 from sklearn import datasets
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 import sklearn.linear_model
 
 from libact.base.dataset import Dataset
@@ -21,22 +21,36 @@ class BinaryRelevanceTestCase(unittest.TestCase):
             train_test_split(X, Y, test_size=0.3, random_state=1126)
 
     def test_binary_relevance_lr(self):
-        print(self.X_test.shape, self.Y_test.shape)
         br = BinaryRelevance(base_clf=LogisticRegression(random_state=1126))
         br.train(Dataset(self.X_train, self.Y_train))
 
         br_pred_train = br.predict(self.X_train).astype(int)
         br_pred_test = br.predict(self.X_test).astype(int)
 
+        br_pred_proba_train = br.predict_proba(self.X_train).astype(float)
+        br_pred_proba_test = br.predict_proba(self.X_test).astype(float)
+
         for i in range(np.shape(self.Y_train)[1]):
             clf = sklearn.linear_model.LogisticRegression(random_state=1126)
             clf.fit(self.X_train, self.Y_train[:, i])
 
             assert_array_equal(clf.predict(self.X_train).astype(int),
-                    br_pred_train[:, i])
+                               br_pred_train[:, i])
             assert_array_equal(clf.predict(self.X_test).astype(int),
-                    br_pred_test[:, i])
+                               br_pred_test[:, i])
 
+            assert_array_equal(clf.predict_proba(self.X_train)[:, 1].astype(float),
+                               br_pred_proba_train[:, i])
+            assert_array_equal(clf.predict_proba(self.X_test)[:, 1].astype(float),
+                               br_pred_proba_test[:, i])
+
+        self.assertEqual(
+            np.mean(np.abs(self.Y_test - br_pred_test).mean(axis=1)),
+            br.score(Dataset(self.X_test, self.Y_test), 'hamming'))
+
+        self.assertRaises(NotImplementedError,
+                lambda: br.score(Dataset(self.X_test, self.Y_test),
+                                 criterion='not_exist'))
 
 if __name__ == '__main__':
     unittest.main()
