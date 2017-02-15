@@ -98,7 +98,7 @@ class SklearnProbaAdapter(ProbabilisticModel):
                                 **kwargs)
 
     def predict_real(self, feature, *args, **kwargs):
-        return self._model.predict_proba(feature, *args, **kwargs)
+        return self._model.predict_proba(feature, *args, **kwargs) * 2 - 1
 
     def predict_proba(self, feature, *args, **kwargs):
         return self._model.predict_proba(feature, *args, **kwargs)
