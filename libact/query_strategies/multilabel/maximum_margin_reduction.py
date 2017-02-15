@@ -8,7 +8,7 @@ from sklearn.svm import SVC
 from libact.base.dataset import Dataset
 from libact.base.interfaces import QueryStrategy, ContinuousModel
 from libact.utils import inherit_docstring_from, seed_random_state, zip
-from libact.models import LogisticRegression, SVM
+from libact.models import LogisticRegression, SklearnProbaAdapter
 from libact.models.multilabel import BinaryRelevance, DummyClf
 
 
@@ -22,7 +22,7 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
     base_learner : :py:mod:`libact.query_strategies` object instance
         The base learner for binary relavance, should support predict_proba
 
-    br_base : sklearn classifier, optional (default=sklearn.svm.SVC(kernel='linear', probability=True))
+    br_base : ProbabilisticModel object instance
         The base learner for the binary relevance in MMC.
         Should support predict_proba.
 
@@ -69,11 +69,12 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
 
         self.n_labels = len(self.dataset.data[0][1])
 
-        self.logreg_param = kwargs.pop('logreg_param', {})
+        self.logreg_param = kwargs.pop('logreg_param',
+                {'multi_class': 'multinomial', 'solver': 'newton-cg'})
         self.logistic_regression_ = LogisticRegression(**self.logreg_param)
 
         self.br_base = kwargs.pop('br_base',
-                                  SVC(kernel='linear', probability=True))
+              SklearnProbaAdapter(SVC(kernel='linear', probability=True)))
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
@@ -87,42 +88,29 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
         Y = np.array(Y)
         X_pool = np.array(X_pool)
 
-        br = BinaryRelevance(SVM(kernel='linear'))
+        br = BinaryRelevance(self.br_base)
         br.train(Dataset(labeled_pool, Y))
-        #lbl_proba = br.predict_proba(X_pool) # shape=(pool size, labels)
-        f = br.predict(X_pool) * 2 - 1 # to (1, -1)
 
-        # predicting number of labels in each label vector with OVA
-        labeled_proba = []
-        unlabeled_proba = []
-        for i in range(1, self.n_labels+1): # shouldn't have 0 label
-            lbl_num = (Y.sum(axis=1)==i)
-            # if there is only one kind of label
-            if len(np.unique(lbl_num)) == 1:
-                clf = DummyClf()
-            else:
-                clf = copy.deepcopy(self.br_base)
-            clf.fit(labeled_pool, lbl_num)
-            labeled_proba.append(clf.predict_proba(labeled_pool)[:, 1])
-            unlabeled_proba.append(clf.predict_proba(X_pool)[:, 1])
+        trnf = br.predict_proba(labeled_pool)
+        poolf = br.predict_proba(X_pool)
+        f = poolf * 2 - 1
 
-        trnf = np.array(labeled_proba).T # shape=(len(labeled_proba), n_labels)
         trnf = np.sort(trnf, axis=1)[:, ::-1]
+        trnf /= np.tile(trnf.sum(axis=1).reshape(-1, 1), (1, trnf.shape[1]))
         if len(np.unique(Y.sum(axis=1))) == 1:
             lr = DummyClf()
         else:
             lr = self.logistic_regression_
         lr.train(Dataset(trnf, Y.sum(axis=1)))
 
-        poolf = np.array(unlabeled_proba).T
         idx_poolf = np.argsort(poolf, axis=1)[:, ::-1]
-        pred_num_lbl = lr.predict(
-                    poolf[np.arange(poolf.shape[0]).reshape(-1, 1), idx_poolf]
-                    ).astype(int)
+        poolf = np.sort(poolf, axis=1)[:, ::-1]
+        poolf /= np.tile(poolf.sum(axis=1).reshape(-1, 1), (1, poolf.shape[1]))
+        pred_num_lbl = lr.predict(poolf).astype(int)
 
         yhat = -1 * np.ones((len(X_pool), self.n_labels))
         for i, p in enumerate(pred_num_lbl):
-            yhat[i, idx_poolf[:p]] = 1
+            yhat[i, idx_poolf[i, :p]] = 1
 
         score = ((1 - yhat * f) / 2).sum(axis=1)
         ask_id = self.random_state_.choice(np.where(score == np.max(score))[0])

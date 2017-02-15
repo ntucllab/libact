@@ -20,7 +20,7 @@ from libact.base.dataset import Dataset, import_libsvm_sparse
 from libact.models import LogisticRegression, SVM
 from libact.models.multilabel import BinaryRelevance
 from libact.query_strategies.multilabel import MMC, \
-        MultilabelWithAuxiliaryLearner
+        MultilabelWithAuxiliaryLearner, BinaryMinimization
 from ...tests.utils import run_qs
 
 
@@ -79,6 +79,14 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([1258, 1461, 231, 1198, 1498, 1374, 955, 1367, 265, 144]))
+
+    def test_binary_minimization(self):
+        trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
+        qs = BinaryMinimization(trn_ds, LogisticRegression(), random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(qseq,
+                np.array([1258, 1461, 231, 1198, 1498, 1374, 955, 1367, 265, 144]))
+
 
 
 if __name__ == '__main__':
