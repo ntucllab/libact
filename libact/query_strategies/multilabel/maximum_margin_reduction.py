@@ -69,15 +69,17 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
 
         self.n_labels = len(self.dataset.data[0][1])
 
+        random_state = kwargs.pop('random_state', None)
+        self.random_state_ = seed_random_state(random_state)
+
         self.logreg_param = kwargs.pop('logreg_param',
-                {'multi_class': 'multinomial', 'solver': 'newton-cg'})
+                {'multi_class': 'multinomial', 'solver': 'newton-cg',
+                 'random_state': random_state})
         self.logistic_regression_ = LogisticRegression(**self.logreg_param)
 
         self.br_base = kwargs.pop('br_base',
-              SklearnProbaAdapter(SVC(kernel='linear', probability=True)))
-
-        random_state = kwargs.pop('random_state', None)
-        self.random_state_ = seed_random_state(random_state)
+              SklearnProbaAdapter(SVC(kernel='linear', probability=True,
+                                      random_state=random_state)))
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
@@ -108,7 +110,7 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
         poolf /= np.tile(poolf.sum(axis=1).reshape(-1, 1), (1, poolf.shape[1]))
         pred_num_lbl = lr.predict(poolf).astype(int)
 
-        yhat = -1 * np.ones((len(X_pool), self.n_labels))
+        yhat = -1 * np.ones((len(X_pool), self.n_labels), dtype=int)
         for i, p in enumerate(pred_num_lbl):
             yhat[i, idx_poolf[i, :p]] = 1
 
