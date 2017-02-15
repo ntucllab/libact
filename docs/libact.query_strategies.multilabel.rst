@@ -4,6 +4,14 @@ libact.query_strategies.multilabel package
 Submodules
 ----------
 
+libact.query_strategies.multilabel.binary_minimization module
+-------------------------------------------------------------------------------
+
+.. automodule:: libact.query_strategies.multilabel.binary_minimization
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.multilabel.maximum_margin_reduction module
 -------------------------------------------------------------------------------
 

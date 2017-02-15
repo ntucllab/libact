@@ -20,7 +20,7 @@ from libact.base.dataset import Dataset, import_libsvm_sparse
 from libact.models import LogisticRegression, SVM
 from libact.models.multilabel import BinaryRelevance
 from libact.query_strategies.multilabel import MMC, \
-        MultilabelWithAuxiliaryLearner
+        MultilabelWithAuxiliaryLearner, BinaryMinimization
 from ...tests.utils import run_qs
 
 
@@ -41,7 +41,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qs = MMC(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
-                np.array([26, 178, 309, 717, 934, 854, 1430, 1222, 739, 1205]))
+                np.array([117, 655, 1350, 909, 1003, 1116, 546, 1055, 165, 1441]))
 
     def test_multilabel_with_auxiliary_learner_hlr(self):
         trn_ds = Dataset(self.X,
@@ -79,6 +79,14 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([1258, 1461, 231, 1198, 1498, 1374, 955, 1367, 265, 144]))
+
+    def test_binary_minimization(self):
+        trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
+        qs = BinaryMinimization(trn_ds, LogisticRegression(), random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(qseq,
+                np.array([936, 924, 1211, 1286, 590, 429, 404, 962, 825, 30]))
+
 
 
 if __name__ == '__main__':

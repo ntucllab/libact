@@ -24,7 +24,7 @@ class DummyClf():
         return self.cls * np.ones(len(X))
 
     def predict_real(self, X):
-        return self.predict_proba(X)
+        return self.predict_proba(X) * 2 - 1
 
     def predict_proba(self, X):
         ret = np.zeros((len(X), 2))

@@ -86,7 +86,7 @@ class BinaryRelevance(MultilabelModel):
         pred = np.zeros((X.shape[0], self.n_labels_))
         for i in range(self.n_labels_):
             pred[:, i] = self.clfs_[i].predict(X)
-        return pred
+        return pred.astype(int)
 
     def predict_real(self, X):
         r"""Predict the probability of being 1 for each label.
