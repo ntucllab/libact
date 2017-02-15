@@ -68,18 +68,16 @@ class BinaryMinimization(QueryStrategy):
 
         clfs = []
         boundaries = []
-
         for i in range(self.n_labels):
             if len(np.unique(Y[:, i])) == 1:
                 clf = DummyClf()
             else:
                 clf = copy.deepcopy(self.base_clf)
             clf.train(Dataset(X, Y[:, i]))
-            boundaries.append(np.abs(clf.predict_real(X_pool)))
+            boundaries.append(np.abs(clf.predict_real(X_pool)[:, 1]))
             clfs.append(clf)
 
-        choices = [i[1]
-                   for i in np.where(np.array(boundaries) == np.min(boundaries))]
+        choices = np.where(np.array(boundaries) == np.min(boundaries))[1]
         ask_id = self.random_state_.choice(choices)
 
         return unlabeled_entry_ids[ask_id]
