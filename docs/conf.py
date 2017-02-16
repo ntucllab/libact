@@ -20,12 +20,6 @@ import sys
 from unittest.mock import MagicMock
 
 
-class Mock(MagicMock):
-
-    @classmethod
-    def __getattr__(cls, name):
-        return Mock()
-
 MOCK_MODULES = ['scipy', 'scipy.optimize', 'scipy.stats',
                 'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
@@ -33,7 +27,7 @@ MOCK_MODULES = ['scipy', 'scipy.optimize', 'scipy.stats',
                 # c extensions
                 'libact.query_strategies._hintsvm',
                 'libact.query_strategies._variance_reduction']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
