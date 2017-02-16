@@ -6,6 +6,7 @@ Submodules
 
 .. toctree::
 
+    libact.query_strategies.multiclass
     libact.query_strategies.multilabel
 
 libact.query_strategies.active_learning_by_learning module

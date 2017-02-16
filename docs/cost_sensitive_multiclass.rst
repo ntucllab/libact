@@ -1,6 +1,8 @@
 Cost Sensitive Active Learning
 ==============================
 
+Example file: :file:`examples/alce_plot.py`
+
 Most active learning algorithms are designed to deal with a specific
 miss-classification error. Though in the real-world applications, the cost for
 miss-classification varies. Cost-sensitive active learning algorithms allows the
@@ -25,3 +27,5 @@ We compared ALCE with Ucertainty Sampling and Random Sampling.
 
 The main difference in declaring an ALCE object is the cost_matrix should be
 passed in as a parameter (``ALCE(trn_ds3, cost_matrix, LinearRegression())``).
+
+.. image:: ./pngs/vehicle_alce_plit.png
