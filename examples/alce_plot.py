@@ -11,10 +11,9 @@ import matplotlib
 matplotlib.use('tkAgg')
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 import sklearn.datasets
 from sklearn.svm import SVR
-from sklearn.linear_model import LinearRegression
 
 # libact classes
 from libact.base.dataset import Dataset, import_libsvm_sparse
@@ -25,17 +24,16 @@ from libact.labelers import IdealLabeler
 from libact.utils import calc_cost
 
 
-np.random.seed(1126)
-
 def run(trn_ds, tst_ds, lbr, model, qs, quota, cost_matrix):
     C_in, C_out = [], []
 
-    for _ in range(quota):
+    for i in range(quota+1):
         # Standard usage of libact objects
-        ask_id = qs.make_query()
-        X, _ = zip(*trn_ds.data)
-        lb = lbr.label(X[ask_id])
-        trn_ds.update(ask_id, lb)
+        if i > 0:
+            ask_id = qs.make_query()
+            X, _ = zip(*trn_ds.data)
+            lb = lbr.label(X[ask_id])
+            trn_ds.update(ask_id, lb)
 
         model.train(trn_ds)
         trn_X, trn_y = zip(*trn_ds.get_labeled_entries())
@@ -50,9 +48,9 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota, cost_matrix):
 
 def split_train_test(test_size):
     # choose a dataset with unbalanced class instances
-    data = sklearn.datasets.fetch_mldata('glass')
     #data = sklearn.datasets.fetch_mldata('segment')
-    #data = sklearn.datasets.fetch_mldata('vehicle')
+    data = sklearn.datasets.fetch_mldata('vehicle')
+
     X = StandardScaler().fit_transform(data['data'])
     target = np.unique(data['target'])
     # mapping the targets to 0 to n_classes-1
@@ -75,19 +73,8 @@ def split_train_test(test_size):
         np.vstack((X_trn[init_y_ind], X_trn[y_ind])),
         np.concatenate((y_trn[init_y_ind], y_trn[y_ind])))
 
-    count = np.bincount(y)
-    cost_matrix = np.zeros((len(target), len(target)), dtype='int')
-    for i in range(len(target)):
-        for j in range(len(target)):
-            if i == j:
-                cost_matrix[i][j] = 0.
-            else:
-                cost_matrix[i][j] = np.random.randint(2000.*count[j]/count[i])
-    print(cost_matrix)
-
-    #random_state = np.random.RandomState(1126)
-    #cost_matrix = random_state.rand(len(target), len(target))
-    #np.fill_diagonal(cost_matrix, 0)
+    cost_matrix = 2000. * np.random.rand(len(target), len(target))
+    np.fill_diagonal(cost_matrix, 0)
 
     return trn_ds, tst_ds, fully_labeled_trn_ds, cost_matrix
 
@@ -97,7 +84,7 @@ def main():
     # randomly selected and assigned to the test set
 
     result = {'E1':[], 'E2':[], 'E3':[]}
-    for i in range(10):
+    for i in range(20):
         trn_ds, tst_ds, fully_labeled_trn_ds, cost_matrix = \
             split_train_test(test_size)
         trn_ds2 = copy.deepcopy(trn_ds)
@@ -109,7 +96,6 @@ def main():
 
         qs = UncertaintySampling(
             trn_ds, method='sm', model=SVM(decision_function_shape='ovr'))
-        qs = ALCE(trn_ds, cost_matrix, SVR())
         _, E_out_1 = run(trn_ds, tst_ds, lbr, model, qs, quota, cost_matrix)
         result['E1'].append(E_out_1)
 
@@ -129,7 +115,7 @@ def main():
     print("Random: ", E_out_2[::5].tolist())
     print("ALCE: ", E_out_3[::5].tolist())
 
-    query_num = np.arange(1, quota + 1)
+    query_num = np.arange(0, quota + 1)
     plt.figure(figsize=(10, 8))
     plt.plot(query_num, E_out_1, 'g', label='Uncertainty sampling')
     plt.plot(query_num, E_out_2, 'k', label='Random')
