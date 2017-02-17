@@ -43,7 +43,7 @@ Currently supported algorithms includes the following:
 +--------------------------------------------------+-------------------------------------+---------------------------------------------------+
 | Uncertainty Sampling (largest margin)            |                                     | Maximal Loss Reduction with Maximal Confidence    |
 +--------------------------------------------------+-------------------------------------+---------------------------------------------------+
-| Uncertainty Sampling (least confident)           |                                     | Multi-lable Active Learning With Auxiliary Learner|
+| Uncertainty Sampling (least confident)           |                                     | Multi-label Active Learning With Auxiliary Learner|
 +--------------------------------------------------+-------------------------------------+---------------------------------------------------+
 | Query By Committee (vote entropy)                |                                     |                                                   |
 +--------------------------------------------------+-------------------------------------+---------------------------------------------------+
@@ -57,6 +57,11 @@ Currently supported algorithms includes the following:
 +--------------------------------------------------+-------------------------------------+---------------------------------------------------+
 | HintSVM                                          |                                     |                                                   |
 +--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Random Sampling                                  |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+
+Note that Uncertainty Sampling can handle multi-class setting though it is not
+under the multiclass submodule.
 
 Additionally, we supported the `Active Learning By Learning` meta algorithm for
 binary class active learning algorithm selection.
@@ -67,7 +72,7 @@ A :py:class:`libact.base.interfaces.Model` object represents a supervised classi
 
 A :py:class:`libact.base.interfaces.ContinuousModel` object represents an algorithm that supports continuous outputs during predictions, which includes an additional predict_real method.
 
-Note that there is a :py:class:`libact.base.interfaces.SklearnAdapter` which
+Note that there is a :py:class:`libact.models.SklearnAdapter` which
 takes a sklearn classifier instance and adaptes it to the libact Model
 interface.
 
