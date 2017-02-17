@@ -24,6 +24,7 @@ MOCK_MODULES = ['scipy', 'scipy.optimize', 'scipy.stats',
                 'matplotlib', 'matplotlib.pyplot', 'numpy', 'sklearn',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
                 'sklearn.metrics.pairwise', 'sklearn.cluster',
+                'sklearn.multiclass', 'sklearn.neighbors'
                 # c extensions
                 'libact.query_strategies._hintsvm',
                 'libact.query_strategies._variance_reduction']
