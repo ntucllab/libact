@@ -29,11 +29,37 @@ the given active learning problem. Its label method takes in an unlabeled exampl
 
 QueryStrategy
 -------------
-A :py:class:`libact.base.interfaces.QueryStrategy` object represents 
-an active learning algorithm. 
+A :py:class:`libact.base.interfaces.QueryStrategy` object represents an implementation active learning algorithm.
 Each QueryStrategy object is associated with a Dataset object. When a QueryStrategy object is initialized, it will automatically register its update
 method as a callback function to the associated Dataset to be informed of any Dataset updates. The make_query method of a QueryStrategy object returns
 the identifier of an unlabeled example that the object (active learning algorithm) wants to query.
+
+Currently supported algorithms includes the following:
+
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Binary-class                                     | Multi-class                         | Multi-label                                       |
++==================================================+=====================================+===================================================+
+| Uncertainty Sampling (entropy)                   | Active Learning With Cost Embedding | Binary Minimization                               |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Uncertainty Sampling (largest margin)            |                                     | Maximal Loss Reduction with Maximal Confidence    |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Uncertainty Sampling (least confident)           |                                     | Multi-lable Active Learning With Auxiliary Learner|
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Query By Committee (vote entropy)                |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Query By Committee (KL-divergence)               |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Variance Reduction                               |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Querying Informative and Representative Examples |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| Density Weighted Uncertainty Sampling            |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+| HintSVM                                          |                                     |                                                   |
++--------------------------------------------------+-------------------------------------+---------------------------------------------------+
+
+Additionally, we supported the `Active Learning By Learning` meta algorithm for
+binary class active learning algorithm selection.
 
 Model
 -----
