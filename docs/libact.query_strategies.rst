@@ -6,12 +6,21 @@ Submodules
 
 .. toctree::
 
+    libact.query_strategies.multiclass
     libact.query_strategies.multilabel
 
 libact.query_strategies.active_learning_by_learning module
 ----------------------------------------------------------
 
 .. automodule:: libact.query_strategies.active_learning_by_learning
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libact.query_strategies.active_learning_with_cost_embedding module
+-------------------------------------------------
+
+.. automodule:: libact.query_strategies.active_learning_with_cost_embedding
     :members:
     :undoc-members:
     :show-inheritance:

@@ -37,3 +37,16 @@ def seed_random_state(seed):
         return seed
     raise ValueError("%r can not be used to generate numpy.random.RandomState"
                      " instance" % seed)
+
+def calc_cost(y, yhat, cost_matrix):
+    """Calculate the cost with given cost matrix
+
+    y : ground truth
+
+    yhat : estimation
+
+    cost_matrix : array-like, shape=(n_classes, n_classes)
+        The ith row, jth column represents the cost of the ground truth being
+        ith class and prediction as jth class.
+    """
+    return np.mean(cost_matrix[list(y), list(yhat)])
