@@ -101,7 +101,7 @@ Available examples:
     with other active learning algorithms.
   - [multilabel_plot](examples/multilabel_plot.py): This example compares the performance of
     algorithms under multilabel setting.
-  - [alce](examples/alce_plot.py): This example compares the performance of
+  - [alce_plot](examples/alce_plot.py): This example compares the performance of
     algorithms under cost-sensitive multi-class setting.
 
 # Running tests
