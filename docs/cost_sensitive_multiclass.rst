@@ -20,7 +20,12 @@ Example file: :file:`examples/alce_plot.py`
 The multi-class dataset to use is the *vehicle* dataset from mldata retrieved by
 sklearn (sklearn.datasets.fetch_mldata('vehicle')).
 The cost matrix is generated randomly.
-``cost_matrix = 2000. * np.random.rand(len(target), len(target))``
+
+.. code-block:: python
+   :linenos:
+
+   cost_matrix = 2000. * np.random.rand(len(target), len(target))
+
 The ``target`` variable is a list of different classes.
 The value ``cost_matrix[i][j]`` represent the cost of i-th class in ``target``
 being predicted as j-th class in ``target``.
@@ -30,4 +35,4 @@ The main difference in declaring an ALCE object is the cost_matrix should be
 passed in as a parameter (``ALCE(trn_ds3, cost_matrix, SVR())``).
 The result is shown as follows.
 
-.. image:: ./examples/pngs/vehicle_alce_plit.png
+.. image:: ./examples/pngs/vehicle_alce_plot.png
