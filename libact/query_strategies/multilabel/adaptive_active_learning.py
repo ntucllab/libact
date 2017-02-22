@@ -12,6 +12,21 @@ from libact.utils import inherit_docstring_from, seed_random_state, zip
 from libact.models.multilabel import BinaryRelevance
 
 
+def _calc_approx_err(br, dataset, X_pool):
+    br.train(dataset)
+    br_real = br.predict_real(X_pool)
+
+    pos = np.copy(br_real)
+    pos[br_real<0] = 1
+    pos = np.max((1.-pos), axis=1)
+
+    neg = np.copy(br_real)
+    neg[br_real>0] = -1
+    neg = np.max((1.+neg), axis=1)
+
+    err = neg + pos
+    return np.sum(err)
+
 class AdaptiveActiveLearning(QueryStrategy):
     r"""Adaptive Active Learning
 
@@ -77,21 +92,6 @@ class AdaptiveActiveLearning(QueryStrategy):
         self.n_jobs = n_jobs
         self.random_state_ = seed_random_state(random_state)
 
-    def _calc_approx_err(self, br, dataset, X_pool):
-        br.train(dataset)
-        br_real = br.predict_real(X_pool)
-
-        pos = np.copy(br_real)
-        pos[br_real<0] = 1
-        pos = np.max((1.-pos), axis=1)
-
-        neg = np.copy(br_real)
-        neg[br_real>0] = -1
-        neg = np.max((1.+neg), axis=1)
-
-        err = neg + pos
-        return np.sum(err)
-
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
@@ -122,7 +122,7 @@ class AdaptiveActiveLearning(QueryStrategy):
 
         candidates = list(candidate_idx_set)
         approx_err = Parallel(n_jobs=self.n_jobs, backend='threading')(
-            delayed(self._calc_approx_err)(
+            delayed(_calc_approx_err)(
                 BinaryRelevance(self.base_clf),
                 Dataset(np.vstack((X, X_pool[idx])), np.vstack((Y, pred[idx]))),
                 X_pool)
