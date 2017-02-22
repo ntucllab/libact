@@ -4,25 +4,35 @@ classification problems
 import copy
 
 import numpy as np
+from joblib import Parallel, delayed
 
 from .dummy_clf import DummyClf
 from libact.base.dataset import Dataset
 from libact.base.interfaces import MultilabelModel
 
+def _fit_model(model, X, y):
+    model.train(Dataset(X, y))
 
 class BinaryRelevance(MultilabelModel):
     r"""Binary Relevance
 
     base_clf : :py:mod:`libact.models` object instances
-    If wanting to use predict_proba, base_clf are required to support
-    predict_proba method.
+        If wanting to use predict_proba, base_clf are required to support
+        predict_proba method.
+
+    n_jobs : int, optional, default: 1
+        The number of jobs to use for the computation. If -1 all CPUs are
+        used. If 1 is given, no parallel computing code is used at all, which is
+        useful for debugging. For n_jobs below -1, (n_cpus + 1 + n_jobs) are
+        used. Thus for n_jobs = -2, all CPUs but one are used.
 
     References
     ----------
     """
-    def __init__(self, base_clf):
+    def __init__(self, base_clf, n_jobs=1):
         self.base_clf = copy.copy(base_clf)
         self.clfs_ = None
+        self.n_jobs = n_jobs
 
     def train(self, dataset):
         r"""Train model with given feature.
@@ -59,8 +69,12 @@ class BinaryRelevance(MultilabelModel):
                 clf = DummyClf()
             else:
                 clf = copy.deepcopy(self.base_clf)
-            clf.train(Dataset(X, Y[:, i]))
             self.clfs_.append(clf)
+
+        Parallel(n_jobs=self.n_jobs, backend='threading')(
+            delayed(_fit_model)(self.clfs_[i], X, Y[:, i])
+            for i in range(self.n_labels_))
+        #clf.train(Dataset(X, Y[:, i]))
 
         return self
 
