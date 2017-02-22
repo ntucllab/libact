@@ -18,6 +18,9 @@ matrix:
       - "nightly" # SciPy bug
       - "3.7-dev"
 
+notifications:
+  email: false
+
 cache:
   directories:
     - $HOME/.cache/pip
