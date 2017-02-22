@@ -31,6 +31,12 @@ class AdaptiveActiveLearning(QueryStrategy):
         np.random.RandomState instance. if np.random.RandomState instance,
         random_state is the random number generate.
 
+    n_jobs : int, optional, default: 1
+        The number of jobs to use for the computation. If -1 all CPUs are
+        used. If 1 is given, no parallel computing code is used at all, which is
+        useful for debugging. For n_jobs below -1, (n_cpus + 1 + n_jobs) are
+        used. Thus for n_jobs = -2, all CPUs but one are used.
+
     Attributes
     ----------
 
@@ -54,8 +60,9 @@ class AdaptiveActiveLearning(QueryStrategy):
            Classification." IJCAI. 2013.
     """
 
-    def __init__(self, dataset, base_clf, betas=None, random_state=None):
-        super(BinaryMinimization, self).__init__(dataset)
+    def __init__(self, dataset, base_clf, betas=None, n_jobs=1,
+            random_state=None):
+        super(AdaptiveActiveLearning, self).__init__(dataset)
 
         self.n_labels = len(self.dataset.data[0][1])
 
@@ -66,29 +73,30 @@ class AdaptiveActiveLearning(QueryStrategy):
         if self.betas is None:
             self.betas = [i/10. for i in range(0, 11)]
 
+        self.n_jobs = n_jobs
         self.random_state_ = seed_random_state(random_state)
 
+    @profile
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
         X, Y = zip(*dataset.get_labeled_entries())
         unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
         Y = np.array(Y)
-        X_pool = np.array(X_pool)
+        X, X_pool = np.array(X), np.array(X_pool)
 
-        clf = BinaryRelevance(self.base_clf)
+        clf = BinaryRelevance(self.base_clf, n_jobs=self.n_jobs)
         clf.train(dataset)
         real = clf.predict_real(X_pool)
         pred = clf.predict(X_pool)
 
         # Separation Margin
-        separation_margin = -real.min(axis=1) + real.max(axis=0)
+        separation_margin = -real.min(axis=1) + real.max(axis=1)
         uncertainty = 1. / separation_margin
 
         # Label Cardinality Inconsistency
-        average_pos_lbl = Y.mean(axis=0)
-        label_cardinality = pred - np.tile(average_pos_lbl, (len(pred), 1))
-        label_cardinality = np.sqrt((label_cardinality**2).sum(axis=1))
+        average_pos_lbl = Y.mean(axis=0).sum()
+        label_cardinality = np.sqrt((pred.sum(axis=1) - average_pos_lbl)**2)
 
         candidate_idx_set = set()
         for b in self.betas:
@@ -100,18 +108,31 @@ class AdaptiveActiveLearning(QueryStrategy):
         approx_err = []
         candidates = list(candidate_idx_set)
         for idx in candidates:
-            ds = Dataset(np.append(X, X_pool[idx]), np.append(Y, pred[idx]))
-            br = BinaryRelevance(self.base_clf)
-            br.train(dataset)
+            ds = Dataset(np.vstack((X, X_pool[idx])), np.vstack((Y, pred[idx])))
+            br = BinaryRelevance(self.base_clf, n_jobs=self.n_jobs)
+            br.train(ds)
             br_real = br.predict_real(X_pool)
 
-            br_real[br_real>0] = (1. - br_real[br_real>0])
-            br_real[br_real>0] = np.maximum(0, br_real[br_real>0])
+            pos = br_real
+            pos[br_real<0] = 1
+            pos = np.max((1.-pos), axis=1)
 
-            br_real[br_real<0] = (1. + br_real[br_real<0])
-            br_real[br_real<0] = np.maximum(0, br_real[br_real<0])
+            neg = br_real
+            neg[br_real>0] = -1
+            neg = np.max((1.+neg), axis=1)
 
-            approx_err.append(np.sum(br_real))
+            err = neg + pos
+
+            err2 = []
+            for x in br_real:
+                pos = max(0, (1.-x)[x>0].max()) if np.sum(x>0)>0 else 0.
+                neg = max(0, (1.+x)[x<0].max()) if np.sum(x<0)>0 else 0.
+                err2.append(pos + neg)
+
+            print(err)
+            print(err2)
+
+            approx_err.append(np.sum(err))
 
         choices = np.where(np.array(approx_err) == np.min(approx_err))[0]
         ask_idx = candidates[self.random_state_.choice(choices)]

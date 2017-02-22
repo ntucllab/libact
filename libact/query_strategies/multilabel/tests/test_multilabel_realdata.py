@@ -19,7 +19,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from libact.base.dataset import Dataset, import_libsvm_sparse
 from libact.models import LogisticRegression, SVM
 from libact.models.multilabel import BinaryRelevance
-from libact.query_strategies.multilabel import MMC, \
+from libact.query_strategies.multilabel import MMC, AdaptiveActiveLearning, \
         MultilabelWithAuxiliaryLearner, BinaryMinimization
 from ...tests.utils import run_qs
 
@@ -86,6 +86,14 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([936, 924, 1211, 1286, 590, 429, 404, 962, 825, 30]))
+
+    def test_adaptive_active_learning(self):
+        trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
+        qs = AdaptiveActiveLearning(trn_ds,
+                base_clf=LogisticRegression(), random_state=1126, n_jobs=-1)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(qseq,
+                np.array([594, 827, 1128, 419, 1223, 484, 96, 833, 37, 367]))
 
 
 
