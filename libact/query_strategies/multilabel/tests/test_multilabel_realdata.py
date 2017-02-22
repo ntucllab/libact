@@ -90,7 +90,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
     def test_adaptive_active_learning(self):
         trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
         qs = AdaptiveActiveLearning(trn_ds,
-                base_clf=LogisticRegression(), random_state=1126, n_jobs=-1)
+                base_clf=LogisticRegression(), n_jobs=-1, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([594, 827, 1128, 419, 1223, 484, 96, 833, 37, 367]))
