@@ -106,7 +106,11 @@ class AdaptiveActiveLearning(QueryStrategy):
         pred = clf.predict(X_pool)
 
         # Separation Margin
-        separation_margin = -real.min(axis=1) + real.max(axis=1)
+        pos = np.copy(real)
+        pos[real<=0] = np.inf
+        neg = np.copy(real)
+        neg[real>=0] = -np.inf
+        separation_margin = pos.min(axis=1) - neg.max(axis=1)
         uncertainty = 1. / separation_margin
 
         # Label Cardinality Inconsistency
