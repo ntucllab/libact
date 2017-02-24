@@ -97,6 +97,17 @@ class MultilabelQUIRE(QueryStrategy):
 
         self.random_state_ = seed_random_state(random_state)
 
+
+        _, lbled_Y = zip(*dataset.get_labeled_entries())
+        n = len(X)
+        m = np.shape(lbled_Y)[1]
+        # label correlation matrix
+        R = np.corrcoef(np.array(lbled_Y).T)
+        R = np.nan_to_num(R)
+
+        self.L = lamba * (np.linalg.pinv(np.kron(R, self.K) \
+                          + lamba * np.eye(n*m)))
+
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
@@ -105,42 +116,36 @@ class MultilabelQUIRE(QueryStrategy):
 
         X = np.array(X)
         K = self.K
-        n = len(X)
+        n_instance = len(X)
         m = np.shape(lbled_Y)[1]
         lamba = self.lamba
 
         # index for labeled and unlabeled instance
-        l = np.array([i for i in range(len(Y)) if Y[i] is not None])
-        l = np.tile(l, m)
-        u = np.array([i for i in range(len(Y)) if Y[i] is None])
-        u = np.tile(u, m)
+        l_id = []
+        a_id = []
+        for i in range(n_instance * m):
+            if Y[i%n_instance] is None:
+                a_id.append(i)
+            else:
+                l_id.append(i)
 
-        # label correlation matrix
-        R = np.corrcoef(np.array(lbled_Y).T)
-        R = np.nan_to_num(R)
+        L = self.L
+        vecY = np.reshape(np.array([y for y in Y if y is not None]).T, (-1, 1))
+        detLaa = np.linalg.det(L[np.ix_(a_id, a_id)])
 
-        L = lamba * (np.linalg.pinv(np.kron(R, K) + lamba * np.eye(n*m)))
-        inv_L = np.linalg.pinv(L)
+        score = []
+        for i, s in enumerate(a_id):
+            u_id = a_id[:i] + a_id[i+1:]
+            invLuu = L[np.ix_(u_id, u_id)] \
+                     - 1./L[s, s] * np.dot(L[u_id, s], L[u_id, s].T)
+            score.append(L[s, s] - detLaa / L[s, s] \
+                         + 2 * np.abs(np.dot(L[np.ix_([s], l_id)] \
+                                      - np.dot(np.dot(L[s, u_id], invLuu),
+                                        L[np.ix_(u_id, l_id)]), vecY))[0][0])
 
-        vecY = np.reshape(np.array([y for y in Y if y is not None]), (-1, 1))
-        invLuu = np.linalg.pinv(L[np.ix_(u, u)])
+        import ipdb; ipdb.set_trace()
+        score = np.sum(np.array(score).reshape(m, -1).T, axis=1)
 
-        score = np.zeros((n, m))
-        for a in range(n):
-            for b in range(m):
-                s = b*n + a
-                U = np.dot(L[np.ix_(u, l)], vecY) + L[np.ix_(u, [s])]
-                temp1 = 2 * np.dot(L[[s], l], vecY) \
-                        - np.dot(np.dot(U.T, invLuu), U)
-                U = np.dot(L[np.ix_(u, l)], vecY)
-                temp0 = -(np.dot(np.dot(U.T, invLuu), U))
-                score[a, b] = L[s, s] \
-                              + np.dot(np.dot(vecY.T, L[np.ix_(l, l)]),
-                                       vecY)[0, 0]\
-                              + np.max((temp1[0, 0], temp0[0, 0]))
+        ask_idx = self.random_state_.choice(np.where(score == np.min(score))[0])
 
-        score = np.sum(score, axis=1)
-
-        ask_id = self.random_state_.choice(np.where(score == np.min(score))[0])
-
-        return ask_id
+        return a_id[ask_idx]
