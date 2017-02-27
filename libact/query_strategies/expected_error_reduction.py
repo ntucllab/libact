@@ -38,7 +38,7 @@ class ExpectedErrorReduction(QueryStrategy):
 
     .. code-block:: python
 
-       from libact.query_strategies import UncertaintySampling
+       from libact.query_strategies import ExpectedErrorReduction
        from libact.models import LogisticRegression
 
        qs = ExpectedErrorReduction(
