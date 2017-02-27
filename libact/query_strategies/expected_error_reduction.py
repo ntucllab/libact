@@ -58,7 +58,7 @@ class ExpectedErrorReduction(QueryStrategy):
 
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super(ExpectedErrorReduction, self).__init__(*args, **kwargs)
 
         self.model = kwargs.pop('model', None)
