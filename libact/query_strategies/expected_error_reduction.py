@@ -33,7 +33,7 @@ class ExpectedErrorReduction(QueryStrategy):
 
     Examples
     --------
-    Here is an example of declaring a UncertaintySampling query_strategy
+    Here is an example of declaring a ExpectedErrorReduction query_strategy
     object:
 
     .. code-block:: python
