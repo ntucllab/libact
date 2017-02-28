@@ -52,5 +52,17 @@ class BinaryRelevanceTestCase(unittest.TestCase):
                 lambda: br.score(Dataset(self.X_test, self.Y_test),
                                  criterion='not_exist'))
 
+    def test_binary_relevance_parallel(self):
+        br = BinaryRelevance(base_clf=LogisticRegression(random_state=1126),
+                             n_jobs=1)
+        br.train(Dataset(self.X_train, self.Y_train))
+        br_par = BinaryRelevance(
+                base_clf=LogisticRegression(random_state=1126), n_jobs=2)
+        br_par.train(Dataset(self.X_train, self.Y_train))
+
+        assert_array_equal(br.predict(self.X_test).astype(int),
+                           br_par.predict(self.X_test).astype(int))
+
+
 if __name__ == '__main__':
     unittest.main()

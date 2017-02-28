@@ -4,6 +4,15 @@ libact.query_strategies.multilabel package
 Submodules
 ----------
 
+libact.query_strategies.multilabel.adaptive_active_learning module
+-------------------------------------------------------------------------------
+
+.. automodule:: libact.query_strategies.multilabel.adaptive_active_learning
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 libact.query_strategies.multilabel.binary_minimization module
 -------------------------------------------------------------------------------
 
