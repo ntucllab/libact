@@ -6,7 +6,7 @@ import numpy as np
 
 from libact.base.interfaces import QueryStrategy, ProbabilisticModel
 from libact.base.dataset import Dataset
-from libact.utils import inherit_docstring_from
+from libact.utils import inherit_docstring_from, seed_random_state
 
 class EER(QueryStrategy):
     """Expected Error Reduction(EER)
@@ -20,6 +20,11 @@ class EER(QueryStrategy):
 
     loss: {'01', 'log'}, optional (default='log')
         The loss function expected to reduce
+
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+        If int or None, random_state is passed as parameter to generate
+        np.random.RandomState instance. if np.random.RandomState instance,
+        random_state is the random number generate.
 
     Attributes
     ----------
@@ -48,7 +53,7 @@ class EER(QueryStrategy):
            Wisconsin, Madison 52.55-66 (2010): 11.
     """
 
-    def __init__(self, dataset, model=None, loss='log'):
+    def __init__(self, dataset, model=None, loss='log', random_state=None):
         super(EER, self).__init__(dataset)
 
         self.model = model
@@ -61,11 +66,13 @@ class EER(QueryStrategy):
                 "model has to be a ProbabilisticModel"
             )
         self.loss = loss
-        if self.method not in ['01', 'log']:
+        if self.loss not in ['01', 'log']:
             raise TypeError(
                 "supported methods are ['01', 'log'], the given one "
                 "is: " + self.method
             )
+
+        self.random_state_ = seed_random_state(random_state)
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
@@ -76,24 +83,24 @@ class EER(QueryStrategy):
         classes = np.unique(y)
         n_classes = len(classes)
 
-        proba = self.model.predict_proba(X_pool)
         self.model.train(dataset)
+        proba = self.model.predict_proba(X_pool)
 
         scores = []
         for i, x in enumerate(X_pool):
             score = []
             for yi in range(n_classes):
                 m = copy.deepcopy(self.model)
-                m.train(Dataset(np.vstack((X, x)), np.concatenate(y, yi)))
+                m.train(Dataset(np.vstack((X, [x])), y + (yi, )))
                 p = m.predict_proba(X_pool)
 
                 if self.loss == '01':  # 0/1 loss
                     score.append(proba[i, yi] * np.sum(1-np.max(p, axis=1)))
-                else self.loss == 'log': # log loss
+                elif self.loss == 'log': # log loss
                     score.append(proba[i, yi] * -np.sum(p * np.log(p)))
             scores.append(np.sum(score))
 
         choices = np.where(np.array(scores) == np.min(scores))[0]
         ask_idx = self.random_state_.choice(choices)
 
-        return unlabeled_entry_ids[ask_id]
+        return unlabeled_entry_ids[ask_idx]
