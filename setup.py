@@ -9,6 +9,9 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
     extensions = []
     cmdclasses = {}
+    setup_requires = []
+    install_requires = []
+    tests_require = []
 else:
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
@@ -45,6 +48,19 @@ else:
         ),
     ])
     cmdclasses = {'build_ext': build_ext}
+    setup_requires = [
+    ]
+    install_requires = [
+        'numpy',
+        'scipy',
+        'scikit-learn',
+        'Cython',
+        'joblib',
+        'six',
+    ]
+    tests_require = [
+        'coverage',
+    ]
 
 
 setup(
@@ -57,6 +73,9 @@ setup(
         'b01902040@csie.ntu.edu.tw, r00942129@ntu.edu.tw, htlin@csie.ntu.edu.tw',
     url='https://github.com/ntucllab/libact',
     cmdclass=cmdclasses,
+    setup_requires=setup_requires,
+    install_requires=install_requires,
+    tests_require=tests_require,
     classifiers=[
         "Topic :: Scientific/Engineering",
         "Programming Language :: Python :: 2.7",
