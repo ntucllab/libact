@@ -135,6 +135,9 @@ class HintSVM(QueryStrategy):
         unlabeled_entry_ids, unlabeled_pool = zip(
             *dataset.get_unlabeled_entries())
         labeled_pool, y = zip(*dataset.get_labeled_entries())
+        if len(np.unique(y)) > 2:
+            raise ValueError("HintSVM query strategy support binary class "
+                "active learning only. Found %s classes" % len(np.unique(y)))
 
         hint_pool_idx = self.random_state_.choice(
             len(unlabeled_pool), int(len(unlabeled_pool) * self.p))
