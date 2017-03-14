@@ -73,13 +73,6 @@ class UncertaintySamplingTestCase(unittest.TestCase):
             qs = UncertaintySampling(
                     trn_ds, method='not_exist', model=LogisticRegression())
 
-    def test_quire(self):
-        trn_ds = init_toyexample(self.X, self.y)
-        qs = QUIRE(trn_ds)
-        model = LogisticRegression()
-        qseq = run_qs(trn_ds, self.lbr, model, qs, self.quota)
-        assert_array_equal(qseq, np.array([6, 7, 9, 8]))
-
 
 if __name__ == '__main__':
     unittest.main()
