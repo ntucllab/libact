@@ -97,7 +97,7 @@ class UncertaintySampling(QueryStrategy):
 
     def make_query(self, return_score=False):
         """Return the index of the sample to be queried and labeled and
-        decision score of each sample. Read-only.
+        selection score of each sample. Read-only.
 
         No modification to the internal states.
 
@@ -107,7 +107,7 @@ class UncertaintySampling(QueryStrategy):
             The index of the next unlabeled sample to be queried and labeled.
 
         score : list of (index, score) tuple
-            Decision score of unlabled entries
+            Selection score of unlabled entries, the larger the better.
 
         """
         dataset = self.dataset
@@ -121,19 +121,18 @@ class UncertaintySampling(QueryStrategy):
             dvalue = self.model.predict_real(X_pool)
 
         if self.method == 'lc':  # least confident
-            score = np.max(dvalue, axis=1)
-            ask_id = np.argmin(score)
+            score = -np.max(dvalue, axis=1)
 
         elif self.method == 'sm':  # smallest margin
             if np.shape(dvalue)[1] > 2:
                 # Find 2 largest decision values
                 dvalue = -(np.partition(-dvalue, 2, axis=1)[:, :2])
-            score = np.abs(dvalue[:, 0] - dvalue[:, 1])
-            ask_id = np.argmin(score)
+            score = -np.abs(dvalue[:, 0] - dvalue[:, 1])
 
         elif self.method == 'entropy':
             score = np.sum(-dvalue * np.log(dvalue), axis=1)
-            ask_id = np.argmax(score)
+
+        ask_id = np.argmax(score)
 
         if return_score:
             return unlabeled_entry_ids[ask_id], \
