@@ -95,8 +95,21 @@ class UncertaintySampling(QueryStrategy):
                 "method 'entropy' requires model to be a ProbabilisticModel"
             )
 
-    @inherit_docstring_from(QueryStrategy)
-    def make_query(self):
+    def make_query(self, return_score=False):
+        """Return the index of the sample to be queried and labeled and
+        decision score of each sample. Read-only.
+
+        No modification to the internal states.
+
+        Returns
+        -------
+        ask_id : int
+            The index of the next unlabeled sample to be queried and labeled.
+
+        score : list of (index, score) tuple
+            Decision score of unlabled entries
+
+        """
         dataset = self.dataset
         self.model.train(dataset)
 
@@ -108,17 +121,22 @@ class UncertaintySampling(QueryStrategy):
             dvalue = self.model.predict_real(X_pool)
 
         if self.method == 'lc':  # least confident
-            ask_id = np.argmin(np.max(dvalue, axis=1))
+            score = np.max(dvalue, axis=1)
+            ask_id = np.argmin(score)
 
         elif self.method == 'sm':  # smallest margin
             if np.shape(dvalue)[1] > 2:
                 # Find 2 largest decision values
                 dvalue = -(np.partition(-dvalue, 2, axis=1)[:, :2])
-            margin = np.abs(dvalue[:, 0] - dvalue[:, 1])
-            ask_id = np.argmin(margin)
+            score = np.abs(dvalue[:, 0] - dvalue[:, 1])
+            ask_id = np.argmin(score)
 
         elif self.method == 'entropy':
-            entropy = np.sum(-dvalue * np.log(dvalue), axis=1)
-            ask_id = np.argmax(entropy)
+            score = np.sum(-dvalue * np.log(dvalue), axis=1)
+            ask_id = np.argmax(score)
 
-        return unlabeled_entry_ids[ask_id]
+        if return_score:
+            return unlabeled_entry_ids[ask_id], \
+                   list(zip(unlabeled_entry_ids, score))
+        else:
+            return unlabeled_entry_ids[ask_id]

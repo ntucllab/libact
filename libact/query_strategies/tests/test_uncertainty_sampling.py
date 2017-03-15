@@ -17,7 +17,7 @@ def init_toyexample(X, y):
 def run_qs(trn_ds, lbr, model, qs, quota):
     qseq = []
     for _ in range(quota):
-        ask_id = qs.make_query()
+        ask_id, score = qs.make_query(return_score=True)
         X, _ = zip(*trn_ds.data)
         lbl = lbr.label(X[ask_id])
         trn_ds.update(ask_id, lbl)
