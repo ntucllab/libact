@@ -9,7 +9,10 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cross_validation import train_test_split
+try:
+    from sklearn.model_selection import train_test_split
+except ImportError:
+    from sklearn.cross_validation import train_test_split
 
 # libact classes
 from libact.base.dataset import Dataset, import_libsvm_sparse
