@@ -18,7 +18,7 @@ class SklearnAdapter(Model):
     .. code-block:: python
 
        from sklearn import datasets
-       from sklearn.cross_validation import train_test_split
+       from sklearn.model_selection import train_test_split
        from sklearn.linear_model import LogisticRegression
 
        from libact.base.dataset import Dataset
@@ -66,7 +66,7 @@ class SklearnProbaAdapter(ProbabilisticModel):
     .. code-block:: python
 
        from sklearn import datasets
-       from sklearn.cross_validation import train_test_split
+       from sklearn.model_selection import train_test_split
        from sklearn.linear_model import LogisticRegression
 
        from libact.base.dataset import Dataset

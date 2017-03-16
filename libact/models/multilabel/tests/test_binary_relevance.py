@@ -5,7 +5,10 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 from sklearn import datasets
-from sklearn.model_selection import train_test_split
+try:
+    from sklearn.model_selection import train_test_split
+except ImportError:
+    from sklearn.cross_validation import train_test_split
 import sklearn.linear_model
 
 from libact.base.dataset import Dataset
