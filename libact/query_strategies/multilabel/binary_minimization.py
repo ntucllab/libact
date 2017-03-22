@@ -30,14 +30,14 @@ class BinaryMinimization(QueryStrategy):
 
     Examples
     --------
-    Here is an example of declaring a MMC query_strategy object:
+    Here is an example of declaring a BinaryMinimization query_strategy object:
 
     .. code-block:: python
 
-       from libact.query_strategies.multilabel import MMC
+       from libact.query_strategies.multilabel import BinaryMinimization
        from sklearn.linear_model import LogisticRegression
 
-       qs = MMC(
+       qs = BinaryMinimization(
                 dataset, # Dataset object
                 br_base=LogisticRegression()
             )
