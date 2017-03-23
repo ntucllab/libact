@@ -252,7 +252,7 @@ class HierarchicalSampling(QueryStrategy):
         else:
             prunings = list(self.prunings)
             sample_weight = self.size[prunings] - self.total[prunings]
-        sample_weight = np.array(sample_weight) / sum(sample_weight)
+        sample_weight = np.array(sample_weight, dtype=float) / sum(sample_weight)
         return self.random_state_.choice(list(self.prunings), p=sample_weight)
 
     def _sample_node(self, node):
