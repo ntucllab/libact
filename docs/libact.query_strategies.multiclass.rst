@@ -20,10 +20,10 @@ libact.query_strategies.uncertainty_sampling module
     :undoc-members:
     :show-inheritance:
 
-libact.query_strategies.expected_error_reduction module
--------------------------------------------------------
+libact.query_strategies.multiclass.expected_error_reduction module
+------------------------------------------------------------------
 
-.. automodule:: libact.query_strategies.expected_error_reduction
+.. automodule:: libact.query_strategies.multiclass.expected_error_reduction
     :members:
     :undoc-members:
     :show-inheritance:
