@@ -33,6 +33,10 @@ class HierarchicalSampling(QueryStrategy):
         True (active selecting): sample weight of a pruning is its weighted
         error bound.
 
+    subsample_qs: {:py:class:`libact.base.interfaces.query_strategies`, None}, optional (default=None)
+        Subsample query strategy used to sample a node in the selected pruning.
+        RandomSampling is used if None.
+
     random_state : {int, np.random.RandomState instance, None}, optional (default=None)
         If int or None, random_state is passed as parameter to generate
         np.random.RandomState instance. if np.random.RandomState instance,
@@ -96,11 +100,17 @@ class HierarchicalSampling(QueryStrategy):
 
     .. code-block:: python
 
-       from libact.query_strategies import HierarchicalSampling
+       from libact.query_strategies import UncertaintySampling
+       from libact.query_strategies.multiclass import HierarchicalSampling
+
+       sub_qs = UncertaintySampling(
+           dataset, method='sm', model=SVM(decision_function_shape='ovr'))
 
        qs = HierarchicalSampling(
                 dataset, # Dataset object
-                dataset.get_num_of_labels()
+                dataset.get_num_of_labels(),
+                active_selecting=True,
+                subsample_qs=sub_qs
             )
 
 
@@ -111,12 +121,20 @@ class HierarchicalSampling(QueryStrategy):
            learning." ICML 2008.
     """
 
-    def __init__(self, dataset, classes, active_selecting=True, random_state=None):
+    def __init__(self, dataset, classes, active_selecting=True,
+            subsample_qs=None, random_state=None):
         super(HierarchicalSampling, self).__init__(dataset)
         X = np.array(next(zip(*self.dataset.get_entries())))
         cluster = AgglomerativeClustering()
         cluster.fit(X)
         childrens = cluster.children_
+
+        if subsample_qs is not None:
+            if not isinstance(subsample_qs, QueryStrategy):
+                raise TypeError("subsample_qs has to be a QueryStrategy")
+            self.sub_qs = subsample_qs
+        else:
+            self.sub_qs = None
 
         self.active_selecting = active_selecting
         self.random_state_ = seed_random_state(random_state)
@@ -177,7 +195,13 @@ class HierarchicalSampling(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         pruning = self._select_pruning()
-        ask_id = self._sample_node(pruning)
+        if self.sub_qs is None:
+            ask_id = self._sample_node(pruning)
+        else:
+            _, scores = self.sub_qs.make_query(return_score=True)
+            leaves = set(self._find_leaves(pruning))
+            leaf_scores = [(score, node) for node, score in scores if node in leaves]
+            ask_id = max(leaf_scores)[1]
         return ask_id
 
     def report_entry_label(self, entry_id):

@@ -7,6 +7,8 @@ from sklearn import datasets
 from sklearn.utils import shuffle
 
 from libact.base.dataset import Dataset
+from libact.models import SVM
+from libact.query_strategies import UncertaintySampling
 from libact.query_strategies.multiclass import HierarchicalSampling as HS
 
 
@@ -42,8 +44,9 @@ class HierarchicalSamplingTestCase(unittest.TestCase):
         qseq = run_qs(ds, qs, self.y, len(self.y)-10)
         self.assertEqual(qseq[-1], 1.)
 
-    # def test_unexpected_label(self):
-        # ds = Dataset(self.X, self.y[:10] + [None] * (len(self.y) - 10))
-        # qs = HS(ds, self.classes[:1], active_selecting=True, random_state=1126)
-        # with self.assertRaises(ValueError):
-            # qseq = run_qs(ds, qs, self.y, len(self.y)-10)
+    def test_hs_subsampling(self):
+        ds = Dataset(self.X, self.y[:10] + [None] * (len(self.y) - 10))
+        sub_qs = UncertaintySampling(ds, model=SVM(decision_function_shape='ovr'))
+        qs = HS(ds, self.classes, subsample_qs=sub_qs, random_state=1126)
+        qseq = run_qs(ds, qs, self.y, len(self.y)-10)
+        self.assertEqual(qseq[-1], 1.)
