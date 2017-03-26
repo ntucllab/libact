@@ -28,6 +28,9 @@ class BinaryRelevance(MultilabelModel):
 
     References
     ----------
+    .. [1] Tsoumakas, Grigorios, Ioannis Katakis, and Ioannis Vlahavas. "Mining
+           multi-label data." Data mining and knowledge discovery handbook.
+           Springer US, 2009. 667-685.
     """
     def __init__(self, base_clf, n_jobs=1):
         self.base_clf = copy.copy(base_clf)
