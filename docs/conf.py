@@ -25,9 +25,11 @@ MOCK_MODULES = ['scipy', 'scipy.optimize', 'scipy.stats',
                 'sklearn.linear_model', 'sklearn.svm', 'sklearn.metrics',
                 'sklearn.metrics.pairwise', 'sklearn.cluster',
                 'sklearn.multiclass', 'sklearn.neighbors',
+                'joblib',
                 # c extensions
                 'libact.query_strategies._hintsvm',
-                'libact.query_strategies._variance_reduction']
+                'libact.query_strategies._variance_reduction',
+                'libact.query_strategies.multiclass.mdsp']
 sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
