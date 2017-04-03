@@ -36,7 +36,7 @@ class UncertaintySampling(QueryStrategy):
 
     Attributes
     ----------
-    model: :py:class:`libact.base.interfaces.ContinuousModel` object instance
+    model: :py:class:`libact.base.interfaces.ContinuousModel` or :py:class:`libact.base.interfaces.ProbabilisticModel` object instance
         The model trained in last query.
 
 

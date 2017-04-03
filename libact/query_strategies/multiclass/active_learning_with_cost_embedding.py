@@ -45,6 +45,18 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
 
     Examples
     --------
+    Here is an example of declaring a ActiveLearningWithCostEmbedding
+    query_strategy object:
+
+    .. code-block:: python
+
+       import numpy as np
+       from sklearn.svm import SVR
+
+       from libact.query_strategies.multiclass import ActiveLearningWithCostEmbedding as ALCE
+
+       cost_matrix = 2000. * np.random.rand(n_classes, n_classes)
+       qs3 = ALCE(dataset, cost_matrix, SVR())
 
     References
     ----------
