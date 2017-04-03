@@ -4,6 +4,7 @@ This module contains a class that implements Hierarchical Sampling for Active
 Learning (HS).
 
 """
+from __future__ import division
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 
@@ -182,7 +183,6 @@ class HierarchicalSampling(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
         if label not in self.class_id:
-            print(type(ValueError()))
             raise ValueError(
                     'Unknown class of entry %d: %s, expected: %s' %
                     (entry_id, label, list(self.class_id.keys()))
@@ -276,7 +276,7 @@ class HierarchicalSampling(QueryStrategy):
         else:
             prunings = list(self.prunings)
             sample_weight = self.size[prunings] - self.total[prunings]
-        sample_weight = np.array(sample_weight, dtype=float) / sum(sample_weight)
+        sample_weight = sample_weight / sum(sample_weight)
         return self.random_state_.choice(list(self.prunings), p=sample_weight)
 
     def _sample_node(self, node):
