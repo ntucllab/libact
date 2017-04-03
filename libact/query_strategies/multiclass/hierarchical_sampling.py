@@ -174,7 +174,7 @@ class HierarchicalSampling(QueryStrategy):
         self.split = np.zeros(self.m, dtype=bool)
         self.cost = self.size.copy()
 
-        self.prunings = set([self.m-1])
+        self.prunings = [self.m-1]
 
         for i, entry in enumerate(self.dataset.data):
             if entry[1] != None:
@@ -274,10 +274,9 @@ class HierarchicalSampling(QueryStrategy):
                     w = self.size[pruning] - self.lower_bound[pruning][best_label]
                 sample_weight.append(w)
         else:
-            prunings = list(self.prunings)
-            sample_weight = self.size[prunings] - self.total[prunings]
+            sample_weight = self.size[self.prunings] - self.total[self.prunings]
         sample_weight = sample_weight / sum(sample_weight)
-        return self.random_state_.choice(list(self.prunings), p=sample_weight)
+        return self.random_state_.choice(self.prunings, p=sample_weight)
 
     def _sample_node(self, node):
         num_unseen_leaves = self.size[node] - self.total[node]
@@ -346,7 +345,7 @@ class HierarchicalSampling(QueryStrategy):
                 node_set.append(self.left_child[node])
                 node_set.append(self.right_child[node])
             else:
-                self.prunings.add(node)
+                self.prunings.append(node)
 
     def _get_delta(self, frac, node):
         fs_corr = 1.0 - self.total[node] / self.size[node]
