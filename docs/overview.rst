@@ -51,7 +51,7 @@ Currently supported algorithms includes the following:
 +--------------------------------------------------+---------------------------------------+---------------------------------------------------+
 | Querying Informative and Representative Examples | Expected Error Reduction (log loss)   |                                                   |
 +--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Random Sampling                                  |                                       |                                                   |
+| Random Sampling                                  | Hierarchical Sampling                 |                                                   |
 +--------------------------------------------------+---------------------------------------+---------------------------------------------------+
 
 Note that Uncertainty Sampling can handle multi-class setting though it is not
