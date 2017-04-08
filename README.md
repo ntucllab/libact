@@ -1,6 +1,6 @@
 # libact: Pool-based Active Learning in Python
 
-authors: Yu-An Chung, Shao-Chuan Lee, Yao-Yuan Yang, Tung-En Wu, [Hsuan-Tien Lin](http://www.csie.ntu.edu.tw/~htlin)
+authors: Yao-Yuan Yang, Shao-Chuan Lee, Yu-An Chung, Tung-En Wu, Si-An Chen, [Hsuan-Tien Lin](http://www.csie.ntu.edu.tw/~htlin)
 
 [![Build Status](https://travis-ci.org/ntucllab/libact.svg)](https://travis-ci.org/ntucllab/libact)
 [![Documentation Status](https://readthedocs.org/projects/libact/badge/?version=latest)](http://libact.readthedocs.org/en/latest/?badge=latest)
@@ -20,7 +20,7 @@ Comments and questions on the package is welcomed at `libact-users@googlegroups.
 
 ```
 @TechReport{libact,
-  author =   {Yao-Yuan Yang and Yu-An Chung and Shao-Chuan Lee and Tung-En Wu and Hsuan-Tien Lin},
+  author =   {Yao-Yuan Yang and Shao-Chuan Lee and Yu-An Chung and Tung-En Wu and Si-An Chen and Hsuan-Tien Lin},
   title =    {libact: Pool-based Active Learning in Python},
   url = {https://github.com/ntucllab/libact},
   year = {2015}
