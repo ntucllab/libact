@@ -15,18 +15,6 @@ real-world users. The package not only implements several popular active learnin
 meta-algorithm that assists the users to automatically select the best strategy
 on the fly. Furthermore, the package provides a unified interface for implementing more strategies, models and application-specific labelers. The package is open-source along with issue trackers on github, and can be easily installed from Python Package Index repository.
 
-Documentation for the latest release is hosted [here](http://libact.readthedocs.org/en/latest/).
-Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. If you find this package useful, please cite the original works (see Reference of each strategy) as well as (temporarily)
-
-```
-@TechReport{libact,
-  author =   {Yao-Yuan Yang and Shao-Chuan Lee and Yu-An Chung and Tung-En Wu and Si-An Chen and Hsuan-Tien Lin},
-  title =    {libact: Pool-based Active Learning in Python},
-  url = {https://github.com/ntucllab/libact},
-  year = {2015}
-}
-```
-
 # Basic Dependencies
 
 * Python 2.7, 3.3, 3.4, 3.5
@@ -106,8 +94,8 @@ Available examples:
 
 # Documentation
 
-The latest version of the [documentation](http://libact.readthedocs.org/en/latest/) is available online. All contributions to the documentation are greatly appreciated!
-
+[Documentation for the latest release is available online](http://libact.readthedocs.org/en/latest/).
+Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. All contributions to the documentation are greatly appreciated!
 
 # Running tests
 
@@ -129,6 +117,20 @@ To measure the test code coverage, install coverage through ```pip install cover
 coverage run --source libact --omit */tests/* setup.py test
 coverage report
 ```
+
+# Citing
+If you find this package useful, please cite the original works (see Reference of each strategy) as well as the following (temporarily)
+
+```
+@TechReport{libact,
+  author =   {Yao-Yuan Yang and Shao-Chuan Lee and Yu-An Chung and Tung-En Wu and Si-An Chen and Hsuan-Tien Lin},
+  title =    {libact: Pool-based Active Learning in Python},
+  url = {https://github.com/ntucllab/libact},
+  year = {2015}
+}
+```
+
+
 
 # Acknowledgments
 
