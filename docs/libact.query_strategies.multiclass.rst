@@ -28,6 +28,13 @@ libact.query_strategies.multiclass.expected_error_reduction module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.multiclass.hierarchical_sampling module
+-------------------------------------------------------------------------------
+
+.. automodule:: libact.query_strategies.multiclass.hierarchical_sampling
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------
