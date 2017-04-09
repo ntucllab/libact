@@ -104,6 +104,11 @@ Available examples:
   - [alce_plot](examples/alce_plot.py): This example compares the performance of
     algorithms under cost-sensitive multi-class setting.
 
+# Documentation
+
+The latest version of the [documentation](http://libact.readthedocs.org/en/latest/) is available online. All contributions to the documentation are greatly appreciated!
+
+
 # Running tests
 
 To run the test suite:
