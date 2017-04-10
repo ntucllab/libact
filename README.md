@@ -15,6 +15,11 @@ real-world users. The package not only implements several popular active learnin
 meta-algorithm that assists the users to automatically select the best strategy
 on the fly. Furthermore, the package provides a unified interface for implementing more strategies, models and application-specific labelers. The package is open-source along with issue trackers on github, and can be easily installed from Python Package Index repository.
 
+# Documentation
+
+[Documentation for the latest release is available online](http://libact.readthedocs.org/en/latest/).
+Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. All contributions to the documentation are greatly appreciated!
+
 # Basic Dependencies
 
 * Python 2.7, 3.3, 3.4, 3.5
@@ -91,11 +96,6 @@ Available examples:
     algorithms under multilabel setting.
   - [alce_plot](examples/alce_plot.py): This example compares the performance of
     algorithms under cost-sensitive multi-class setting.
-
-# Documentation
-
-[Documentation for the latest release is available online](http://libact.readthedocs.org/en/latest/).
-Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. All contributions to the documentation are greatly appreciated!
 
 # Running tests
 
