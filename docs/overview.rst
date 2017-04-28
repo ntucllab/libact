@@ -7,18 +7,18 @@ on the fly. Furthermore, the package provides a unified interface for implementi
 
 
 Currently `libact` supports pool-based active learning problems, which consist
-of a set of labeled examples, a set of unlabeled examples, a supervised learning model, and an labeling oracle. In each iteration of active learning, the algorithm (also called a query strategy) queries the oracle to label an unlabeled example. The model can then be improved by the newly-labeled example.
+of a set of labeled examples, a set of unlabeled examples, a supervised learning model, and a labeling oracle. In each iteration of active learning, the algorithm (also called a query strategy) queries the oracle to label an unlabeled example. The model can then be improved by the newly-labeled example.
 The goal is to use as few queries as possible for the model to achieve decent learning performance. Based on the components above,
-we designed the following four interfaces for `libact`.
+we have designed the following four interfaces for `libact`.
 
 Dataset
 -------
 A :py:class:`libact.base.dataset.Dataset` object stores the labeled set
-and unlabeled set. Each unlabeled or labeled example within a Dataset object is assigned with a unique identifier. After retrieving the label for an unlabeled example 
+and the unlabeled set. Each unlabeled or labeled example within a Dataset object is assigned with a unique identifier. After retrieving the label for an unlabeled example 
 from the Labeler (the oracle to be discussed below), the update method is used to 
 assign the label to the example, referenced by its identifier.
 
-Internally, Dataset also maintains a callback queue. The method on_update can be
+Internally, Dataset also maintains a callback queue. The on_update method can be
 used to register callback functions, which will be called after each update to
 the Dataset. The callback functions can be used for active learning algorithms that need to update their internal states after querying the oracle.
 
@@ -29,7 +29,7 @@ the given active learning problem. Its label method takes in an unlabeled exampl
 
 QueryStrategy
 -------------
-A :py:class:`libact.base.interfaces.QueryStrategy` object represents an implementation active learning algorithm.
+A :py:class:`libact.base.interfaces.QueryStrategy` object implements an active learning algorithm.
 Each QueryStrategy object is associated with a Dataset object. When a QueryStrategy object is initialized, it will automatically register its update
 method as a callback function to the associated Dataset to be informed of any Dataset updates. The make_query method of a QueryStrategy object returns
 the identifier of an unlabeled example that the object (active learning algorithm) wants to query.
