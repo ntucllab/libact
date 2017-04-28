@@ -57,8 +57,7 @@ Currently, the following active learning algorithms are supported:
 
 Note that because of legacy reasons, Uncertainty Sampling can handle multi-class setting though it is not under the multiclass submodule.
 
-Additionally, we supported the `Active Learning By Learning` meta algorithm for
-binary class active learning algorithm selection.
+Additionally, we supported the `Active Learning By Learning` meta-algorithm (active_learning_by_learning.py) for selecting active learning algorithms for binary classification on the fly.
 
 Model
 -----
