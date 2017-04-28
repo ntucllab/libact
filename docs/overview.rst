@@ -34,25 +34,7 @@ Each QueryStrategy object is associated with a Dataset object. When a QueryStrat
 method as a callback function to the associated Dataset to be informed of any Dataset updates. The make_query method of a QueryStrategy object returns
 the identifier of an unlabeled example that the object (active learning algorithm) wants to query.
 
-Currently supported algorithms includes the following:
-
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Binary-class                                     | Multi-class                           | Multi-label                                       |
-+==================================================+=======================================+===================================================+
-| Density Weighted Uncertainty Sampling            | Uncertainty Sampling (entropy)        | Binary Minimization                               |
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Query By Committee (vote entropy)                | Uncertainty Sampling (largest margin) | Maximal Loss Reduction with Maximal Confidence    |
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Query By Committee (KL-divergence)               | Uncertainty Sampling (least confident)| Multi-label Active Learning With Auxiliary Learner|
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Variance Reduction                               | Active Learning With Cost Embedding   | Adaptive Active Learning                          |
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| HintSVM                                          | Expected Error Reduction (0/1 loss)   |                                                   |
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Querying Informative and Representative Examples | Expected Error Reduction (log loss)   |                                                   |
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
-| Random Sampling                                  | Hierarchical Sampling                 |                                                   |
-+--------------------------------------------------+---------------------------------------+---------------------------------------------------+
+Currently, the following active learning algorithms are supported:
 
 - Binary Classification
   - Density Weighted Uncertainty Sampling (density_weighted_uncertainty_sampling.py)
@@ -73,7 +55,6 @@ Currently supported algorithms includes the following:
   - Maximal Loss Reduction with Maximal Confidence (multilabel/maximum_margin_reduction.py)
   - Multi-label Active Learning With Auxiliary Learner (multilabel/multilabel_with_auxiliary_learner.py)
 
-  - 
 Note that because of legacy reasons, Uncertainty Sampling can handle multi-class setting though it is not under the multiclass submodule.
 
 Additionally, we supported the `Active Learning By Learning` meta algorithm for
