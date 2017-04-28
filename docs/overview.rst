@@ -54,6 +54,15 @@ Currently supported algorithms includes the following:
 | Random Sampling                                  | Hierarchical Sampling                 |                                                   |
 +--------------------------------------------------+---------------------------------------+---------------------------------------------------+
 
+- Binary Classification
+  - Density Weighted Uncertainty Sampling (density_weighted_uncertainty_sampling.py)
+  - Hinted Sampling with SVM (hintsvm.py)
+  - Query By Committee (query_by_committee.py)
+  - Querying Informative and Representative Examples (quire.py)  
+  - Random Sampling (random_sampling.py)
+  - Uncertainty Sampling (uncertainty_sampling.py)
+  - Variance Reduction (variance_reduction.py)
+    
 Note that Uncertainty Sampling can handle multi-class setting though it is not
 under the multiclass submodule.
 
