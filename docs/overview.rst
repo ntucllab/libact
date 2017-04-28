@@ -62,9 +62,13 @@ Currently supported algorithms includes the following:
   - Random Sampling (random_sampling.py)
   - Uncertainty Sampling (uncertainty_sampling.py)
   - Variance Reduction (variance_reduction.py)
+- Multi-class Classification
+  - Active Learning with Cost Embedding (multiclass/active_learning_with_cost_embedding.py)
+  - Hierarchical Sampling (multiclass/hierarchical_sampling.py)
+  - Expected Error Reduction (multiclass/expected_error_reduction.py)
+  - Uncertainty Sampling (uncertainty_sampling.py)    
     
-Note that Uncertainty Sampling can handle multi-class setting though it is not
-under the multiclass submodule.
+Note that because of legacy reasons, Uncertainty Sampling can handle multi-class setting though it is not under the multiclass submodule.
 
 Additionally, we supported the `Active Learning By Learning` meta algorithm for
 binary class active learning algorithm selection.
