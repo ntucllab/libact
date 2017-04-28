@@ -66,8 +66,14 @@ Currently supported algorithms includes the following:
   - Active Learning with Cost Embedding (multiclass/active_learning_with_cost_embedding.py)
   - Hierarchical Sampling (multiclass/hierarchical_sampling.py)
   - Expected Error Reduction (multiclass/expected_error_reduction.py)
-  - Uncertainty Sampling (uncertainty_sampling.py)    
-    
+  - Uncertainty Sampling (uncertainty_sampling.py)
+- Multi-label Classification
+  - Adaptive Active Learning (multilabel/adaptive_active_learning.py)
+  - Binary Minimization (multilabel/binary_minimization.py)
+  - Maximal Loss Reduction with Maximal Confidence (multilabel/maximum_margin_reduction.py)
+  - Multi-label Active Learning With Auxiliary Learner (multilabel/multilabel_with_auxiliary_learner.py)
+
+  - 
 Note that because of legacy reasons, Uncertainty Sampling can handle multi-class setting though it is not under the multiclass submodule.
 
 Additionally, we supported the `Active Learning By Learning` meta algorithm for
