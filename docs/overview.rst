@@ -37,19 +37,24 @@ the identifier of an unlabeled example that the object (active learning algorith
 Currently, the following active learning algorithms are supported:
 
 - Binary Classification
+
   - Density Weighted Uncertainty Sampling (density_weighted_uncertainty_sampling.py)
   - Hinted Sampling with SVM (hintsvm.py)
   - Query By Committee (query_by_committee.py)
-  - Querying Informative and Representative Examples (quire.py)  
+  - Querying Informative and Representative Examples (quire.py)
   - Random Sampling (random_sampling.py)
   - Uncertainty Sampling (uncertainty_sampling.py)
   - Variance Reduction (variance_reduction.py)
+
 - Multi-class Classification
+
   - Active Learning with Cost Embedding (multiclass/active_learning_with_cost_embedding.py)
   - Hierarchical Sampling (multiclass/hierarchical_sampling.py)
   - Expected Error Reduction (multiclass/expected_error_reduction.py)
   - Uncertainty Sampling (uncertainty_sampling.py)
+
 - Multi-label Classification
+
   - Adaptive Active Learning (multilabel/adaptive_active_learning.py)
   - Binary Minimization (multilabel/binary_minimization.py)
   - Maximal Loss Reduction with Maximal Confidence (multilabel/maximum_margin_reduction.py)
@@ -86,4 +91,4 @@ Here is an example usage of `libact`:
        query_id = query_strategy.make_query() # let the specified QueryStrategy suggest a data to query
        lbl = labeler.label(dataset.data[query_id][0]) # query the label of the example at query_id
        dataset.update(query_id, lbl) # update the dataset with newly-labeled example
-       model.train(dataset) #train model with newly-updated Dataset
+       model.train(dataset) # train model with newly-updated Dataset
