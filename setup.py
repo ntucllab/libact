@@ -65,7 +65,7 @@ else:
 
 setup(
     name='libact',
-    version='0.1.3b1',
+    version='0.1.3',
     description='Pool-based active learning in Python',
     long_description=open('README.md').read(),
     author='Y.-Y. Yang, S.-C. Lee, Y.-A. Chung, T.-E. Wu, H.-T. Lin',
