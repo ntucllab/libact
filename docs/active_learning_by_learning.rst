@@ -8,27 +8,13 @@ ALBL considers multiple existing active learning algorithms and adaptively
 *learns* a querying strategy based on the performance of these algorithms.
 
 ALBL's design is based on a well-known adaptive learning problem called
-multi-armed bandit problem. In bandit problem, it is given :math:`K` bandit
-machines and a budget of :math:`T` iterations. Each time a bandit machine is
-pulled, the machine returns with a reward. Multi-armed bandit problem wants to
-balance between exploring each bandit machine and exploit the information gotten
-from previous exploration to receive good reward. It wants to maximize the total
-rewards earned through a series of decisions.
+multi-armed bandit. In the problem, :math:`K` bandit
+machines and a budget of :math:`T` iterations are given.
+Each time a bandit machine is
+pulled, the machine returns a reward that reflects the goodness of the machine. The multi-armed bandit problem aims at
+balancing between exploring each bandit machine and exploit the observed information in order to maximize the cumulative rewards after a seris of pulling decisions. The details can be found in the paper
 
-In ALBL, it utilizes `Exp4.P` contextual bandit algorithm. Each bandit machine
-corresponds to each sub-active learning algorithm. ALBL wants to balance between
-exploring a good active learning algorithm for this problem and exploiting
-the active learning algorithm that already performs well to earn a good reward.
-The reward function that ALBL adopt is the Importance-Weighted-Accuracy (IW-ACC)
-
-.. math::
-
-    IW-ACC(f, τ) = \frac{1}{n\tau} \sum^{τ}_{t=1} W_t[y_{i_t} = f(x_{i_t})]
-
-:math:`f` is the current model learned from the labeled samples, :math:`τ` is
-the number of queries ALBL have asked, :math:`n` is number of samples (labeled +
-unlabeled), :math:`i_t` is the index of the sample which is queried in turn
-:math:`t`.
+Wei-Ning Hsu, and Hsuan-Tien Lin. "Active Learning by Learning." Twenty-Ninth AAAI Conference on Artificial Intelligence. 2015.
 
 Here is an example of how to declare a ALBL query_strategy object:
 
@@ -55,4 +41,4 @@ The :code:`query_strategies` parameter is a list of
 dataset must be the same :code:`Dataset` instance. ALBL combines the result of
 these query strategies and generate its own suggestion of which sample to query.
 ALBL will adaptively *learn* from each of the decision it made, using the given
-supervised learning model in :code:`model` parameter to evaluate its IW-ACC.
+supervised learning model in :code:`model` parameter.

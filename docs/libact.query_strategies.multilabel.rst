@@ -29,10 +29,10 @@ libact.query_strategies.multilabel.maximum_margin_reduction module
     :undoc-members:
     :show-inheritance:
 
-libact.query_strategies.multilabel.multilable_with_auxiliary_learner module
+libact.query_strategies.multilabel.multilabel_with_auxiliary_learner module
 -------------------------------------------------------------------------------
 
-.. automodule:: libact.query_strategies.multilabel.multilable_with_auxiliary_learner
+.. automodule:: libact.query_strategies.multilabel.multilabel_with_auxiliary_learner
     :members:
     :undoc-members:
     :show-inheritance:
