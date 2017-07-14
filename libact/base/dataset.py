@@ -146,7 +146,8 @@ class Dataset(object):
         return np.array(X), np.array(y)
 
     def format_jsre(self):
-        X, y = zip(*self.get_labeled_entries())
+        entries = [(x[0], y) for x, y in self.get_labeled_entries()]
+        X, y = zip(*entries)
         return X, y
 
     def get_entries(self):
@@ -233,8 +234,8 @@ def import_jsre(filename):
 
     X , y = [], []
     for line in lines:
-        label = int(line.split('\t')[0])
+        label = line.split('\t')[0]
         instance = '\t'.join(line.split('\t')[1:])
-        X.append(instance)
+        X.append([instance])
         y.append(None if label == '-1' else label)
     return Dataset(X, y)

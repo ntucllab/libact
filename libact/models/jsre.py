@@ -48,14 +48,14 @@ class JSRE(ProbabilisticModel):
         #     LOGGER.error('Could not find output file "{}".'.format(output_file))
         #     sys.exit(-1)
 
-    def __raw_predict(self, features):
-        tmp_example_file = '{}/test.jsre'.format(os.getcwd())
-        tmp_output_file = '{}/output.jsre'.format(os.getcwd())
+    def __raw_predict(self, instances):
+        tmp_example_file = '{}/tmp_test.jsre'.format(os.getcwd())
+        tmp_output_file = '{}/tmp_output.jsre'.format(os.getcwd())
 
         with open(tmp_example_file, 'w') as testf:
-            for f in features:
+            for instance in instances:
                 # use 1 as default label b/c -1 will crash jSRE even tough thats the proposed label for unknown
-                testf.write('1\t{}\n'.format(f))
+                testf.write('1\t{}\n'.format(instance[0]))  # all features are encoded as one for jSRE
 
         cmd = self.predict_template.format(
             cp=self.classpath, memory=self.max_memory, model=self.model,
@@ -67,7 +67,7 @@ class JSRE(ProbabilisticModel):
         return predictions, probas
 
     def train(self, dataset, *args, **kwargs):
-        tmp_training_file = '{}/train.jsre'.format(os.getcwd())
+        tmp_training_file = '{}/tmp_train.jsre'.format(os.getcwd())
         lines = ['{}\t{}'.format(lbl, feat) for feat, lbl in zip(*dataset.format_jsre())]
         with open(tmp_training_file, 'w') as trainingf:
             trainingf.write('\n'.join(lines))
@@ -78,18 +78,18 @@ class JSRE(ProbabilisticModel):
 
         self.__run_command(cmd)
 
-    def predict(self, feature, *args, **kwargs):
-        predictions, _ = self.__raw_predict(feature)
+    def predict(self, instances, *args, **kwargs):
+        predictions, _ = self.__raw_predict(instances)
         return np.array(predictions)
 
-    def predict_proba(self, feature, *args, **kwargs):
-        _, probas = self.__raw_predict(feature)
+    def predict_proba(self, instances, *args, **kwargs):
+        _, probas = self.__raw_predict(instances)
         # this is dependent on the data and can be the other way round as well!
         return np.array(probas)
 
     def score(self, dataset, *args, **kwargs):
-        tmp_test_file = '{}/test.jsre'.format(os.getcwd())
-        tmp_output_file = '{}/output.jsre'.format(os.getcwd())
+        tmp_test_file = '{}/tmp_test.jsre'.format(os.getcwd())
+        tmp_output_file = '{}/tmp_output.jsre'.format(os.getcwd())
         lines = ['{}\t{}'.format(lbl, feat) for feat, lbl in zip(*dataset.format_jsre())]
         with open(tmp_test_file, 'w') as trainingf:
             trainingf.write('\n'.join(lines))
@@ -103,7 +103,6 @@ class JSRE(ProbabilisticModel):
         if match is None or len(match.groups()) < 1:
             LOGGER.error('Could not extract accuracy from output of "{}"'.format(cmd))
             sys.exit(-1)
-        # import ipdb; ipdb.set_trace()
 
         accuracy = float(match.groups()[0])/100
         return accuracy
