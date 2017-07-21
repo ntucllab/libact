@@ -83,6 +83,7 @@ class ActiveLearningByLearning(QueryStrategy):
 
        qs = ActiveLearningByLearning(
             dataset, # Dataset object
+            T=100, # qs.make_query can be called for at most 100 times
             query_strategies=[
                 UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
                 UncertaintySampling(dataset, model=LogisticRegression(C=.01)),
