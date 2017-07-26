@@ -8,6 +8,8 @@ import subprocess
 import re
 import numpy as np
 import logging
+import datetime
+import time
 LOGGER = logging.getLogger(__name__)
 
 from libact.base.interfaces import ProbabilisticModel
@@ -23,14 +25,22 @@ class JSRE(ProbabilisticModel):
 
     """
 
-    def __init__(self, model_path, jsre_path):
+    def __init__(self, model_path, jsre_path, tmp_dir='/tmp'):
         """model_path => where to save the model to"""
+        self.tmp_dir = tmp_dir
         self.model = model_path
         self.classpath = './bin:./lib/*'.format(jsre_path, jsre_path)
         self.jsre_path = jsre_path
         self.max_memory = '-mx1024M'
         self.predict_template = 'java -cp {cp} {memory} org.itc.irst.tcc.sre.Predict {to_predict} {model} {output}'
         self.train_template = 'java -cp {cp} {memory} org.itc.irst.tcc.sre.Train -m 512 -k SL -n 3 -w 2 {to_train} {model_output}'
+
+    def __generate_timestamp():
+        return datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
+
+    def __get_tmp_filename(string):
+        ts = self.__generate_timestamp()
+        returnos.path.join(self.tmp_dir, '/{}-{}.jsre'.format(string, ts))
 
     def __run_command(self, cmd, output_file=None):
         try:
@@ -49,8 +59,9 @@ class JSRE(ProbabilisticModel):
         #     sys.exit(-1)
 
     def __raw_predict(self, instances):
-        tmp_example_file = '{}/tmp_test.jsre'.format(os.getcwd())
-        tmp_output_file = '{}/tmp_output.jsre'.format(os.getcwd())
+        ts = self.__generate_timestamp()
+        tmp_example_file = self.__get_tmp_filename('test')
+        tmp_output_file = self.__get_tmp_filename('output')
 
         with open(tmp_example_file, 'w') as testf:
             for instance in instances:
@@ -67,7 +78,8 @@ class JSRE(ProbabilisticModel):
         return predictions, probas
 
     def train(self, dataset, *args, **kwargs):
-        tmp_training_file = '{}/tmp_train.jsre'.format(os.getcwd())
+        ts = self.__generate_timestamp()
+        tmp_training_file = self.__get_tmp_filename('train')
         lines = ['{}\t{}'.format(lbl, feat) for feat, lbl in zip(*dataset.format_jsre())]
         with open(tmp_training_file, 'w') as trainingf:
             trainingf.write('\n'.join(lines))
@@ -88,8 +100,8 @@ class JSRE(ProbabilisticModel):
         return np.array(probas)
 
     def score(self, dataset, *args, **kwargs):
-        tmp_test_file = '{}/tmp_test.jsre'.format(os.getcwd())
-        tmp_output_file = '{}/tmp_output.jsre'.format(os.getcwd())
+        tmp_test_file = self.__get_tmp_filename('test')
+        tmp_output_file = self.__get_tmp_filename('output')
         lines = ['{}\t{}'.format(lbl, feat) for feat, lbl in zip(*dataset.format_jsre())]
         with open(tmp_test_file, 'w') as trainingf:
             trainingf.write('\n'.join(lines))
