@@ -145,6 +145,11 @@ class Dataset(object):
         X, y = zip(*self.get_labeled_entries())
         return np.array(X), np.array(y)
 
+    def format_jsre(self):
+        entries = [(x[0], y) for x, y in self.get_labeled_entries()]
+        X, y = zip(*entries)
+        return X, y
+
     def get_entries(self):
         """
         Return the list of all sample feature and ground truth tuple.
@@ -216,4 +221,21 @@ def import_scipy_mat(filename):
     np.random.shuffle(zipper)
     X, y = zip(*zipper)
     X, y = np.array(X), np.array(y).reshape(-1)
+    return Dataset(X, y)
+
+def import_jsre(filename):
+    """
+    Import jSRE formated training data
+
+    Represent all jSRE features as a single string feature.
+    """
+    with open(filename, 'r') as jsre_file:
+        lines = jsre_file.read().strip().split('\n')
+
+    X , y = [], []
+    for line in lines:
+        label = line.split('\t')[0]
+        instance = '\t'.join(line.split('\t')[1:])
+        X.append([instance])
+        y.append(None if label == '-1' else label)
     return Dataset(X, y)
