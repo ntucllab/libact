@@ -35,12 +35,12 @@ class JSRE(ProbabilisticModel):
         self.predict_template = 'java -cp {cp} {memory} org.itc.irst.tcc.sre.Predict {to_predict} {model} {output}'
         self.train_template = 'java -cp {cp} {memory} org.itc.irst.tcc.sre.Train -m 512 -k SL -n 3 -w 2 {to_train} {model_output}'
 
-    def __generate_timestamp():
+    def __generate_timestamp(self):
         return datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')
 
-    def __get_tmp_filename(string):
+    def __get_tmp_filename(self, string):
         ts = self.__generate_timestamp()
-        returnos.path.join(self.tmp_dir, '/{}-{}.jsre'.format(string, ts))
+        return os.path.join(self.tmp_dir, '{}-{}.jsre'.format(string, ts))
 
     def __run_command(self, cmd, output_file=None):
         try:
@@ -89,6 +89,10 @@ class JSRE(ProbabilisticModel):
             to_train=tmp_training_file)
 
         self.__run_command(cmd)
+        try:
+            os.remove(tmp_training_file)
+        except OSError:
+            pass
 
     def predict(self, instances, *args, **kwargs):
         predictions, _ = self.__raw_predict(instances)
@@ -117,4 +121,10 @@ class JSRE(ProbabilisticModel):
             sys.exit(-1)
 
         accuracy = float(match.groups()[0])/100
+        try:
+            os.remove(tmp_test_file)
+            os.remove(tmp_output_file)
+        except OSError:
+            pass
+
         return accuracy
