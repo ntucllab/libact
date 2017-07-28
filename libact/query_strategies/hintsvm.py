@@ -146,12 +146,15 @@ class HintSVM(QueryStrategy):
         weight = [1.0 for _ in range(len(labeled_pool))] +\
                  [(self.ch / self.cl) for _ in range(len(hint_pool))]
         y = list(y) + [0 for _ in range(len(hint_pool))]
-        X = [x.tolist() for x in labeled_pool] +\
-            [x.tolist() for x in hint_pool]
+        X = [x for x in labeled_pool] +\
+            [x for x in hint_pool]
 
         p_val = hintsvm_query(
-            np.array(X), np.array(y), np.array(weight),
-            np.array([x.tolist() for x in unlabeled_pool]), self.svm_params)
+            np.array(X, dtype=np.float64),
+            np.array(y, dtype=np.float64),
+            np.array(weight, dtype=np.float64),
+            np.array([x.tolist() for x in unlabeled_pool], dtype=np.float64),
+            self.svm_params)
 
         p_val = [abs(float(val[0])) for val in p_val]
         idx = int(np.argmax(p_val))
