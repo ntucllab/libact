@@ -153,7 +153,7 @@ class HintSVM(QueryStrategy):
             np.array(X, dtype=np.float64),
             np.array(y, dtype=np.float64),
             np.array(weight, dtype=np.float64),
-            np.array([x.tolist() for x in unlabeled_pool], dtype=np.float64),
+            np.array([x for x in unlabeled_pool], dtype=np.float64),
             self.svm_params)
 
         p_val = [abs(float(val[0])) for val in p_val]
