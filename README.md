@@ -36,7 +36,7 @@ sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev p
 
 * macOS
 ```
-brew install homebrew/science/openblas
+brew install openblas
 ```
 
 # Installation
