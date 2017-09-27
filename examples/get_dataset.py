@@ -27,7 +27,7 @@
 # labels y \in {-1, +1}
 
 import os
-import urllib.request
+import six.moves.urllib as urllib
 import random
 
 
