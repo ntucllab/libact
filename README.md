@@ -119,14 +119,14 @@ coverage report
 ```
 
 # Citing
-If you find this package useful, please cite the original works (see Reference of each strategy) as well as the following (temporarily)
+If you find this package useful, please cite the original works (see Reference of each strategy) as well as the following
 
 ```
-@TechReport{libact,
-  author =   {Yao-Yuan Yang and Shao-Chuan Lee and Yu-An Chung and Tung-En Wu and Si-An Chen and Hsuan-Tien Lin},
-  title =    {libact: Pool-based Active Learning in Python},
-  url = {https://github.com/ntucllab/libact},
-  year = {2015}
+@article{libact,
+  title={libact: Pool-based Active Learning in Python},
+  author={Yao-Yuan Yang and Shao-Chuan Lee and Yu-An Chung and Tung-En Wu and Si-An Chen and Hsuan-Tien Lin},
+  journal={arXiv preprint arXiv:1710.00379},
+  year={2016}
 }
 ```
 
