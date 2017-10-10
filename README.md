@@ -122,7 +122,7 @@ coverage report
 If you find this package useful, please cite the original works (see Reference of each strategy) as well as the following
 
 ```
-@article{libact,
+@TechReport{libact,
   title={libact: Pool-based Active Learning in Python},
   author={Yao-Yuan Yang and Shao-Chuan Lee and Yu-An Chung and Tung-En Wu and Si-An Chen and Hsuan-Tien Lin},
   journal={arXiv preprint arXiv:1710.00379},
