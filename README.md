@@ -17,7 +17,7 @@ on the fly. Furthermore, the package provides a unified interface for implementi
 
 # Documentation
 
-The technical report associated with the package is on [arXiv](https://arxiv.org/abs/1710.00379), and the [documentation for the latest release is available online](http://libact.readthedocs.org/en/latest/).
+The technical report associated with the package is on [arXiv](https://arxiv.org/abs/1710.00379), and the documentation for the latest release is available on [readthedocs](http://libact.readthedocs.org/en/latest/).
 Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. All contributions to the documentation are greatly appreciated!
 
 # Basic Dependencies
