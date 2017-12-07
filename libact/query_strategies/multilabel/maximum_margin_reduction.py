@@ -67,7 +67,7 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
     def __init__(self, *args, **kwargs):
         super(MaximumLossReductionMaximalConfidence, self).__init__(*args, **kwargs)
 
-        self.n_labels = len(self.dataset.data[0][1])
+        self.n_labels = len(self.dataset.get_labeled_entries()[0][1])
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
