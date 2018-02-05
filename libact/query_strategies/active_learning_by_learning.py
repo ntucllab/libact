@@ -146,7 +146,7 @@ class ActiveLearningByLearning(QueryStrategy):
 
         self.pmin = kwargs.pop('pmin', None)
         n_algorithms = (len(self.query_strategies_) + self.uniform_sampler)
-        if self.pmin and (self.pmin < (1. / n_algorithms) or self.pmin < 0):
+        if self.pmin and (self.pmin > (1. / n_algorithms) or self.pmin < 0):
             raise ValueError("'pmin' should be 0 < pmin < "
                              "1/len(n_active_algorithm)")
 
