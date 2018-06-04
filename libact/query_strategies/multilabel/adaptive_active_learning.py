@@ -120,7 +120,7 @@ class AdaptiveActiveLearning(QueryStrategy):
         candidate_idx_set = set()
         for b in self.betas:
             # score shape = (len(X_pool), )
-            score = separation_margin**b * label_cardinality**(1.-b)
+            score = uncertainty**b * label_cardinality**(1.-b)
             for idx in np.where(score == np.max(score))[0]:
                 candidate_idx_set.add(idx)
 
