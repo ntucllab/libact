@@ -19,3 +19,14 @@ from .density_weighted_uncertainty_sampling import DWUS
 if not ON_RTD:
     from ._variance_reduction import estVar
 from .variance_reduction import VarianceReduction
+
+__all__ = [
+    'ActiveLearningByLearning',
+    'DWUS',
+    'HintSVM',
+    'QUIRE',
+    'QueryByCommittee',
+    'RandomSampling',
+    'UncertaintySampling',
+    'VarianceReduction',
+]
