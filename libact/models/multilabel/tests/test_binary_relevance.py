@@ -25,7 +25,7 @@ class BinaryRelevanceTestCase(unittest.TestCase):
 
     def test_binary_relevance_lr(self):
         br = BinaryRelevance(
-            base_clf=LogisticRegression(solver='liblinear', multi_class="auto",
+            base_clf=LogisticRegression(solver='liblinear', multi_class="ovr",
                                         random_state=1126))
         br.train(Dataset(self.X_train, self.Y_train))
 
@@ -37,7 +37,7 @@ class BinaryRelevanceTestCase(unittest.TestCase):
 
         for i in range(np.shape(self.Y_train)[1]):
             clf = sklearn.linear_model.LogisticRegression(
-                solver='liblinear', multi_class="auto", random_state=1126)
+                solver='liblinear', multi_class="ovr", random_state=1126)
             clf.fit(self.X_train, self.Y_train[:, i])
 
             assert_array_almost_equal(clf.predict(self.X_train).astype(int),
@@ -60,7 +60,7 @@ class BinaryRelevanceTestCase(unittest.TestCase):
 
     def test_binary_relevance_parallel(self):
         br = BinaryRelevance(base_clf=LogisticRegression(solver='liblinear',
-                                    multi_class="auto", random_state=1126),
+                                    multi_class="ovr", random_state=1126),
                              n_jobs=1)
         br.train(Dataset(self.X_train, self.Y_train))
         br_par = BinaryRelevance(

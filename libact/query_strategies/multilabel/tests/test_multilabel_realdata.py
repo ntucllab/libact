@@ -49,7 +49,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
                 major_learner=BinaryRelevance(
                         LogisticRegression(solver='liblinear',
-                                           multi_class="auto",
+                                           multi_class="ovr",
                                            random_state=1126)),
                 auxiliary_learner=BinaryRelevance(SVM(gamma="auto")),
                 criterion='hlr',
@@ -63,7 +63,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
                 major_learner=BinaryRelevance(LogisticRegression(solver='liblinear',
-                                                                 multi_class="auto")),
+                                                                 multi_class="ovr")),
                 auxiliary_learner=BinaryRelevance(SVM(gamma="auto")),
                 criterion='shlr',
                 b=1.,
@@ -77,7 +77,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
                 major_learner=BinaryRelevance(LogisticRegression(solver='liblinear',
-                                                                 multi_class="auto")),
+                                                                 multi_class="ovr")),
                 auxiliary_learner=BinaryRelevance(SVM(gamma="auto")),
                 criterion='mmr',
                 random_state=1126)
@@ -87,7 +87,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
 
     def test_binary_minimization(self):
         trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
-        qs = BinaryMinimization(trn_ds, LogisticRegression(solver='liblinear', multi_class="auto"),
+        qs = BinaryMinimization(trn_ds, LogisticRegression(solver='liblinear', multi_class="ovr"),
                                 random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
@@ -96,7 +96,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
     def test_adaptive_active_learning(self):
         trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
         qs = AdaptiveActiveLearning(trn_ds,
-                base_clf=LogisticRegression(solver='liblinear', multi_class="auto"), n_jobs=-1,
+                base_clf=LogisticRegression(solver='liblinear', multi_class="ovr"), n_jobs=-1,
                                             random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,

@@ -56,7 +56,7 @@ class IrisTestCase(unittest.TestCase):
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
         qs = EER(ds,
-                 LogisticRegression(solver='liblinear', multi_class='auto'),
+                 LogisticRegression(solver='liblinear', multi_class="ovr"),
                  random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(
@@ -66,7 +66,7 @@ class IrisTestCase(unittest.TestCase):
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
         qs = EER(ds,
-                 LogisticRegression(solver='liblinear', multi_class='auto'),
+                 LogisticRegression(solver='liblinear', multi_class="ovr"),
                  loss='01', random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(

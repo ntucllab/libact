@@ -73,9 +73,9 @@ class RealdataTestCase(unittest.TestCase):
         qs = QueryByCommittee(
             trn_ds,
             disagreement='vote',
-            models=[LogisticRegression(C=1.0, solver="liblinear", multi_class="auto"),
-                    LogisticRegression(C=0.01, solver="liblinear", multi_class="auto"),
-                    LogisticRegression(C=100, solver="liblinear", multi_class="auto")],
+            models=[LogisticRegression(C=1.0, solver="liblinear", multi_class="ovr"),
+                    LogisticRegression(C=0.01, solver="liblinear", multi_class="ovr"),
+                    LogisticRegression(C=100, solver="liblinear", multi_class="ovr")],
             random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
@@ -88,9 +88,9 @@ class RealdataTestCase(unittest.TestCase):
         qs = QueryByCommittee(
                 trn_ds,
                 disagreement='kl_divergence',
-                models=[LogisticRegression(C=1.0, solver="liblinear", multi_class="auto"),
-                        LogisticRegression(C=0.01, solver="liblinear", multi_class="auto"),
-                        LogisticRegression(C=100, solver="liblinear", multi_class="auto")],
+                models=[LogisticRegression(C=1.0, solver="liblinear", multi_class="ovr"),
+                        LogisticRegression(C=0.01, solver="liblinear", multi_class="ovr"),
+                        LogisticRegression(C=100, solver="liblinear", multi_class="ovr")],
                 random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
@@ -102,7 +102,7 @@ class RealdataTestCase(unittest.TestCase):
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='lc',
-            model=LogisticRegression(solver="liblinear", multi_class="auto"))
+            model=LogisticRegression(solver="liblinear", multi_class="ovr"))
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
@@ -113,7 +113,7 @@ class RealdataTestCase(unittest.TestCase):
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='sm',
-                model=LogisticRegression(solver="liblinear", multi_class="auto"))
+                model=LogisticRegression(solver="liblinear", multi_class="ovr"))
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
@@ -124,7 +124,7 @@ class RealdataTestCase(unittest.TestCase):
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='entropy',
-                model=LogisticRegression(solver="liblinear", multi_class="auto"))
+                model=LogisticRegression(solver="liblinear", multi_class="ovr"))
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
@@ -138,9 +138,9 @@ class RealdataTestCase(unittest.TestCase):
             query_strategies=[
                 UncertaintySampling(
                     trn_ds,
-                    model=LogisticRegression(solver="liblinear", multi_class="auto")),
+                    model=LogisticRegression(solver="liblinear", multi_class="ovr")),
                 HintSVM(trn_ds, random_state=1126)],
-            model=LogisticRegression(solver="liblinear", multi_class="auto"),
+            model=LogisticRegression(solver="liblinear", multi_class="ovr"),
             random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(

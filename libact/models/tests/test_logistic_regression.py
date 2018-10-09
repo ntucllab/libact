@@ -28,9 +28,9 @@ class LogisticRegressionIrisTestCase(unittest.TestCase):
 
     def test_logistic_regression(self):
         clf = sklearn.linear_model.LogisticRegression(
-            solver='liblinear', multi_class='auto')
+            solver='liblinear', multi_class="ovr")
         clf.fit(self.X_train, self.y_train)
-        lr = LogisticRegression(solver='liblinear', multi_class='auto')
+        lr = LogisticRegression(solver='liblinear', multi_class="ovr")
         lr.train(Dataset(self.X_train, self.y_train))
 
         assert_array_equal(

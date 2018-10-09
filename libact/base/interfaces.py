@@ -38,7 +38,7 @@ class QueryStrategy(with_metaclass(ABCMeta, object)):
         """
         pass
 
-    def _get_score(self):
+    def _get_scores(self):
         """Return the score used for making query, the larger the better. Read-only.
 
         No modification to the internal states.

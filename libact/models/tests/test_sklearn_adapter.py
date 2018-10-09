@@ -51,9 +51,9 @@ class IrisTestCase(unittest.TestCase):
 
     def test_adapt_logistic_regression(self):
         adapter = SklearnProbaAdapter(
-            LogisticRegression(solver='liblinear', multi_class='auto',
+            LogisticRegression(solver='liblinear', multi_class="ovr",
                                random_state=1126))
-        clf = LogisticRegression(solver='liblinear', multi_class='auto',
+        clf = LogisticRegression(solver='liblinear', multi_class="ovr",
                                  random_state=1126)
         self.check_functions(adapter, clf)
 
