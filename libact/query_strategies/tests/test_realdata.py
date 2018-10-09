@@ -70,12 +70,13 @@ class RealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
-        qs = QueryByCommittee(trn_ds,
-                              disagreement='vote',
-                              models=[LogisticRegression(C=1.0),
-                                      LogisticRegression(C=0.01),
-                                      LogisticRegression(C=100)],
-                              random_state=1126)
+        qs = QueryByCommittee(
+            trn_ds,
+            disagreement='vote',
+            models=[LogisticRegression(C=1.0, solver="liblinear", multi_class="auto"),
+                    LogisticRegression(C=0.01, solver="liblinear", multi_class="auto"),
+                    LogisticRegression(C=100, solver="liblinear", multi_class="auto")],
+            random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([267, 210, 229, 220, 134, 252, 222, 142, 245, 228]))
@@ -84,12 +85,13 @@ class RealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
-        qs = QueryByCommittee(trn_ds,
-                              disagreement='kl_divergence',
-                              models=[LogisticRegression(C=1.0),
-                                      LogisticRegression(C=0.01),
-                                      LogisticRegression(C=100)],
-                              random_state=1126)
+        qs = QueryByCommittee(
+                trn_ds,
+                disagreement='kl_divergence',
+                models=[LogisticRegression(C=1.0, solver="liblinear", multi_class="auto"),
+                        LogisticRegression(C=0.01, solver="liblinear", multi_class="auto"),
+                        LogisticRegression(C=100, solver="liblinear", multi_class="auto")],
+                random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([228, 111, 162, 243, 213, 122, 110, 108, 156, 37]))
@@ -100,7 +102,7 @@ class RealdataTestCase(unittest.TestCase):
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='lc',
-                                 model=LogisticRegression())
+            model=LogisticRegression(solver="liblinear", multi_class="auto"))
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
@@ -111,7 +113,7 @@ class RealdataTestCase(unittest.TestCase):
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='sm',
-                                 model=LogisticRegression())
+                model=LogisticRegression(solver="liblinear", multi_class="auto"))
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
@@ -122,7 +124,7 @@ class RealdataTestCase(unittest.TestCase):
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
         qs = UncertaintySampling(trn_ds, method='entropy',
-                                 model=LogisticRegression())
+                model=LogisticRegression(solver="liblinear", multi_class="auto"))
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([145, 66, 82, 37, 194, 60, 191, 211, 245, 131]))
@@ -131,14 +133,15 @@ class RealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:10],
                                          [None] * (len(self.y) - 10)]))
-        qs = ActiveLearningByLearning(trn_ds, T=self.quota,
-                                      query_strategies=[
-                                          UncertaintySampling(
-                                              trn_ds,
-                                              model=LogisticRegression()),
-                                          HintSVM(trn_ds, random_state=1126)],
-                                      model=LogisticRegression(),
-                                      random_state=1126)
+        qs = ActiveLearningByLearning(trn_ds,
+            T=self.quota,
+            query_strategies=[
+                UncertaintySampling(
+                    trn_ds,
+                    model=LogisticRegression(solver="liblinear", multi_class="auto")),
+                HintSVM(trn_ds, random_state=1126)],
+            model=LogisticRegression(solver="liblinear", multi_class="auto"),
+            random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
             qseq, np.array([173, 103, 133, 184, 187, 147, 251, 83, 93, 33]))

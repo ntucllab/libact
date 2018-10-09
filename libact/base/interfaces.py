@@ -38,6 +38,18 @@ class QueryStrategy(with_metaclass(ABCMeta, object)):
         """
         pass
 
+    def _get_score(self):
+        """Return the score used for making query, the larger the better. Read-only.
+
+        No modification to the internal states.
+
+        Returns
+        -------
+        (ask_id, score): list of tuple (int, float)
+            The index of the next unlabeled sample to be queried and the score assigned.
+        """
+        pass
+
     @abstractmethod
     def make_query(self):
         """Return the index of the sample to be queried and labeled. Read-only.

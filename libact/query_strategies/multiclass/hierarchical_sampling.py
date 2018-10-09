@@ -5,6 +5,7 @@ Learning (HS).
 
 """
 from __future__ import division
+
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 
@@ -30,7 +31,7 @@ class HierarchicalSampling(QueryStrategy):
 
     active_selecting: {True, False}, optional (default=True)
         False (random selecting): sample weight of a pruning is its number of
-        unsean leaves.
+        unseen leaves.
         True (active selecting): sample weight of a pruning is its weighted
         error bound.
 

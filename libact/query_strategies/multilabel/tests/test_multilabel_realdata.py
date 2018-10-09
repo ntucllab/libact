@@ -47,8 +47,11 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
-                major_learner=BinaryRelevance(LogisticRegression()),
-                auxiliary_learner=BinaryRelevance(SVM()),
+                major_learner=BinaryRelevance(
+                        LogisticRegression(solver='liblinear',
+                                           multi_class="auto",
+                                           random_state=1126)),
+                auxiliary_learner=BinaryRelevance(SVM(gamma="auto")),
                 criterion='hlr',
                 random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
@@ -59,8 +62,9 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
-                major_learner=BinaryRelevance(LogisticRegression()),
-                auxiliary_learner=BinaryRelevance(SVM()),
+                major_learner=BinaryRelevance(LogisticRegression(solver='liblinear',
+                                                                 multi_class="auto")),
+                auxiliary_learner=BinaryRelevance(SVM(gamma="auto")),
                 criterion='shlr',
                 b=1.,
                 random_state=1126)
@@ -72,8 +76,9 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          self.y[:5] + [None] * (len(self.y) - 5))
         qs = MultilabelWithAuxiliaryLearner(trn_ds,
-                major_learner=BinaryRelevance(LogisticRegression()),
-                auxiliary_learner=BinaryRelevance(SVM()),
+                major_learner=BinaryRelevance(LogisticRegression(solver='liblinear',
+                                                                 multi_class="auto")),
+                auxiliary_learner=BinaryRelevance(SVM(gamma="auto")),
                 criterion='mmr',
                 random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
@@ -82,7 +87,8 @@ class MultilabelRealdataTestCase(unittest.TestCase):
 
     def test_binary_minimization(self):
         trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
-        qs = BinaryMinimization(trn_ds, LogisticRegression(), random_state=1126)
+        qs = BinaryMinimization(trn_ds, LogisticRegression(solver='liblinear', multi_class="auto"),
+                                random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([936, 924, 1211, 1286, 590, 429, 404, 962, 825, 30]))
@@ -90,7 +96,8 @@ class MultilabelRealdataTestCase(unittest.TestCase):
     def test_adaptive_active_learning(self):
         trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
         qs = AdaptiveActiveLearning(trn_ds,
-                base_clf=LogisticRegression(), n_jobs=-1, random_state=1126)
+                base_clf=LogisticRegression(solver='liblinear', multi_class="auto"), n_jobs=-1,
+                                            random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([594, 827, 1128, 419, 1223, 484, 96, 833, 37, 367]))

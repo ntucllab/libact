@@ -27,7 +27,7 @@ class SVMIrisTestCase(unittest.TestCase):
             train_test_split(X, y, test_size=0.3, random_state=1126)
 
     def test_svm(self):
-        svc_clf = SVC()
+        svc_clf = SVC(gamma="auto")
         svc_clf.fit(self.X_train, self.y_train)
         svm = SVM()
         svm.train(Dataset(self.X_train, self.y_train))
