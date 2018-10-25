@@ -197,7 +197,7 @@ class HierarchicalSampling(QueryStrategy):
     def make_query(self):
         pruning = self._select_pruning()
         if self.sub_qs is None:
-            ask_id = self._sample_node(pruning)
+            ask_id = int(self._sample_node(pruning))
         else:
             _, scores = self.sub_qs.make_query(return_score=True)
             leaves = set(self._find_leaves(pruning))

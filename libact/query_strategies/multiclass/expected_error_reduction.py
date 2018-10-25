@@ -69,7 +69,7 @@ class EER(QueryStrategy):
         if self.loss not in ['01', 'log']:
             raise TypeError(
                 "supported methods are ['01', 'log'], the given one "
-                "is: " + self.method
+                "is: " + self.loss
             )
 
         self.random_state_ = seed_random_state(random_state)

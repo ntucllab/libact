@@ -19,9 +19,15 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from libact.base.dataset import Dataset, import_libsvm_sparse
 from libact.models import LogisticRegression, SVM
 from libact.models.multilabel import BinaryRelevance
-from libact.query_strategies.multilabel import MMC, AdaptiveActiveLearning, \
-        MultilabelWithAuxiliaryLearner, BinaryMinimization
+from libact.query_strategies.multilabel import (
+    AdaptiveActiveLearning,
+    BinaryMinimization, 
+    CostSensitiveReferencePairEncoding,
+    MMC,
+    MultilabelWithAuxiliaryLearner,
+)
 from ...tests.utils import run_qs
+from libact.utils.multilabel import pairwise_f1_score
 
 
 class MultilabelRealdataTestCase(unittest.TestCase):
@@ -101,6 +107,25 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
                 np.array([594, 827, 1128, 419, 1223, 484, 96, 833, 37, 367]))
+
+
+    def test_cost_sensitive_random_pair_encoding(self):
+        trn_ds = Dataset(self.X, self.y[:5] + [None] * (len(self.y) - 5))
+        model = BinaryRelevance(LogisticRegression(solver='liblinear',
+                                                   multi_class="ovr"))
+        base_model = LogisticRegression(
+                solver='liblinear', multi_class="ovr", random_state=1126)
+        qs = CostSensitiveReferencePairEncoding(
+                trn_ds,
+                scoring_fn=pairwise_f1_score,
+                model=model,
+                base_model=base_model,
+                n_models=10,
+                n_jobs=1,
+                random_state=1126)
+        qseq = run_qs(trn_ds, qs, self.y, self.quota)
+        assert_array_equal(qseq,
+                np.array([149, 434, 1126, 719, 983, 564, 816, 732, 101, 1242]))
 
 
 

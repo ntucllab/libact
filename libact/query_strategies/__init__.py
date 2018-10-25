@@ -19,6 +19,8 @@ from .density_weighted_uncertainty_sampling import DWUS
 if not ON_RTD:
     from ._variance_reduction import estVar
 from .variance_reduction import VarianceReduction
+from .density_weighted_meta import DensityWeightedMeta
+from .importance_weighted import ImportanceWeighted
 
 __all__ = [
     'ActiveLearningByLearning',
@@ -29,4 +31,6 @@ __all__ = [
     'RandomSampling',
     'UncertaintySampling',
     'VarianceReduction',
+    'DensityWeightedMeta',
+    'ImportanceWeighted',
 ]

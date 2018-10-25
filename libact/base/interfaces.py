@@ -45,7 +45,7 @@ class QueryStrategy(with_metaclass(ABCMeta, object)):
 
         Returns
         -------
-        (ask_id, score): list of tuple (int, float)
+        (ask_id, scores): list of tuple (int, float)
             The index of the next unlabeled sample to be queried and the score assigned.
         """
         pass
