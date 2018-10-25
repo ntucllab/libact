@@ -10,15 +10,12 @@ os:
 sudo: required
 dist: trusty
 matrix:
-  include:
-    - os: linux
-      python: "nightly"
-    - os: linux
-      python: "3.7-dev"
   allow_failures:
     - os: osx           # Python 3 not supported in Travis OSX environment
     - os: linux
-      python: "nightly"
+      python:
+        - "nightly"
+        - "3.7-dev"
 
 notifications:
   email: false

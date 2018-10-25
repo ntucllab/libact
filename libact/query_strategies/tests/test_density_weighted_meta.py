@@ -37,7 +37,7 @@ class DensityWeightedMetaTestCase(unittest.TestCase):
             beta=1.0, random_state=1126)
         model = LogisticRegression(solver='liblinear', multi_class="ovr")
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
-        assert_array_equal(qseq, np.array([6, 7, 8, 9]))
+        assert_array_equal(qseq, np.array([13, 18,  9, 12,  8, 16, 10, 19, 15, 17]))
 
 
 if __name__ == '__main__':
