@@ -74,7 +74,7 @@ class DensityWeightedMeta(QueryStrategy):
                 "'base_query_strategy' has to be an instance of 'QueryStrategy'"
             )
         if base_query_strategy.dataset != self.dataset:
-            raise ValueError("query_strategies should share the same"
+            raise ValueError("base_query_strategy should share the same"
                              "dataset instance with DensityWeightedMeta")
 
         self.base_query_strategy = base_query_strategy

@@ -14,12 +14,7 @@ from ..density_weighted_meta import DensityWeightedMeta
 from .utils import run_qs
 
 
-def init_toyexample(X, y):
-    trn_ds = Dataset(X, np.concatenate([y[:6], [None] * 4]))
-    return trn_ds
-
-
-class UncertaintySamplingTestCase(unittest.TestCase):
+class DensityWeightedMetaTestCase(unittest.TestCase):
 
     def setUp(self):
         dataset_filepath = os.path.join(
@@ -29,7 +24,7 @@ class UncertaintySamplingTestCase(unittest.TestCase):
         self.quota = 10
 
     def test_density_weighted_meta_uncertainty_lc(self):
-        trn_ds = init_toyexample(self.X, self.y)
+        trn_ds = Dataset(self.X[:20], np.concatenate([self.y[:6], [None] * 14]))
         base_qs = UncertaintySampling(
             trn_ds, method='lc',
             model=LogisticRegression(solver='liblinear', multi_class="ovr"))
