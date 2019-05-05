@@ -34,6 +34,11 @@ pip install -r requirements.txt
 sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
 ```
 
+* Arch
+```
+sudo pacman -S lapacke
+```
+
 * macOS
 ```
 brew install openblas
@@ -65,6 +70,20 @@ To build and install from souce for all users on Unix/Linux:
 ```
 python setup.py build
 sudo python setup.py install
+```
+
+## Installation Options
+
+- `LIBACT_BUILD_HINTSVM`: set this variable to 1 if you would like to build
+  hintsvm c-extension. If set to 0, you will not be able to use the HintSVM
+  query strategy.
+- `LIBACT_BUILD_VARIANCE_REDUCTION`: set this variable to 1 if you would like to
+  build variance reduction c-extension. If set to 0, you will not be able to use
+  the VarianceReduction query strategy.
+
+Example:
+```
+LIBACT_BUILD_HINTSVM=1 pip install git+https://github.com/ntucllab/libact.git
 ```
 
 # Usage
