@@ -16,7 +16,6 @@ from .random_sampling import RandomSampling
 from .density_weighted_uncertainty_sampling import DWUS
 # don't import c extentions when on readthedocs server
 from .density_weighted_meta import DensityWeightedMeta
-from .importance_weighted import ImportanceWeighted
 if not ON_RTD:
     try:
         from ._variance_reduction import estVar
@@ -47,5 +46,4 @@ __all__ = [
     'UncertaintySampling',
     'VarianceReduction',
     'DensityWeightedMeta',
-    'ImportanceWeighted',
 ]
