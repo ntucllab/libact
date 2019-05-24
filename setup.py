@@ -23,7 +23,9 @@ else:
     import numpy.distutils
     if sys.platform == 'darwin':
         print("Platform Detection: Mac OS X. Link to openblas...")
-        extra_link_args = ['-L/opt/local/lib -lopenblas']
+        extra_link_args = []
+        libraries = ['openblas']
+        library_dirs = ['/opt/local/lib']
         include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
                         ['/opt/local/include'])
     else:
