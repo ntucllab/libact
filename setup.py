@@ -19,13 +19,13 @@ else:
     import numpy.distutils
     if sys.platform == 'darwin':
         print("Platform Detection: Mac OS X. Link to openblas...")
-        extra_link_args = ['-L/usr/local/opt/openblas/lib -lopenblas']
+        extra_link_args = ['-L/usr/local/opt/openblas/lib', '-lopenblas']
         include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
                         ['/usr/local/opt/openblas/include'])
     else:
         # assume linux otherwise, unless we support Windows in the future...
         print("Platform Detection: Linux. Link to liblapacke...")
-        extra_link_args = ['-llapacke -llapack -lblas']
+        extra_link_args = ['-llapacke', '-llapack', '-lblas']
         include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
                         ['/usr/include/lapacke'])
 
