@@ -76,10 +76,10 @@ sudo python setup.py install
 
 - `LIBACT_BUILD_HINTSVM`: set this variable to 1 if you would like to build
   hintsvm c-extension. If set to 0, you will not be able to use the HintSVM
-  query strategy.
+  query strategy. Default=1.
 - `LIBACT_BUILD_VARIANCE_REDUCTION`: set this variable to 1 if you would like to
   build variance reduction c-extension. If set to 0, you will not be able to use
-  the VarianceReduction query strategy.
+  the VarianceReduction query strategy. Default=1.
 
 Example:
 ```
