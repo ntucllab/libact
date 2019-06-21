@@ -73,12 +73,15 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
         self.random_state_ = seed_random_state(random_state)
 
         self.logreg_param = kwargs.pop('logreg_param',
-                {'multi_class': 'multinomial', 'solver': 'newton-cg',
-                 'random_state': random_state})
+                                       {'multi_class': 'multinomial',
+                                        'solver': 'newton-cg',
+                                        'random_state': random_state})
         self.logistic_regression_ = LogisticRegression(**self.logreg_param)
 
         self.br_base = kwargs.pop('br_base',
-              SklearnProbaAdapter(SVC(kernel='linear', probability=True,
+              SklearnProbaAdapter(SVC(kernel='linear',
+                                      probability=True,
+                                      gamma="auto",
                                       random_state=random_state)))
 
     @inherit_docstring_from(QueryStrategy)

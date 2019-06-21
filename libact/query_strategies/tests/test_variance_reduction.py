@@ -20,7 +20,11 @@ class VarianceReductionTestCase(unittest.TestCase):
         trn_ds = Dataset(self.X,
                          np.concatenate([self.y[:2],
                                          [None] * (len(self.y) - 2)]))
-        qs = VarianceReduction(trn_ds, model=LogisticRegression(), sigma=0.1)
+        qs = VarianceReduction(
+                trn_ds,
+                model=LogisticRegression(solver='liblinear', multi_class="ovr"),
+                sigma=0.1
+            )
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq, np.array([4, 5, 2, 3]))
 

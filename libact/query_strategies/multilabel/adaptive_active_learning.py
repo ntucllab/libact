@@ -3,7 +3,6 @@
 import copy
 
 import numpy as np
-from sklearn.svm import SVC
 from joblib import Parallel, delayed
 
 from libact.base.dataset import Dataset

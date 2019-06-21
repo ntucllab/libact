@@ -5,6 +5,7 @@ Learning (HS).
 
 """
 from __future__ import division
+
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 
@@ -30,7 +31,7 @@ class HierarchicalSampling(QueryStrategy):
 
     active_selecting: {True, False}, optional (default=True)
         False (random selecting): sample weight of a pruning is its number of
-        unsean leaves.
+        unseen leaves.
         True (active selecting): sample weight of a pruning is its weighted
         error bound.
 
@@ -196,7 +197,7 @@ class HierarchicalSampling(QueryStrategy):
     def make_query(self):
         pruning = self._select_pruning()
         if self.sub_qs is None:
-            ask_id = self._sample_node(pruning)
+            ask_id = int(self._sample_node(pruning))
         else:
             _, scores = self.sub_qs.make_query(return_score=True)
             leaves = set(self._find_leaves(pruning))

@@ -50,8 +50,11 @@ class IrisTestCase(unittest.TestCase):
                            clf.predict_proba(self.X_train))
 
     def test_adapt_logistic_regression(self):
-        adapter = SklearnProbaAdapter(LogisticRegression(random_state=1126))
-        clf = LogisticRegression(random_state=1126)
+        adapter = SklearnProbaAdapter(
+            LogisticRegression(solver='liblinear', multi_class="ovr",
+                               random_state=1126))
+        clf = LogisticRegression(solver='liblinear', multi_class="ovr",
+                                 random_state=1126)
         self.check_functions(adapter, clf)
 
     def test_adapt_linear_svc(self):

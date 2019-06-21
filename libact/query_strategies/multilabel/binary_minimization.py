@@ -3,7 +3,6 @@
 import copy
 
 import numpy as np
-from sklearn.svm import SVC
 
 from libact.base.dataset import Dataset
 from libact.base.interfaces import QueryStrategy, ContinuousModel

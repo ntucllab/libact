@@ -49,6 +49,15 @@ libact.query_strategies.random_sampling module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.density_weighted_uncertainty.sampling module
+---------------------------------------------------
+
+.. automodule:: libact.query_strategies.density_weighted_uncertainty.sampling
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.uncertainty_sampling module
 ---------------------------------------------------
 

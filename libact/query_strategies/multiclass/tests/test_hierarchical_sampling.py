@@ -45,7 +45,8 @@ class HierarchicalSamplingTestCase(unittest.TestCase):
 
     def test_hs_subsampling(self):
         ds = Dataset(self.X, self.y[:10] + [None] * (len(self.y) - 10))
-        sub_qs = UncertaintySampling(ds, model=SVM(decision_function_shape='ovr'))
+        sub_qs = UncertaintySampling(ds,
+                    model=SVM(gamma='auto', decision_function_shape='ovr'))
         qs = HS(ds, self.classes, subsample_qs=sub_qs, random_state=1126)
         qseq = run_qs(ds, qs, self.y, len(self.y)-10)
         assert_array_equal(

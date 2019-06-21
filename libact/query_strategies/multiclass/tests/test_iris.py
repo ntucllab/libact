@@ -5,7 +5,6 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 from sklearn import datasets
-from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LinearRegression
 
@@ -56,7 +55,9 @@ class IrisTestCase(unittest.TestCase):
     def test_eer(self):
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
-        qs = EER(ds, LogisticRegression(), random_state=1126)
+        qs = EER(ds,
+                 LogisticRegression(solver='liblinear', multi_class="ovr"),
+                 random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(
             qseq, np.array([131, 20, 129, 78, 22, 139, 88, 43, 141, 133]))
@@ -64,7 +65,9 @@ class IrisTestCase(unittest.TestCase):
     def test_eer_01(self):
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
-        qs = EER(ds, LogisticRegression(), loss='01', random_state=1126)
+        qs = EER(ds,
+                 LogisticRegression(solver='liblinear', multi_class="ovr"),
+                 loss='01', random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(
             qseq, np.array([105, 16, 131, 117, 109, 148, 136, 115, 144, 121]))
