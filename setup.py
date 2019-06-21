@@ -67,16 +67,10 @@ else:
 
     extensions = cythonize(extensions)
     cmdclasses = {'build_ext': build_ext}
-    setup_requires = [
-    ]
-    install_requires = [
-        'numpy',
-        'scipy',
-        'scikit-learn',
-        'Cython',
-        'joblib',
-        'six',
-    ]
+    setup_requires = []
+    with open('./requirements.txt') as f:
+        requirements = f.read().splitlines()
+    install_requires = requirements
     tests_require = [
         'coverage',
     ]
@@ -84,7 +78,7 @@ else:
 
 setup(
     name='libact',
-    version='0.1.3',
+    version='0.1.4',
     description='Pool-based active learning in Python',
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
