@@ -119,9 +119,9 @@ class ActiveLearningWithCostEmbedding(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        unlabeled_entry_ids, pool_X = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, pool_X = dataset.get_unlabeled_entries()
         # The input class should be 0-n_classes
-        X, y = zip(*dataset.get_labeled_entries())
+        X, y = dataset.get_labeled_entries()
 
         pred_embed = np.zeros((len(pool_X), self.embed_dim))
         for i in range(self.embed_dim):

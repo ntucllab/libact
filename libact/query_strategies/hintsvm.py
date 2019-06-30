@@ -132,9 +132,8 @@ class HintSVM(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        unlabeled_entry_ids, unlabeled_pool = zip(
-            *dataset.get_unlabeled_entries())
-        labeled_pool, y = zip(*dataset.get_labeled_entries())
+        unlabeled_entry_ids, unlabeled_pool = dataset.get_unlabeled_entries()
+        labeled_pool, y = dataset.get_labeled_entries()
         if len(np.unique(y)) > 2:
             raise ValueError("HintSVM query strategy support binary class "
                 "active learning only. Found %s classes" % len(np.unique(y)))

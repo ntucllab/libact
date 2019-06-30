@@ -124,7 +124,7 @@ class DWUS(QueryStrategy):
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
-        unlabeled_entry_ids, _ = zip(*self.dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, _ = self.dataset.get_unlabeled_entries()
         labeled_entry_ids = np.array([eid
                                       for eid, x in enumerate(self.dataset.data)
                                       if x[1] != None])

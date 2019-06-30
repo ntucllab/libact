@@ -126,7 +126,7 @@ class HierarchicalSampling(QueryStrategy):
     def __init__(self, dataset, classes, active_selecting=True,
             subsample_qs=None, random_state=None):
         super(HierarchicalSampling, self).__init__(dataset)
-        X = np.array(next(zip(*self.dataset.get_entries())))
+        X, _ = self.dataset.get_entries()
         cluster = AgglomerativeClustering()
         cluster.fit(X)
         childrens = cluster.children_

@@ -45,7 +45,7 @@ class RandomSampling(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        unlabeled_entry_ids, _ = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, _ = dataset.get_unlabeled_entries()
         entry_id = unlabeled_entry_ids[
             self.random_state_.randint(0, len(unlabeled_entry_ids))]
         return entry_id

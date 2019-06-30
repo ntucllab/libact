@@ -21,7 +21,7 @@ class IdealLabeler(Labeler):
     """
 
     def __init__(self, dataset, **kwargs):
-        X, y = zip(*dataset.get_entries())
+        X, y = dataset.get_entries()
         # make sure the input dataset is fully labeled
         assert (np.array(y) != np.array(None)).all()
         self.X = X

@@ -98,7 +98,7 @@ class UncertaintySampling(QueryStrategy):
     def _get_scores(self):
         dataset = self.dataset
         self.model.train(dataset)
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
 
         if isinstance(self.model, ProbabilisticModel):
             dvalue = self.model.predict_proba(X_pool)
@@ -135,7 +135,7 @@ class UncertaintySampling(QueryStrategy):
 
         """
         dataset = self.dataset
-        unlabeled_entry_ids, _ = zip(*dataset.get_unlabeled_entries())
+        # unlabeled_entry_ids, _ = dataset.get_unlabeled_entries()
 
         unlabeled_entry_ids, scores = zip(*self._get_scores())
         ask_id = np.argmax(scores)

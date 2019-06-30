@@ -62,13 +62,11 @@ class VarianceReduction(QueryStrategy):
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
-        labeled_entries = self.dataset.get_labeled_entries()
-        Xlabeled, y = zip(*labeled_entries)
+        Xlabeled, y = self.dataset.get_labeled_entries()
         Xlabeled = np.array(Xlabeled)
         y = list(y)
 
-        unlabeled_entries = self.dataset.get_unlabeled_entries()
-        unlabeled_entry_ids, X_pool = zip(*unlabeled_entries)
+        unlabeled_entry_ids, X_pool = self.dataset.get_unlabeled_entries()
 
         label_count = self.dataset.get_num_of_labels()
 

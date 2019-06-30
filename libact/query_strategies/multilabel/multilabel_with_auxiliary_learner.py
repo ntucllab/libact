@@ -91,8 +91,8 @@ class MultilabelWithAuxiliaryLearner(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        labeled_pool, Y = zip(*dataset.get_labeled_entries())
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        labeled_pool, Y = dataset.get_labeled_entries()
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
 
         major_clf = copy.deepcopy(self.major_learner)
         major_clf.train(dataset)

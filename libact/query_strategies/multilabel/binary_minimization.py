@@ -60,9 +60,9 @@ class BinaryMinimization(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        X, Y = zip(*dataset.get_labeled_entries())
+        X, Y = dataset.get_labeled_entries()
         Y = np.array(Y)
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
         X_pool = np.array(X_pool)
 
         clfs = []

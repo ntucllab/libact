@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import random
 import numpy as np
+import scipy.sparse as sp
 
 from libact.utils import zip
 
@@ -33,9 +34,16 @@ class Dataset(object):
     """
 
     def __init__(self, X=None, y=None):
-        if X is None: X = []
+        if X is None: X = np.array([])
+        elif not isinstance(X, sp.csr_matrix):
+            X = np.array( X )
+
         if y is None: y = []
-        self.data = list(zip(X, y))
+        y = np.array( y )
+        
+        # self.data = list(zip(X, y))
+        self._X = X
+        self._y = y
         self.modified = True
         self._update_callback = set()
 
@@ -47,9 +55,26 @@ class Dataset(object):
         -------
         n_samples : int
         """
-        return len(self.data)
+        return self._X.shape[0]
+    
+    def __getitem__(self, idx):
+        # still provide the interface to direct access the data by index
+        return self._X[idx], self._y[idx]
+    
+    @property
+    def data(self): return self
 
-    def len_labeled(self):
+    def get_labeled_mask(self):
+        """
+        Get the mask of labeled entries.
+
+        Returns
+        -------
+        mask: numpy array of bool, shape = (n_sample, )
+        """
+        return ~np.fromiter( ( e is None for e in self._y), dtype=bool )
+
+    def len_labeled(self): 
         """
         Number of labeled data entries in this object.
 
@@ -57,7 +82,7 @@ class Dataset(object):
         -------
         n_samples : int
         """
-        return len(self.get_labeled_entries())
+        return self.get_labeled_mask().sum()
 
     def len_unlabeled(self):
         """
@@ -67,7 +92,7 @@ class Dataset(object):
         -------
         n_samples : int
         """
-        return len(list(filter(lambda entry: entry[1] is None, self.data)))
+        return (~self.get_labeled_mask()).sum()
 
     def get_num_of_labels(self):
         """
@@ -77,7 +102,7 @@ class Dataset(object):
         -------
         n_labels : int
         """
-        return len({entry[1] for entry in self.data if entry[1] is not None})
+        return np.unique( self._y[ self.get_labeled_mask() ] ).size
 
     def append(self, feature, label=None):
         """
@@ -97,9 +122,14 @@ class Dataset(object):
         entry_id : {int}
             entry_id for the appened sample.
         """
-        self.data.append((feature, label))
+        if isinstance( self._X, np.ndarray ):
+            self._X = np.vstack([ self._X, feature ])
+        else: # sp.csr_matrix
+            self._X = sp.vstack([ self._X, feature ])
+        self._y = np.append( self._y, label )
+        
         self.modified = True
-        return len(self.data) - 1
+        return len(self) - 1
 
     def update(self, entry_id, new_label):
         """
@@ -113,7 +143,7 @@ class Dataset(object):
         label : {int, None}
             Label of the sample to be update.
         """
-        self.data[entry_id] = (self.data[entry_id][0], new_label)
+        self._y[ entry_id ] = new_label
         self.modified = True
         for callback in self._update_callback:
             callback(entry_id, new_label)
@@ -142,8 +172,9 @@ class Dataset(object):
         y : numpy array, shape = (n_samples)
             Sample labels.
         """
-        X, y = zip(*self.get_labeled_entries())
-        return np.array(X), np.array(y)
+        # becomes the same as get_labled_entries
+        X, y = self.get_labeled_entries()
+        return X, np.array(y)
 
     def get_entries(self):
         """
@@ -151,10 +182,10 @@ class Dataset(object):
 
         Returns
         -------
-        data : list, shape = (n_samples)
-            List of all sample feature and label tuple.
+        X: numpy array or scipy matrix, shape = ( n_sample, n_features )
+        y: numpy array, shape = (n_samples)
         """
-        return self.data
+        return self._X, self._y
 
     def get_labeled_entries(self):
         """
@@ -162,24 +193,21 @@ class Dataset(object):
 
         Returns
         -------
-        labeled_entries : list of (feature, label) tuple
-            Labeled entries
+        X: numpy array or scipy matrix, shape = ( n_sample labeled, n_features )
+        y: list, shape = (n_samples lebaled)
         """
-        return list(filter(lambda entry: entry[1] is not None, self.data))
+        return self._X[ self.get_labeled_mask() ], self._y[ self.get_labeled_mask() ].tolist()
 
-    def get_unlabeled_entries(self):
+    def get_unlabeled_entries(self): # TODO: change interface
         """
         Returns list of unlabeled features, along with their entry_ids
 
         Returns
         -------
-        unlabeled_entries : list of (entry_id, feature) tuple
-            Labeled entries
+        idx: numpy array, shape = (n_samples unlebaled)
+        X: numpy array or scipy matrix, shape = ( n_sample unlabeled, n_features )
         """
-        return [
-            (idx, entry[0]) for idx, entry in enumerate(self.data)
-            if entry[1] is None
-        ]
+        return np.where( ~self.get_labeled_mask() )[0], self._X[ ~self.get_labeled_mask() ]
 
     def labeled_uniform_sample(self, sample_size, replace=True):
         """Returns a Dataset object with labeled data only, which is
@@ -190,21 +218,16 @@ class Dataset(object):
         ----------
         sample_size
         """
-        if replace:
-            samples = [
-                random.choice(self.get_labeled_entries())
-                for _ in range(sample_size)
-            ]
-        else:
-            samples = random.sample(self.get_labeled_entries(), sample_size)
-        return Dataset(*zip(*samples))
+        idx = np.random.choice( np.where( self.get_labeled_mask() )[0], 
+                                size=sample_size, replace=replace )
+        return Dataset( self._X[idx], self._y[idx] )
 
 
 def import_libsvm_sparse(filename):
     """Imports dataset file in libsvm sparse format"""
     from sklearn.datasets import load_svmlight_file
     X, y = load_svmlight_file(filename)
-    return Dataset(X.toarray().tolist(), y.tolist())
+    return Dataset(X.toarray(), y)
 
 
 def import_scipy_mat(filename):

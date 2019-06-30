@@ -69,14 +69,16 @@ class QUIRE(QueryStrategy):
 
     def __init__(self, *args, **kwargs):
         super(QUIRE, self).__init__(*args, **kwargs)
-        self.Uindex = [
-            idx for idx, _ in self.dataset.get_unlabeled_entries()
-        ]
-        self.Lindex = [
-            idx for idx in range(len(self.dataset)) if idx not in self.Uindex
-        ]
+        self.Uindex = self.dataset.get_unlabeled_entries()[0].tolist()
+        self.Lindex = np.where( self.dataset.get_labeled_mask() )[0].tolist()
+        # self.Uindex = [
+        #     idx for idx, _ in self.dataset.get_unlabeled_entries()
+        # ]
+        # self.Lindex = [
+        #     idx for idx in range(len(self.dataset)) if idx not in self.Uindex
+        # ]
         self.lmbda = kwargs.pop('lambda', 1.)
-        X, self.y = zip(*self.dataset.get_entries())
+        X, self.y = self.dataset.get_entries()
         self.y = list(self.y)
         self.kernel = kwargs.pop('kernel', 'rbf')
         if self.kernel == 'rbf':

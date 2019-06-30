@@ -77,8 +77,8 @@ class EER(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        X, y = zip(*dataset.get_labeled_entries())
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        X, y = dataset.get_labeled_entries()
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
 
         classes = np.unique(y)
         n_classes = len(classes)
@@ -91,7 +91,7 @@ class EER(QueryStrategy):
             score = []
             for yi in range(n_classes):
                 m = copy.deepcopy(self.model)
-                m.train(Dataset(np.vstack((X, [x])), y + (yi, )))
+                m.train(Dataset(np.vstack((X, [x])), y + [yi ] ))
                 p = m.predict_proba(X_pool)
 
                 if self.loss == '01':  # 0/1 loss
