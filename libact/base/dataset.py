@@ -198,22 +198,3 @@ class Dataset(object):
         else:
             samples = random.sample(self.get_labeled_entries(), sample_size)
         return Dataset(*zip(*samples))
-
-
-def import_libsvm_sparse(filename):
-    """Imports dataset file in libsvm sparse format"""
-    from sklearn.datasets import load_svmlight_file
-    X, y = load_svmlight_file(filename)
-    return Dataset(X.toarray().tolist(), y.tolist())
-
-
-def import_scipy_mat(filename):
-    from scipy.io import loadmat
-    data = loadmat(filename)
-    X = data['X']
-    y = data['y']
-    zipper = list(zip(X, y))
-    np.random.shuffle(zipper)
-    X, y = zip(*zipper)
-    X, y = np.array(X), np.array(y).reshape(-1)
-    return Dataset(X, y)
