@@ -34,8 +34,7 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota, cost_matrix):
         # Standard usage of libact objects
         if i > 0:
             ask_id = qs.make_query()
-            X, _ = zip(*trn_ds.data)
-            lb = lbr.label(X[ask_id])
+            lb = lbr.label(trn_ds.data[ask_id][0])
             trn_ds.update(ask_id, lb)
 
         model.train(trn_ds)
