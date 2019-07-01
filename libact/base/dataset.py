@@ -40,7 +40,7 @@ class Dataset(object):
 
         if y is None: y = []
         y = np.array( y )
-        
+
         # self.data = list(zip(X, y))
         self._X = X
         self._y = y
@@ -56,11 +56,11 @@ class Dataset(object):
         n_samples : int
         """
         return self._X.shape[0]
-    
+
     def __getitem__(self, idx):
         # still provide the interface to direct access the data by index
         return self._X[idx], self._y[idx]
-    
+
     @property
     def data(self): return self
 
@@ -74,7 +74,7 @@ class Dataset(object):
         """
         return ~np.fromiter( ( e is None for e in self._y), dtype=bool )
 
-    def len_labeled(self): 
+    def len_labeled(self):
         """
         Number of labeled data entries in this object.
 
@@ -127,7 +127,7 @@ class Dataset(object):
         else: # sp.csr_matrix
             self._X = sp.vstack([ self._X, feature ])
         self._y = np.append( self._y, label )
-        
+
         self.modified = True
         return len(self) - 1
 
@@ -218,7 +218,7 @@ class Dataset(object):
         ----------
         sample_size
         """
-        idx = np.random.choice( np.where( self.get_labeled_mask() )[0], 
+        idx = np.random.choice( np.where( self.get_labeled_mask() )[0],
                                 size=sample_size, replace=replace )
         return Dataset( self._X[idx], self._y[idx] )
 
