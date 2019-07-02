@@ -28,7 +28,7 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota):
     for _ in range(quota):
         # Standard usage of libact objects
         ask_id = qs.make_query()        
-        lb = lbr.label( trn_ds.data[ask_id][0] )
+        lb = lbr.label(trn_ds.data[ask_id][0])
         trn_ds.update(ask_id, lb)
 
         model.train(trn_ds)
