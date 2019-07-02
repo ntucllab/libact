@@ -159,10 +159,8 @@ class QueryByCommittee(QueryStrategy):
     def _labeled_uniform_sample(self, sample_size):
         """sample labeled entries uniformly"""
         X, y = self.dataset.get_labeled_entries()
-        samples_idx = [
-            self.random_state_.randint(0, X.shape[0]) for _ in range(sample_size)]
-        return Dataset( X[samples_idx], np.array(y)[samples_idx] )
-        # return self.dataset.labeled_uniform_sample(sample_size, replace=True)
+        samples_idx = [self.random_state_.randint(0, X.shape[0]) for _ in range(sample_size)]
+        return Dataset(X[samples_idx], np.array(y)[samples_idx])
 
     def teach_students(self):
         """

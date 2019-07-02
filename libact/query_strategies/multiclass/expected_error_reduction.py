@@ -91,7 +91,7 @@ class EER(QueryStrategy):
             score = []
             for yi in range(n_classes):
                 m = copy.deepcopy(self.model)
-                m.train(Dataset(np.vstack((X, [x])), y + [yi ] ))
+                m.train(Dataset(np.vstack((X, [x])), y + [yi]))
                 p = m.predict_proba(X_pool)
 
                 if self.loss == '01':  # 0/1 loss
