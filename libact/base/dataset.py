@@ -71,7 +71,7 @@ class Dataset(object):
         -------
         mask: numpy array of bool, shape = (n_sample, )
         """
-        return ~np.fromiter( ( e is None for e in self._y), dtype=bool )
+        return ~np.fromiter((e is None for e in self._y), dtype=bool)
 
     def len_labeled(self):
         """
@@ -101,7 +101,7 @@ class Dataset(object):
         -------
         n_labels : int
         """
-        return np.unique( self._y[self.get_labeled_mask()] ).size
+        return np.unique(self._y[self.get_labeled_mask()]).size
 
     def append(self, feature, label=None):
         """
@@ -121,7 +121,7 @@ class Dataset(object):
         entry_id : {int}
             entry_id for the appened sample.
         """
-        if isinstance( self._X, np.ndarray ):
+        if isinstance(self._X, np.ndarray):
             self._X = np.vstack([self._X, feature])
         else: # sp.csr_matrix
             self._X = sp.vstack([self._X, feature])
@@ -142,7 +142,7 @@ class Dataset(object):
         label : {int, None}
             Label of the sample to be update.
         """
-        self._y[ entry_id ] = new_label
+        self._y[entry_id] = new_label
         self.modified = True
         for callback in self._update_callback:
             callback(entry_id, new_label)
