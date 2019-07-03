@@ -158,11 +158,9 @@ class QueryByCommittee(QueryStrategy):
 
     def _labeled_uniform_sample(self, sample_size):
         """sample labeled entries uniformly"""
-        labeled_entries = self.dataset.get_labeled_entries()
-        samples = [labeled_entries[
-            self.random_state_.randint(0, len(labeled_entries))
-        ]for _ in range(sample_size)]
-        return Dataset(*zip(*samples))
+        X, y = self.dataset.get_labeled_entries()
+        samples_idx = [self.random_state_.randint(0, X.shape[0]) for _ in range(sample_size)]
+        return Dataset(X[samples_idx], np.array(y)[samples_idx])
 
     def teach_students(self):
         """
@@ -186,7 +184,7 @@ class QueryByCommittee(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
 
         if self.disagreement == 'vote':
             # Let the trained students vote for unlabeled data

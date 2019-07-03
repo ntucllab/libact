@@ -17,7 +17,7 @@ class DummyClf():
         self.cls = int(y[0]) # 1 or 0
 
     def train(self, dataset):
-        _, y = zip(*dataset.get_labeled_entries())
+        _, y = dataset.get_labeled_entries()
         self.cls = int(y[0])
 
     def predict(self, X):

@@ -134,11 +134,10 @@ class ActiveLearningByLearning(QueryStrategy):
                 "__init__() missing required keyword-only argument: 'T'"
             )
 
-        self.unlabeled_entry_ids, _ = \
-            zip(*self.dataset.get_unlabeled_entries())
+        self.unlabeled_entry_ids, _ = self.dataset.get_unlabeled_entries()
         self.unlabeled_invert_id_idx = {}
-        for i, entry in enumerate(self.dataset.get_unlabeled_entries()):
-            self.unlabeled_invert_id_idx[entry[0]] = i
+        for i, idx in enumerate(self.dataset.get_unlabeled_entries()[0]):
+            self.unlabeled_invert_id_idx[idx] = i
 
         self.uniform_sampler = kwargs.pop('uniform_sampler', True)
         if not isinstance(self.uniform_sampler, bool):
@@ -219,7 +218,7 @@ class ActiveLearningByLearning(QueryStrategy):
     def make_query(self):
         dataset = self.dataset
         try:
-            unlabeled_entry_ids, _ = zip(*dataset.get_unlabeled_entries())
+            unlabeled_entry_ids, _ = dataset.get_unlabeled_entries()
         except ValueError:
             # might be no more unlabeled data left
             return

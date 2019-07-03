@@ -67,7 +67,8 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
     def __init__(self, *args, **kwargs):
         super(MaximumLossReductionMaximalConfidence, self).__init__(*args, **kwargs)
 
-        self.n_labels = len(self.dataset.get_labeled_entries()[0][1])
+        # self.n_labels = len(self.dataset.get_labeled_entries()[0][1])
+        self.n_labels = len(self.dataset.get_labeled_entries()[1][0])
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
@@ -87,8 +88,8 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
-        labeled_pool, Y = zip(*dataset.get_labeled_entries())
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        labeled_pool, Y = dataset.get_labeled_entries()
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
         labeled_pool = np.array(labeled_pool)
         Y = np.array(Y)
         X_pool = np.array(X_pool)

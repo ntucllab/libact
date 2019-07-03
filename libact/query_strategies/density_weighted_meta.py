@@ -102,7 +102,7 @@ class DensityWeightedMeta(QueryStrategy):
         dataset = self.dataset
         X, _ = zip(*dataset.data)
         scores = self.base_query_strategy._get_scores()
-        _, X_pool = zip(*dataset.get_unlabeled_entries())
+        _, X_pool = dataset.get_unlabeled_entries()
         unlabeled_entry_ids, base_scores = zip(*scores)
         
         self.clustering_method.fit(X)

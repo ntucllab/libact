@@ -84,7 +84,7 @@ class CostSensitiveReferencePairEncoding(QueryStrategy):
     def make_query(self):
         dataset = self.dataset
 
-        unlabeled_entry_ids, X_pool = zip(*dataset.get_unlabeled_entries())
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
         X_pool = np.asarray(X_pool)
 
         self.csrpe_.train(dataset)
