@@ -70,7 +70,7 @@ class QUIRE(QueryStrategy):
     def __init__(self, *args, **kwargs):
         super(QUIRE, self).__init__(*args, **kwargs)
         self.Uindex = self.dataset.get_unlabeled_entries()[0].tolist()
-        self.Lindex = np.where( self.dataset.get_labeled_mask() )[0].tolist()
+        self.Lindex = np.where(self.dataset.get_labeled_mask())[0].tolist()
         # self.Uindex = [
         #     idx for idx, _ in self.dataset.get_unlabeled_entries()
         # ]
