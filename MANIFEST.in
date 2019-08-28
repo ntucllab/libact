@@ -2,3 +2,4 @@ recursive-include libact *.pyx *.pxd *.h
 include README.md
 include LICENSE
 include libact/query_strategies/src/hintsvm/COPYRIGHT
+include requirements.txt
