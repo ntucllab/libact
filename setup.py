@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from io import open # python 2 compatibility
 import os
 from setuptools import setup, Extension
 import sys
