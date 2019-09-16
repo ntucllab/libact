@@ -6,7 +6,6 @@ authors: Yao-Yuan Yang, Shao-Chuan Lee, Yu-An Chung, Tung-En Wu, Si-An Chen, [Hs
 [![Documentation Status](https://readthedocs.org/projects/libact/badge/?version=latest)](http://libact.readthedocs.org/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/libact.svg)](https://badge.fury.io/py/libact)
 [![codecov.io](https://codecov.io/github/ntucllab/libact/coverage.svg?branch=master)](https://codecov.io/github/ntucllab/libact?branch=master)
-[![Week Stars](http://starveller.sigsev.io/api/repos/ntucllab/libact/badge)](http://starveller.sigsev.io/ntucllab/libact)
 
 # Introduction
 
