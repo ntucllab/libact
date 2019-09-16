@@ -80,7 +80,7 @@ setup(
     name='libact',
     version='0.1.5',
     description='Pool-based active learning in Python',
-    long_description=open('README.md').read(),
+    long_description=open('README.md', 'r', newline='', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     author='Y.-Y. Yang, S.-C. Lee, Y.-A. Chung, T.-E. Wu, H.-T. Lin',
     author_email='b01902066@csie.ntu.edu.tw, b01902010@csie.ntu.edu.tw, '
