@@ -17,8 +17,8 @@ except ImportError:
 
 # libact classes
 from libact.base.dataset import Dataset, import_libsvm_sparse
-from libact.models import *
-from libact.query_strategies import *
+from libact.models import LogisticRegression
+from libact.query_strategies import RandomSampling, UncertaintySampling
 from libact.labelers import IdealLabeler
 
 
@@ -27,7 +27,7 @@ def run(trn_ds, tst_ds, lbr, model, qs, quota):
 
     for _ in range(quota):
         # Standard usage of libact objects
-        ask_id = qs.make_query()        
+        ask_id = qs.make_query()
         lb = lbr.label(trn_ds.data[ask_id][0])
         trn_ds.update(ask_id, lb)
 
