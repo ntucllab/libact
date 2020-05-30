@@ -31,4 +31,5 @@ class IdealLabeler(Labeler):
     def label(self, feature):
         yy = self.y[np.where([np.array_equal(x, feature)
                               for x in self.X])[0]]
-        return np.random.choice(yy, 1)[0]
+        ind = np.arange(len(yy))
+        return yy[np.random.choice(ind, 1)[0]]
