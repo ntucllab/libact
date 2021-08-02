@@ -47,7 +47,7 @@ class MultilabelRealdataTestCase(unittest.TestCase):
         qs = MMC(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq,
-                np.array([117, 655, 1350, 909, 1003, 1116, 546, 1055, 165, 1441]))
+                np.array([117,  655,  234, 1419, 1350, 1224,  427,  890, 1447,  103]))
 
     def test_multilabel_with_auxiliary_learner_hlr(self):
         trn_ds = Dataset(self.X,

@@ -1,7 +1,7 @@
 setuptools
 numpy
 scipy
-scikit-learn==0.22
+scikit-learn==0.23
 matplotlib
 Cython
 joblib
