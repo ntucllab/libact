@@ -4,11 +4,6 @@
 #include <numpy/arrayobject.h>
 #include <lapacke.h>
 
-/* DGESVD prototype */
-extern void LAPACK_dgesvd( char* jobu, char* jobvt, int* m, int* n, double* a,
-                    int* lda, double* s, double* u, int* ldu, double* vt, int* ldvt,
-                    double* work, int* lwork, int* info );
-
 double** An(double *pi, double *x, int labs, int dims);
 double** A(double **PI, double **X, int labs, int dims, int n_pool);
 double** Fisher(double *pi, double *x, double sigma, int labs, int dims);
