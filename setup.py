@@ -26,9 +26,13 @@ else:
         print("Platform Detection: Mac OS X. Link to openblas...")
         extra_link_args = []
         libraries = ['openblas']
-        library_dirs = ['/opt/local/lib']
+        library_dirs = [
+            '/opt/local/lib',
+            '/usr/local/opt/openblas/lib',  # for brew installs
+        ]
         include_dirs = (numpy.distutils.misc_util.get_numpy_include_dirs() +
-                        ['/opt/local/include'])
+                        ['/opt/local/include',
+                         '/usr/local/opt/openblas/include'])  # for brew installs
     else:
         # assume linux otherwise, unless we support Windows in the future...
         print("Platform Detection: Linux. Link to liblapacke...")
