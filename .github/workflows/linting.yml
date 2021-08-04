@@ -6,9 +6,9 @@ jobs:
   build:
 
     runs-on: ${{ matrix.os }}
+    continue-on-error: True
     strategy:
       fail-fast: false
-      continue-on-error: True
       matrix:
         os: [ubuntu-latest]
         python-version: [3.9]

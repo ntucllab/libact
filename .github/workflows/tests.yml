@@ -22,10 +22,9 @@ jobs:
         run: |
           if [ "$RUNNER_OS" = "macOS" ]; then
             brew update
-            brew install openblas lapack
-            export LDFLAGS="-L/usr/local/opt/lapack/lib"
-            export CPPFLAGS="-I/usr/local/opt/lapack/include"
-            export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig"
+            brew install openblas
+            mkdir -p ~/.matplotlib
+            echo "backend: TkAgg" >> ~/.matplotlib/matplotlibrc
           else
             sudo apt-get update -qq
             sudo apt-get install -y build-essential gfortran libatlas-base-dev liblapacke-dev
@@ -35,7 +34,8 @@ jobs:
           pip install pylint coverage codecov
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Install Libact
-        run: ./setup.py build_ext --inplace
+        run: |
+          ./setup.py build_ext --inplace
       - name: Unittests
         run: |
           python -m unittest -v
