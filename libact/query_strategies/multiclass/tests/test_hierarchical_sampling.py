@@ -52,7 +52,7 @@ class HierarchicalSamplingTestCase(unittest.TestCase):
         assert_array_equal(
             np.concatenate([qseq[:10], qseq[-10:]]),
             np.array([120,  50, 33, 28,  78, 133, 52, 124, 102, 109,
-                       81, 108, 10, 89, 126, 114, 92,  48,  25,  13])
+                      81, 108, 10, 89, 126, 114, 92, 48, 25, 13])
             )
 
     def test_hs_report_all_label(self):

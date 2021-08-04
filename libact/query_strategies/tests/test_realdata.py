@@ -153,7 +153,7 @@ class RealdataTestCase(unittest.TestCase):
         qs = DWUS(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([ 30, 179, 104, 186,  28,  65, 142,  62, 257, 221]))
+            qseq, np.array([30, 179, 104, 186, 28, 65, 142, 62, 257, 221]))
 
 
 if __name__ == '__main__':
