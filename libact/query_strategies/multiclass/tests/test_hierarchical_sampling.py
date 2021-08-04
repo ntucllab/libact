@@ -29,8 +29,8 @@ class HierarchicalSamplingTestCase(unittest.TestCase):
         qseq = run_qs(ds, qs, self.y, len(self.y)-10)
         assert_array_equal(
             np.concatenate([qseq[:10], qseq[-10:]]),
-            np.array([39, 126, 66, 135,  37, 33, 118, 132, 142, 144,
-                      71,  28, 63,  41, 140, 34,  20, 110, 136,  36])
+            np.array([39, 126, 66, 135, 37, 33, 118, 132, 142, 144,
+                      71, 28, 63, 41, 140, 34, 20, 110, 136, 36])
             )
 
     def test_hs_active_selecting(self):
@@ -40,7 +40,7 @@ class HierarchicalSamplingTestCase(unittest.TestCase):
         assert_array_equal(
             np.concatenate([qseq[:10], qseq[-10:]]),
             np.array([39, 126, 66, 135, 37, 33, 118, 132, 142, 144,
-                      89, 117, 48,  67, 75, 14,  79,  62, 105,  19])
+                      89, 117, 48, 67, 75, 14, 79, 62, 105, 19])
             )
 
     def test_hs_subsampling(self):
