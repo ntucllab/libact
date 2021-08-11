@@ -29,7 +29,7 @@ class SVMIrisTestCase(unittest.TestCase):
     def test_svm(self):
         svc_clf = SVC(gamma="auto")
         svc_clf.fit(self.X_train, self.y_train)
-        svm = SVM()
+        svm = SVM(gamma="auto")
         svm.train(Dataset(self.X_train, self.y_train))
 
         assert_array_equal(
