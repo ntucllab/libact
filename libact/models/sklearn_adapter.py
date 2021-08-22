@@ -92,6 +92,7 @@ class SklearnProbaAdapter(ProbabilisticModel):
     """
 
     def __init__(self, clf):
+        super().__init__()
         self._model = clf
 
     def train(self, dataset, *args, **kwargs):

@@ -1,0 +1,44 @@
+name: Libact tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            brew update
+            brew install openblas
+            mkdir -p ~/.matplotlib
+            echo "backend: TkAgg" >> ~/.matplotlib/matplotlibrc
+          else
+            sudo apt-get update -qq
+            sudo apt-get install -y build-essential gfortran libatlas-base-dev liblapacke-dev
+            sudo apt-get install -y python3-dev
+          fi
+          python -m pip install --upgrade pip
+          pip install pylint coverage codecov
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install Libact
+        run: |
+          ./setup.py build_ext --inplace
+      - name: Unittests
+        run: |
+          python -m unittest -v
+      - run: coverage run --source libact --omit */tests/* setup.py test
+      - run: coverage report
+      - run: codecov

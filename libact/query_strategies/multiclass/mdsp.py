@@ -9,6 +9,7 @@ by Kuan-Hao Huang.
 # Licence: BSD
 
 import numpy as np
+import sklearn
 
 import warnings
 
@@ -16,6 +17,7 @@ from sklearn.base import BaseEstimator
 from sklearn.metrics import euclidean_distances
 from sklearn.utils import check_random_state, check_array, check_symmetric
 from joblib import Parallel, delayed
+
 from sklearn.isotonic import IsotonicRegression
 
 
