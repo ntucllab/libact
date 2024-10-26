@@ -23,14 +23,14 @@ Comments and questions on the package is welcomed at `libact-users@googlegroups.
 
 * Python 2.7, 3.3, 3.4, 3.5, 3.6
 
-* Python dependencies
-```
-pip install -r requirements.txt
-```
-
 * Debian (>= 7) / Ubuntu (>= 14.04)
 ```
 sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
+```
+
+* Python dependencies
+```
+pip install -r requirements.txt
 ```
 
 * Arch
@@ -67,8 +67,7 @@ python setup.py install --user
 
 To build and install from souce for all users on Unix/Linux:
 ```
-python setup.py build
-sudo python setup.py install
+pip install -e .
 ```
 
 ## Installation Options
