@@ -40,7 +40,6 @@ class DensityWeightedMetaTestCase(unittest.TestCase):
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq, np.array(
             [13, 18, 9, 12, 8, 16, 10, 19, 15, 17]))
-        # assert True
 
 
 if __name__ == '__main__':
