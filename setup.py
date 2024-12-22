@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-from io import open  # python 2 compatibility
+from io import open # python 2 compatibility
 import os
 from setuptools import setup, Extension
 import sys
 
 BUILD_HINTSVM = int(os.environ.get("LIBACT_BUILD_HINTSVM", 1))
-BUILD_VARIANCE_REDUCTION = int(os.environ.get(
-    "LIBACT_BUILD_VARIANCE_REDUCTION", 1))
+BUILD_VARIANCE_REDUCTION = int(os.environ.get("LIBACT_BUILD_VARIANCE_REDUCTION", 1))
 
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -66,8 +65,7 @@ else:
                          "libact/query_strategies/src/hintsvm/libsvm_helper.c",
                          "libact/query_strategies/src/hintsvm/svm.cpp"],
                 include_dirs=[numpy.get_include(),
-                              "libact/query_strategies/src/hintsvm/",
-                              "libact/query_strategies/"],
+                              "libact/query_strategies/src/hintsvm/"],
                 extra_compile_args=['-lstdc++'],
             )
         )
@@ -87,12 +85,11 @@ setup(
     name='libact',
     version='0.1.6',
     description='Pool-based active learning in Python',
-    long_description=open('README.md', 'r', newline='',
-                          encoding='utf-8').read(),
+    long_description=open('README.md', 'r', newline='', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     author='Y.-Y. Yang, S.-C. Lee, Y.-A. Chung, T.-E. Wu, H.-T. Lin',
     author_email='b01902066@csie.ntu.edu.tw, b01902010@csie.ntu.edu.tw, '
-    'b01902040@csie.ntu.edu.tw, r00942129@ntu.edu.tw, htlin@csie.ntu.edu.tw',
+        'b01902040@csie.ntu.edu.tw, r00942129@ntu.edu.tw, htlin@csie.ntu.edu.tw',
     url='https://github.com/ntucllab/libact',
     cmdclass=cmdclasses,
     setup_requires=setup_requires,

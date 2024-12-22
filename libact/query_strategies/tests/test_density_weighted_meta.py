@@ -24,8 +24,7 @@ class DensityWeightedMetaTestCase(unittest.TestCase):
         self.quota = 10
 
     def test_density_weighted_meta_uncertainty_lc(self):
-        trn_ds = Dataset(self.X[:20], np.concatenate(
-            [self.y[:6], [None] * 14]))
+        trn_ds = Dataset(self.X[:20], np.concatenate([self.y[:6], [None] * 14]))
         base_qs = UncertaintySampling(
             trn_ds, method='lc',
             model=LogisticRegression(solver='liblinear', multi_class="ovr"))
@@ -38,8 +37,7 @@ class DensityWeightedMetaTestCase(unittest.TestCase):
             beta=1.0, random_state=1126)
         model = LogisticRegression(solver='liblinear', multi_class="ovr")
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
-        assert_array_equal(qseq, np.array(
-            [13, 18, 9, 12, 8, 16, 10, 19, 15, 17]))
+        assert_array_equal(qseq, np.array([13, 18,  9, 12,  8, 16, 10, 19, 15, 17]))
 
 
 if __name__ == '__main__':
