@@ -66,6 +66,8 @@ python setup.py install --user
 ```
 
 To build and install from souce for all users on Unix/Linux:
+
+**(This is the recommended method for Python 3.10 users)**
 ```
 pip install -e .
 ```
