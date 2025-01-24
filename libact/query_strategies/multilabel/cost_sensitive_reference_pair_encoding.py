@@ -73,7 +73,8 @@ class CostSensitiveReferencePairEncoding(QueryStrategy):
 
     def __init__(self, dataset, scoring_fn, model, base_model, n_models=100,
                  n_jobs=1, random_state=None):
-        super(CostSensitiveReferencePairEncoding, self).__init__(dataset=dataset)
+        super(CostSensitiveReferencePairEncoding,
+              self).__init__(dataset=dataset)
 
         self.model_ = model
         self.csrpe_ = CSRPE(scoring_fn=scoring_fn, base_clf=base_model,
@@ -94,12 +95,12 @@ class CostSensitiveReferencePairEncoding(QueryStrategy):
         Z = self.csrpe_.predicted_code(X_pool)
         predZ = self.csrpe_.encode(predY)
 
-        dist = paired_distances(Z, predZ, metric=hamming) # z1 z2
-        dist2 = self.csrpe_.predict_dist(X_pool) # z1 zt
-        #dist3 = self.csrpe.distance(predZ) # z2 zt
+        dist = paired_distances(Z, predZ, metric=hamming)  # z1 z2
+        dist2 = self.csrpe_.predict_dist(X_pool)  # z1 zt
+        # dist3 = self.csrpe.distance(predZ) # z2 zt
 
         dist = dist + dist2
-        #dist = dist + dist3
+        # dist = dist + dist3
 
         ask_id = self.random_state_.choice(
             np.where(np.isclose(dist, np.max(dist)))[0])
@@ -127,8 +128,10 @@ class BinaryCLF():
         self.n_samples = np.shape(X)[0]
         self.n_labels = np.shape(y)[1]
 
-        score0 = self.scoring_fn(y, np.tile(self.rep_label[0], (self.n_samples, 1)))
-        score1 = self.scoring_fn(y, np.tile(self.rep_label[1], (self.n_samples, 1)))
+        score0 = self.scoring_fn(y, np.tile(
+            self.rep_label[0], (self.n_samples, 1)))
+        score1 = self.scoring_fn(y, np.tile(
+            self.rep_label[1], (self.n_samples, 1)))
         lbl = (((score1 - score0) > 0) + 0.0)
 
         weight = np.abs(score1 - score0)
@@ -153,8 +156,8 @@ class CSRPE():
                  metric='euclidean', random_state=None):
         self.scoring_fn = scoring_fn
         self.base_clf = base_clf
-        self.nn_ = NearestNeighbors(1, algorithm='ball_tree',
-                metric=metric, n_jobs=n_jobs)
+        self.nn_ = NearestNeighbors(n_neighbors=1, algorithm='ball_tree',
+                                    metric=metric, n_jobs=n_jobs)
         self.n_clfs = n_clfs
         self.random_state_ = seed_random_state(random_state)
 

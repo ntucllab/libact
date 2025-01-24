@@ -101,7 +101,7 @@ class DWUS(QueryStrategy):
         dis = np.zeros((len(all_x), self.n_clusts))
         for i in range(self.n_clusts):
             dis[:, i] = np.exp(-np.einsum('ij,ji->i', (all_x - centers[i]),
-                (all_x - centers[i]).T) / 2 / self.sigma)
+                                          (all_x - centers[i]).T) / 2 / self.sigma)
 
         # EM percedure to estimate the prior
         for _ in range(self.max_iter):
@@ -153,6 +153,7 @@ class DWUS(QueryStrategy):
 
         return unlabeled_entry_ids[ask_id]
 
+
 class DensityWeightedLogisticRegression(object):
     """Density Weighted Logistic Regression
 
@@ -203,15 +204,16 @@ class DensityWeightedLogisticRegression(object):
 
     def _likelihood(self, w, X, y):
         w = w.reshape(-1, 1)
-        sigmoid = lambda t: 1. / (1. + np.exp(-t))
+        def sigmoid(t): return 1. / (1. + np.exp(-t))
         # w --> shape = (d+1, 1)
-        L = lambda w: (self.C/2. * np.dot(w[:-1].T, w[:-1]) - \
-                np.sum(np.log(
-                    np.sum(self.density *
-                        sigmoid(np.dot(y,
-                                       (np.dot(self.centers, w[:-1]) + w[-1]).T)
-                        ), axis=1)
-                ), axis=0))[0][0]
+
+        def L(w): return (self.C/2. * np.dot(w[:-1].T, w[:-1]) -
+                          np.sum(np.log(
+                              np.sum(self.density *
+                                     sigmoid(np.dot(y,
+                                                    (np.dot(self.centers, w[:-1]) + w[-1]).T)
+                                             ), axis=1)
+                          ), axis=0))[0][0]
 
         return L(w)
 
@@ -235,7 +237,7 @@ class DensityWeightedLogisticRegression(object):
 
         """
         if self.w_ is not None:
-            sigmoid = lambda t: 1. / (1. + np.exp(-t))
+            def sigmoid(t): return 1. / (1. + np.exp(-t))
             return sigmoid(np.dot(self.centers, self.w_[:-1]) + self.w_[-1])
         else:
             # TODO the model is not trained
