@@ -86,12 +86,11 @@ class DensityWeightedMeta(QueryStrategy):
         else:
             self.clustering_method = KMeans(
                 n_clusters=5, random_state=self.random_state_)
-        
+
         if similarity_metric is not None:
             self.similarity_metric = similarity_metric
         else:
             self.similarity_metric = cosine_similarity
-
 
     @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
@@ -104,7 +103,7 @@ class DensityWeightedMeta(QueryStrategy):
         scores = self.base_query_strategy._get_scores()
         _, X_pool = dataset.get_unlabeled_entries()
         unlabeled_entry_ids, base_scores = zip(*scores)
-        
+
         self.clustering_method.fit(X)
         pool_cluster = self.clustering_method.predict(X_pool)
         cluster_center = self.clustering_method.cluster_centers_
@@ -126,6 +125,7 @@ class DensityWeightedMeta(QueryStrategy):
         dataset = self.dataset
 
         unlabeled_entry_ids, scores = zip(*self._get_scores())
-        ask_id = self.random_state_.choice(np.where(scores == np.max(scores))[0])
+        ask_id = self.random_state_.choice(
+            np.where(scores == np.max(scores))[0])
 
         return unlabeled_entry_ids[ask_id]

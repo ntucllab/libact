@@ -65,3 +65,5 @@ examples/heart.txt
 libact/query_strategies/_hintsvm.c
 .devcontainer/
 .github/dependabot.yml
+
+temp/
