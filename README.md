@@ -121,7 +121,7 @@ Available examples:
 To run the test suite:
 
 ```
-python setup.py test
+python -m unittest -v
 ```
 
 To run pylint, install pylint through ```pip install pylint``` and run the following command in root directory:
@@ -133,8 +133,8 @@ pylint libact
 To measure the test code coverage, install coverage through ```pip install coverage``` and run the following commands in root directory:
 
 ```
-coverage run --source libact --omit */tests/* setup.py test
-coverage report
+python -m coverage run --source libact --omit */tests/* -m unittest
+python -m coverage report
 ```
 
 # Citing
