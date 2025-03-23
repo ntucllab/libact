@@ -34,13 +34,11 @@ class Dataset(object):
     """
 
     def __init__(self, X=None, y=None):
-        if X is None:
-            X = np.array([])
+        if X is None: X = np.array([])
         elif not isinstance(X, sp.csr_matrix):
             X = np.array(X)
 
-        if y is None:
-            y = []
+        if y is None: y = []
         y = np.array(y, dtype=object)
 
         self._X = X
@@ -125,7 +123,7 @@ class Dataset(object):
         """
         if isinstance(self._X, np.ndarray):
             self._X = np.vstack([self._X, feature])
-        else:  # sp.csr_matrix
+        else: # sp.csr_matrix
             self._X = sp.vstack([self._X, feature])
         self._y = np.append(self._y, label)
 
