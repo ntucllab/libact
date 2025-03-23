@@ -125,7 +125,6 @@ class DensityWeightedMeta(QueryStrategy):
         dataset = self.dataset
 
         unlabeled_entry_ids, scores = zip(*self._get_scores())
-        ask_id = self.random_state_.choice(
-            np.where(scores == np.max(scores))[0])
+        ask_id = self.random_state_.choice(np.where(scores == np.max(scores))[0])
 
         return unlabeled_entry_ids[ask_id]
