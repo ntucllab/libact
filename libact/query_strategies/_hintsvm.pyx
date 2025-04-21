@@ -3,7 +3,7 @@
 import  numpy as np
 cimport numpy as np
 from libc.stdlib cimport free
-cimport _hintsvm
+from . cimport _hintsvm
 
 cdef extern from *:
     ctypedef struct svm_parameter:
