@@ -153,6 +153,7 @@ class DWUS(QueryStrategy):
 
         return unlabeled_entry_ids[ask_id]
 
+
 class DensityWeightedLogisticRegression(object):
     """Density Weighted Logistic Regression
 

@@ -39,7 +39,7 @@ class Dataset(object):
             X = np.array(X)
 
         if y is None: y = []
-        y = np.array(y)
+        y = np.array(y, dtype=object)
 
         self._X = X
         self._y = y
@@ -218,7 +218,7 @@ class Dataset(object):
         sample_size
         """
         idx = np.random.choice(np.where(self.get_labeled_mask())[0],
-                               size=sample_size, replace=replace )
+                               size=sample_size, replace=replace)
         return Dataset(self._X[idx], self._y[idx])
 
 
