@@ -21,7 +21,8 @@ Comments and questions on the package is welcomed at `libact-users@googlegroups.
 
 # Basic Dependencies
 
-* Python 2.7, 3.3, 3.4, 3.5, 3.6, 3.9, 3.10, 3.11
+* Python 3.9, 3.10, 3.11
+  * _Note._ We will soon release Python 2.7, 3.3, 3.4, 3.5, and 3.6 installations in the new branch.
 
 * Debian (>= 7) / Ubuntu (>= 14.04)
 ```
