@@ -155,7 +155,7 @@ class DWUS(QueryStrategy):
 
 
 class DensityWeightedLogisticRegression(object):
-    """Density Weighted Logistic Regression
+    r"""Density Weighted Logistic Regression
 
     Density Weighted Logistice Regression is used in DWUS to estimate the
     probability of representing which label for each cluster.
