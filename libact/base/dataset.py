@@ -34,12 +34,14 @@ class Dataset(object):
     """
 
     def __init__(self, X=None, y=None):
-        if X is None: X = np.array([])
+        if X is None:
+            X = np.array([])
         elif not isinstance(X, sp.csr_matrix):
             X = np.array(X)
 
-        if y is None: y = []
-        y = np.array(y)
+        if y is None:
+            y = []
+        y = np.array(y, dtype=object)
 
         self._X = X
         self._y = y
