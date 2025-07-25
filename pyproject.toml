@@ -1,0 +1,40 @@
+[build-system]
+build-backend = "mesonpy"
+requires = ["meson-python>=0.16", "ninja", "cython", "numpy"]
+
+[project]
+name = "libact"
+version = "0.1.6"
+description = "Pool-based active learning in Python"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+license-file = ["LICENSE"]
+authors = [
+    { name = "Y.-Y. Yang", email = "b01902066@csie.ntu.edu.tw" },
+    { name = "S.-C. Lee", email = "b01902010@csie.ntu.edu.tw" },
+    { name = "Y.-A. Chung", email = "b01902040@csie.ntu.edu.tw" },
+    { name = "T.-E. Wu", email = "r00942129@ntu.edu.tw" },
+    { name = "H.-T. Lin", email = "htlin@csie.ntu.edu.tw" },
+]
+classifiers = [
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "setuptools",
+    "numpy",
+    "scipy",
+    "scikit-learn>=0.24",
+    "matplotlib",
+    "joblib",
+]
+
+[project.urls]
+Homepage = "https://github.com/ntucllab/libact"
+Repository = "https://github.com/ntucllab/libact"
