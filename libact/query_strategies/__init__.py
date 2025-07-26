@@ -26,7 +26,7 @@ if not ON_RTD:
                        "LIBACT_BUILD_VARIANCE_REDUCTION=1 if intend to run "
                        "VarianceReduction")
     try:
-        from libact.query_strategies._hintsvm import hintsvm_query
+        from ._hintsvm import hintsvm_query
         from .hintsvm import HintSVM
     except ModuleNotFoundError:
         LOGGER.warning("HintSVM C-extension not compiled. "

@@ -1,13 +1,15 @@
 name: libact
 channels:
-  - conda-forge
+    - conda-forge
 dependencies:
-  - python=3.12
-  - compilers
-  - openblas
-  - meson-python
-  - ninja
-  - pkg-config
-  - pip
-  - ca-certificates
-  - openssl
+    - python=3.12
+    - compilers
+    - openblas
+    - meson-python
+    - ninja
+    - pkg-config
+    - pip
+    - ca-certificates
+    - openssl
+    - cython
+    - numpy

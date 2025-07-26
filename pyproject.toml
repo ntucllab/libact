@@ -7,7 +7,7 @@ name = "libact"
 version = "0.1.6"
 description = "Pool-based active learning in Python"
 readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license-file = ["LICENSE"]
 authors = [
     { name = "Y.-Y. Yang", email = "b01902066@csie.ntu.edu.tw" },
@@ -27,12 +27,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "setuptools",
-    "numpy",
-    "scipy",
-    "scikit-learn>=0.24",
-    "matplotlib",
-    "joblib",
+    "numpy>=2",
+    "scipy>=1.13",
+    "scikit-learn>=1.6",
+    "matplotlib>=3.8",
+    "joblib==1.5.1",
 ]
 
 [project.urls]
