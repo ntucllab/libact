@@ -1,7 +1,25 @@
-option('blas', type: 'string', value: 'auto',
-        description: 'option for BLAS library switching')
-option('lapack', type: 'string', value: 'auto',
-        description: 'option for LAPACK library switching')
+option(
+    'blas',
+    type: 'string',
+    value: 'auto',
+    description: 'option for BLAS library switching',
+)
+option(
+    'lapack',
+    type: 'string',
+    value: 'auto',
+    description: 'option for LAPACK library switching',
+)
 
-option('variance_reduction', type: 'boolean', value: true, description: 'Build libact.query_strategies._variance_reduction')
-option('hintsvm', type: 'boolean', value: true, description: 'Build libact.query_strategies._hintsvm')
+option(
+    'variance_reduction',
+    type: 'boolean',
+    value: true,
+    description: 'Build libact.query_strategies._variance_reduction',
+)
+option(
+    'hintsvm',
+    type: 'boolean',
+    value: true,
+    description: 'Build libact.query_strategies._hintsvm',
+)

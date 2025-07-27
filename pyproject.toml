@@ -8,7 +8,7 @@ version = "0.1.6"
 description = "Pool-based active learning in Python"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
-license-file = ["LICENSE"]
+license = { file = "LICENSE" }
 authors = [
     { name = "Y.-Y. Yang", email = "b01902066@csie.ntu.edu.tw" },
     { name = "S.-C. Lee", email = "b01902010@csie.ntu.edu.tw" },
@@ -37,3 +37,6 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/ntucllab/libact"
 Repository = "https://github.com/ntucllab/libact"
+
+[project.optional-dependencies]
+dev = ["build>=1.2.2.post1"]

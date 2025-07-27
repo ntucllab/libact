@@ -7,87 +7,120 @@ authors: [Yao-Yuan Yang](http://yyyang.me), Shao-Chuan Lee, Yu-An Chung, Tung-En
 [![PyPI version](https://badge.fury.io/py/libact.svg)](https://badge.fury.io/py/libact)
 [![codecov.io](https://codecov.io/github/ntucllab/libact/coverage.svg?branch=master)](https://codecov.io/github/ntucllab/libact?branch=master)
 
-# Introduction
+## Introduction
 
 `libact` is a Python package designed to make active learning easier for
 real-world users. The package not only implements several popular active learning strategies, but also features the [active-learning-by-learning](http://www.csie.ntu.edu.tw/~htlin/paper/doc/aaai15albl.pdf)
 meta-algorithm that assists the users to automatically select the best strategy
 on the fly. Furthermore, the package provides a unified interface for implementing more strategies, models and application-specific labelers. The package is open-source along with issue trackers on github, and can be easily installed from Python Package Index repository.
 
-# Documentation
+## Documentation
 
 The technical report associated with the package is on [arXiv](https://arxiv.org/abs/1710.00379), and the documentation for the latest release is available on [readthedocs](http://libact.readthedocs.org/en/latest/).
 Comments and questions on the package is welcomed at `libact-users@googlegroups.com`. All contributions to the documentation are greatly appreciated!
 
-# Basic Dependencies
+## Basic Dependencies
 
-* Python 3.9, 3.10, 3.11
-  * _Note._ We will soon release Python 2.7, 3.3, 3.4, 3.5, and 3.6 installations in the new branch.
+- Python 3.9, 3.10, 3.11, 3.12
+  - _Note._ We will soon release Python 2.7, 3.3, 3.4, 3.5, and 3.6 installations in the new branch.
 
-* Debian (>= 7) / Ubuntu (>= 14.04)
-```
-sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
-```
+- Python dependencies:
 
-* Python dependencies
 ```
 pip install -r requirements.txt
 ```
 
-* Arch
+### BLAS/LAPACKE Dependencies
+
+- Debian (>= 7) / Ubuntu (>= 14.04)
+
+```
+sudo apt-get install build-essential gfortran libatlas-base-dev liblapacke-dev python3-dev
+```
+
+- Arch Linux
+
 ```
 sudo pacman -S lapacke
 ```
 
-* macOS
+- macOS
 ```
 brew install openblas
 ```
 
-# Installation
+- Others: refer to the BLAS/LAPACKE installation guides.
 
-After resolving the dependencies, you may install the package via pip (for all users):
-```
-sudo pip install libact
-```
+## Installation
 
-or pip install in home directory:
-```
-pip install --user libact
+- Install the official release (from PyPI):
+
+```shell
+pip install libact
 ```
 
-or pip install from github repository for latest source:
-```
+- Install the latest development version
+
+```shell
 pip install git+https://github.com/ntucllab/libact.git
 ```
 
-To build and install from souce in your home directory:
-```
-python setup.py install --user
-```
+## Build Options
 
-To build and install from souce for all users on Unix/Linux:
+This package supports the following build options:
 
-**(This is the recommended method for Python 3.10 users)**
-```
-pip install -e .
-```
+- `blas`: BLAS library to use (default='auto'). Options: `auto`, `openblas`, `Accelerate`, `mkl`, `lapack`, `blis`.
+- `lapack`: LAPACK library to use (default=`auto`). Options: `auto`, `openblas`, `Accelerate`, `mkl`, `lapack`, `blis`.
+- `variance_reduction`: Build variance reduction module (default: true)
+- `hintsvm`: Build hintsvm module (default: true)
 
-## Installation Options
+### Examples
 
-- `LIBACT_BUILD_HINTSVM`: set this variable to 1 if you would like to build
-  hintsvm c-extension. If set to 0, you will not be able to use the HintSVM
-  query strategy. Default=1.
-- `LIBACT_BUILD_VARIANCE_REDUCTION`: set this variable to 1 if you would like to
-  build variance reduction c-extension. If set to 0, you will not be able to use
-  the VarianceReduction query strategy. Default=1.
+To install `libact` with the default configuration, run:
 
-Example:
-```
-LIBACT_BUILD_HINTSVM=1 pip install git+https://github.com/ntucllab/libact.git
+```shell
+pip install libact
 ```
 
-# Usage
+Install without optional modules:
+
+```shell
+pip install libact --config-settings=setup-args="-Dvariance_reduction=false" \
+                    --config-settings=setup-args="-Dhintsvm=false"
+```
+
+## Build from Source
+
+### Overview
+
+This project utilizes `meson` and `meson-python` as the build backend. To build from source, ensure you have the aforementioned dependencies installed on your system. The building procedure additionally requires the following dependencies:
+
+- `meson-python`
+- `ninja`
+- `cython`
+- `numpy`
+
+### The Recommended Approach (Using Bootstrapped Environment Config)
+
+To simplify the environment setup, we provide a pre-configured `environment.yml` located at the root directory of the project. Install with `conda/mamba` to get a head start.
+
+```shell
+# Clone the repository
+git clone https://github.com/ntucllab/libact.git
+cd libact
+
+# Create and activate conda environment
+conda env create -f environment.yml
+conda activate libact
+
+# Install in development mode
+pip install --no-build-isolation -e .
+
+# Or build and install
+pip install --no-build-isolation .
+```
+
+## Usage
 
 The main usage of `libact` is as follows:
 
@@ -117,7 +150,7 @@ Available examples:
   - [alce_plot](examples/alce_plot.py): This example compares the performance of
     algorithms under cost-sensitive multi-class setting.
 
-# Running tests
+## Running tests
 
 To run the test suite:
 
@@ -138,7 +171,8 @@ python -m coverage run --source libact --omit */tests/* -m unittest
 python -m coverage report
 ```
 
-# Citing
+## Citing
+
 If you find this package useful, please cite the original works (see Reference of each strategy) as well as the following
 
 ```
@@ -153,7 +187,6 @@ If you find this package useful, please cite the original works (see Reference o
 }
 ```
 
-
-# Acknowledgments
+## Acknowledgments
 
 The authors thank Chih-Wei Chang and other members of the [Computational Learning Lab](https://learner.csie.ntu.edu.tw/) at National Taiwan University for valuable discussions and various contributions to making this package better.
