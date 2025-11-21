@@ -120,6 +120,20 @@ pip install --no-build-isolation -e .
 pip install --no-build-isolation .
 ```
 
+### Editable Install with UV or pip
+
+When installing in editable/development mode, you **must** include the dev dependencies to ensure the build tools are available:
+
+```shell
+# With pip
+pip install -e ".[dev]"
+
+# With UV
+uv pip install -e ".[dev]"
+```
+
+**Important:** Editable installs require `meson`, `ninja`, and `cython` to be available in your environment. These are automatically installed when you use the `[dev]` extra as shown above. If you encounter errors about missing `ninja` or other build tools, make sure you installed with the dev dependencies.
+
 ## Usage
 
 The main usage of `libact` is as follows:
