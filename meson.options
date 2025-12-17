@@ -11,15 +11,18 @@ option(
     description: 'option for LAPACK library switching',
 )
 
+# Optional features (enabled by default)
+# These features require BLAS/LAPACK libraries
+# If BLAS/LAPACK are not found, they will be automatically disabled with a warning
 option(
     'variance_reduction',
     type: 'boolean',
     value: true,
-    description: 'Build libact.query_strategies._variance_reduction',
+    description: 'Build libact.query_strategies._variance_reduction (default: enabled, requires BLAS/LAPACK)',
 )
 option(
     'hintsvm',
     type: 'boolean',
     value: true,
-    description: 'Build libact.query_strategies._hintsvm',
+    description: 'Build libact.query_strategies._hintsvm (default: enabled, requires BLAS/LAPACK)',
 )
