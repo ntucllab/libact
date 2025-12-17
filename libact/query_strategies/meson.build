@@ -25,9 +25,15 @@ incdir_numpy = run_command(
 ).stdout().strip()
 
 # BLAS/LAPACK are only needed if variance_reduction or hintsvm features are enabled
+# By default, both features are enabled (see meson.options)
 want_variance_reduction = get_option('variance_reduction')
 want_hintsvm = get_option('hintsvm')
 need_blas = want_variance_reduction or want_hintsvm
+
+# Show what we're attempting to build
+message('Optional features requested:')
+message('  - variance_reduction: ' + want_variance_reduction.to_string())
+message('  - hintsvm: ' + want_hintsvm.to_string())
 
 blas_dep = dependency('', required: false)
 lapack_dep = dependency('', required: false)
@@ -104,3 +110,17 @@ endif
 subdir('multilabel')
 subdir('multiclass')
 subdir('tests')
+
+# Summary of what was built
+message('=== Build Summary ===')
+if want_variance_reduction
+  message('  ✓ variance_reduction: BUILT')
+else
+  message('  ✗ variance_reduction: SKIPPED')
+endif
+if want_hintsvm
+  message('  ✓ hintsvm: BUILT')
+else
+  message('  ✗ hintsvm: SKIPPED')
+endif
+message('====================')

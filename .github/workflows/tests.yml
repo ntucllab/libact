@@ -40,7 +40,25 @@ jobs:
           pip install meson-python meson ninja cython numpy
       - name: Install libact in editable mode
         run: |
-          pip install --no-build-isolation -e .
+          pip install --no-build-isolation -e . 2>&1 | tee build.log
+      - name: Verify optional features were built
+        run: |
+          # Check build log for feature messages
+          if grep -q "Building VarianceReduction" build.log; then
+            echo "✓ VarianceReduction feature was built"
+          else
+            echo "✗ ERROR: VarianceReduction feature was NOT built (expected with BLAS/LAPACK)"
+            exit 1
+          fi
+          if grep -q "Building HintSVM" build.log; then
+            echo "✓ HintSVM feature was built"
+          else
+            echo "✗ ERROR: HintSVM feature was NOT built (expected with BLAS/LAPACK)"
+            exit 1
+          fi
+          # Verify the compiled modules are importable
+          python -c "from libact.query_strategies._variance_reduction import *; print('✓ _variance_reduction module imports successfully')"
+          python -c "from libact.query_strategies._hintsvm import *; print('✓ _hintsvm module imports successfully')"
       - name: Run unittests
         run: |
           python -m unittest -v
@@ -82,8 +100,40 @@ jobs:
       - name: Install libact (should skip variance_reduction and hintsvm)
         run: |
           pip install --no-build-isolation -e . 2>&1 | tee install.log
+      - name: Verify optional features were skipped
+        run: |
           # Verify warning message appears
-          grep -q "BLAS/LAPACK libraries not found" install.log || echo "WARNING: Expected BLAS/LAPACK warning not found"
+          if grep -q "BLAS/LAPACK libraries not found" install.log; then
+            echo "✓ BLAS/LAPACK warning message found (as expected)"
+          else
+            echo "✗ WARNING: Expected BLAS/LAPACK warning message not found"
+          fi
+          # Verify features were skipped
+          if grep -q "Skipping VarianceReduction" install.log; then
+            echo "✓ VarianceReduction was correctly skipped"
+          else
+            echo "✗ ERROR: VarianceReduction skip message not found"
+            exit 1
+          fi
+          if grep -q "Skipping HintSVM" install.log; then
+            echo "✓ HintSVM was correctly skipped"
+          else
+            echo "✗ ERROR: HintSVM skip message not found"
+            exit 1
+          fi
+          # Verify the modules don't exist (shouldn't be importable)
+          python -c "try:
+    from libact.query_strategies._variance_reduction import *
+    print('✗ ERROR: _variance_reduction should not be importable without BLAS')
+    exit(1)
+except ImportError:
+    print('✓ _variance_reduction correctly not available (as expected)')" || exit 1
+          python -c "try:
+    from libact.query_strategies._hintsvm import *
+    print('✗ ERROR: _hintsvm should not be importable without BLAS')
+    exit(1)
+except ImportError:
+    print('✓ _hintsvm correctly not available (as expected)')" || exit 1
       - name: Test basic import
         run: |
           python -c "from libact.base.dataset import Dataset; print('SUCCESS: Basic import works without BLAS/LAPACK')"
