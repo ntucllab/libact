@@ -39,4 +39,15 @@ Homepage = "https://github.com/ntucllab/libact"
 Repository = "https://github.com/ntucllab/libact"
 
 [project.optional-dependencies]
-dev = ["build>=1.2.2.post1"]
+dev = [
+    "build>=1.2.2.post1",
+    "meson>=1.5.0",
+    "ninja",
+    "cython",
+    "numpy",
+]
+
+[tool.meson-python]
+# Editable installs with meson-python rebuild on import and require build tools
+# at runtime. Install with: pip install -e ".[dev]" to ensure dependencies are available
+editable-verbose = true

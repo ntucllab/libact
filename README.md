@@ -120,6 +120,46 @@ pip install --no-build-isolation -e .
 pip install --no-build-isolation .
 ```
 
+### Regular Install (Recommended for Users)
+
+For regular usage (not development), simply install from PyPI or from a local clone:
+
+```shell
+# From PyPI
+pip install libact
+
+# From local clone
+pip install .
+```
+
+Regular installs do **not** require build tools at runtime and will work without any additional dependencies.
+
+### Editable/Development Install
+
+Editable installs with meson-python automatically rebuild compiled components when you import the package. This requires build tools to be available at runtime. There are two approaches:
+
+**Option 1: Install with dev dependencies (Recommended)**
+```shell
+# With pip
+pip install -e ".[dev]"
+
+# With UV
+uv pip install -e ".[dev]"
+```
+
+**Option 2: Use --no-build-isolation**
+```shell
+# First install build dependencies
+pip install meson-python meson ninja cython numpy
+
+# Then install in editable mode
+pip install --no-build-isolation -e .
+```
+
+**Important:** If you get errors about missing `ninja` or build tools when importing libact in another project, it means you installed in editable mode without the necessary runtime dependencies. Either:
+- Reinstall using Option 1 above, OR
+- Reinstall as a regular (non-editable) install: `pip install .`
+
 ## Usage
 
 The main usage of `libact` is as follows:
