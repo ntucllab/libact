@@ -24,37 +24,44 @@ incdir_numpy = run_command(
   check: true,
 ).stdout().strip()
 
-blas_candidates = ['mkl', 'Accelerate', 'openblas', 'blis', 'lapack']
-blas_opt = get_option('blas')
-lapack_opt = get_option('lapack')
+# BLAS/LAPACK are only needed if variance_reduction or hintsvm features are enabled
+want_variance_reduction = get_option('variance_reduction')
+want_hintsvm = get_option('hintsvm')
+need_blas = want_variance_reduction or want_hintsvm
 
-blas_dep = (blas_opt != 'auto') ? dependency(blas_opt, required: false) : dependency('', required: false)
-lapack_dep = (lapack_opt != 'auto') ? dependency(lapack_opt, required: false) : dependency('', required: false)
+blas_dep = dependency('', required: false)
+lapack_dep = dependency('', required: false)
 
-# fall-back loop
+if need_blas
+  blas_candidates = ['mkl', 'Accelerate', 'openblas', 'blis', 'lapack']
+  blas_opt = get_option('blas')
+  lapack_opt = get_option('lapack')
 
-foreach cand : blas_candidates
-  if not blas_dep.found()
-    blas_dep = dependency(cand, required: false)
+  blas_dep = (blas_opt != 'auto') ? dependency(blas_opt, required: false) : dependency('', required: false)
+  lapack_dep = (lapack_opt != 'auto') ? dependency(lapack_opt, required: false) : dependency('', required: false)
+
+  # fall-back loop
+  foreach cand : blas_candidates
+    if not blas_dep.found()
+      blas_dep = dependency(cand, required: false)
+    endif
+    if not lapack_dep.found()
+      lapack_dep = dependency(cand, required: false)
+    endif
+  endforeach
+
+  if not blas_dep.found() or not lapack_dep.found()
+    # If BLAS/LAPACK not found, automatically disable optional features and continue
+    warning(
+      'BLAS/LAPACK libraries not found. Disabling variance_reduction and hintsvm features. ' +
+      'To enable these features, install BLAS/LAPACK libraries (e.g., libopenblas-dev and liblapacke-dev on Debian/Ubuntu, openblas on macOS via Homebrew).'
+    )
+    want_variance_reduction = false
+    want_hintsvm = false
   endif
-  if not lapack_dep.found()
-    lapack_dep = dependency(cand, required: false)
-  endif
-endforeach
-
-if not blas_dep.found()
-  error(
-    'No usable BLAS library found. Ensure that necessary packages are installed and included the PATH environment variable.',
-  )
 endif
 
-if not lapack_dep.found()
-  error(
-    'No usable LAPACK library found. Ensure that necessary packages are installed and included the PATH environment variable.',
-  )
-endif
-
-if get_option('variance_reduction')
+if want_variance_reduction
   message('Building VarianceReduction ...')
   py.extension_module(
     '_variance_reduction',
@@ -67,6 +74,8 @@ if get_option('variance_reduction')
     install: true,
     subdir: 'libact/query_strategies',
   )
+else
+  message('Skipping VarianceReduction (BLAS/LAPACK not available or feature disabled)')
 endif
 
 srcs = [
@@ -75,7 +84,8 @@ srcs = [
   'src/hintsvm/svm.cpp',
 ]
 
-if get_option('hintsvm')
+if want_hintsvm
+  message('Building HintSVM ...')
   py.extension_module(
     '_hintsvm',
     srcs,
@@ -87,6 +97,8 @@ if get_option('hintsvm')
     install: true,
     subdir: 'libact/query_strategies',
   )
+else
+  message('Skipping HintSVM (BLAS/LAPACK not available or feature disabled)')
 endif
 
 subdir('multilabel')

@@ -134,31 +134,23 @@ pip install .
 
 Regular installs do **not** require build tools at runtime and will work without any additional dependencies.
 
-### Editable/Development Install
+### Editable/Development Install (Recommended Method)
 
-Editable installs with meson-python automatically rebuild compiled components when you import the package. This requires build tools to be available at runtime. There are two approaches:
+Editable installs with meson-python automatically rebuild compiled components when you import the package. To ensure build tools are available, use `--no-build-isolation`:
 
-**Option 1: Install with dev dependencies (Recommended)**
 ```shell
-# With pip
-pip install -e ".[dev]"
-
-# With UV
-uv pip install -e ".[dev]"
-```
-
-**Option 2: Use --no-build-isolation**
-```shell
-# First install build dependencies
+# First install build dependencies in your environment
 pip install meson-python meson ninja cython numpy
 
-# Then install in editable mode
+# Then install in editable mode without build isolation
 pip install --no-build-isolation -e .
 ```
 
-**Important:** If you get errors about missing `ninja` or build tools when importing libact in another project, it means you installed in editable mode without the necessary runtime dependencies. Either:
-- Reinstall using Option 1 above, OR
-- Reinstall as a regular (non-editable) install: `pip install .`
+This ensures that `ninja`, `meson`, and other build tools remain available in your environment for rebuilds.
+
+**Troubleshooting:** If you get errors about missing `ninja` or build tools when importing libact:
+- You may have installed in editable mode with build isolation (which is not recommended)
+- Solution: Reinstall using the method above, OR use a regular install: `pip install .`
 
 ## Usage
 
