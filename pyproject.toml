@@ -39,13 +39,68 @@ Homepage = "https://github.com/ntucllab/libact"
 Repository = "https://github.com/ntucllab/libact"
 
 [project.optional-dependencies]
-dev = [
-    "build>=1.2.2.post1",
-    "meson>=1.5.0",
-    "ninja",
-    "cython",
-    "numpy",
+dev = ["build>=1.2.2.post1", "meson>=1.5.0", "ninja", "cython", "numpy"]
+
+# Build wheels
+
+[tool.cibuildwheel]
+build = "cp39-* cp310-* cp311-* cp312-*"
+
+# Skip musllinux (Alpine) and PyPy
+skip = "*-musllinux_* pp*"
+
+# Test the wheel after building
+test-command = "python -c 'import libact; from libact.query_strategies import HintSVM, VarianceReduction; print(\"✓ All modules imported successfully\")'"
+test-requires = [
+    "numpy>=2",
+    "scipy>=1.13",
+    "scikit-learn>=1.6",
+    "matplotlib>=3.8",
 ]
 
-# Note: Editable installs with meson-python rebuild on import and require build tools
-# at runtime. Install with: pip install -e ".[dev]" to ensure dependencies are available
+# Catch all import failures
+test-skip = ""
+
+[tool.cibuildwheel.linux]
+
+archs = ["x86_64", "aarch64"]
+
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
+
+before-all = [
+    "dnf install -y openblas-devel lapack-devel pkg-config",  # AlmaLinux uses dnf, not yum
+]
+
+environment = { PKG_CONFIG_PATH="/usr/lib64/pkgconfig:/usr/lib/pkgconfig" }
+
+# Bundle OpenBLAS libraries into the wheel
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+# Build for both Intel and Apple Silicon
+archs = ["x86_64", "arm64"]
+
+# GitHub Actions macOS runners have homebrew pre-installed
+before-all = ["brew install openblas"]
+
+# pkg-config paths for both Intel (/usr/local) and ARM (/opt/homebrew)
+environment = { PKG_CONFIG_PATH = "/opt/homebrew/opt/openblas/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig" }
+
+# Use delocate to bundle OpenBLAS into wheel
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+
+[tool.cibuildwheel.windows]
+
+archs = ["AMD64"]
+
+# GitHub Actions Windows runners have chocolatey pre-installed
+before-all = ["choco install -y openblas"]
+
+# Install delvewheel for bundling DLLs into the wheel
+before-build = "pip install delvewheel"
+
+# Use delvewheel to find and bundle OpenBLAS DLLs
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
+
+environment = { PKG_CONFIG_PATH = "C:\\tools\\openblas\\lib\\pkgconfig" }
