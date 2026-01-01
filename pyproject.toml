@@ -1,6 +1,12 @@
 [build-system]
 build-backend = "mesonpy"
-requires = ["meson-python>=0.16", "ninja", "cython", "numpy", "scipy-openblas32>=0.3.27; platform_system=='Darwin'"]
+requires = [
+    "meson-python>=0.16",
+    "ninja",
+    "cython",
+    "numpy",
+    "scipy-openblas32>=0.3.27",
+]
 
 [project]
 name = "libact"
@@ -69,10 +75,10 @@ manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
 
 before-all = [
-    "dnf install -y openblas-devel lapack-devel pkg-config",  # AlmaLinux uses dnf, not yum
+    "dnf install -y openblas-devel lapack-devel pkg-config", # AlmaLinux uses dnf, not yum
 ]
 
-environment = { PKG_CONFIG_PATH="/usr/lib64/pkgconfig:/usr/lib/pkgconfig" }
+environment = { PKG_CONFIG_PATH = "/usr/lib64/pkgconfig:/usr/lib/pkgconfig" }
 
 # Bundle OpenBLAS libraries into the wheel
 repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
@@ -81,14 +87,16 @@ repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
 # Build for both Intel and Apple Silicon
 archs = ["x86_64", "arm64"]
 
-before-build = [
-    "python -c 'from scipy_openblas32 import get_pkg_config; open(\"/tmp/scipy-openblas.pc\", \"w\").write(get_pkg_config())'",
-    "python -c 'from scipy_openblas32 import get_include; import os; print(f\"LAPACK headers: {get_include()}\")'",
-]
+# GitHub Actions macOS runners have homebrew pre-installed
+before-all = ["brew install openblas lapack pkg-config"]
+
+environment = {
+    PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig",
+CFLAGS="-I/opt/homebrew/opt/lapack/include -I/usr/local/opt/lapack/include",
+CXXFLAGS="-I/opt/homebrew/opt/lapack/include -I/usr/local/opt/lapack/include",
+}
 
 # pkg-config paths for both Intel (/usr/local) and ARM (/opt/homebrew)
-environment = {PKG_CONFIG_PATH="/tmp"}
-
 # Use delocate to bundle OpenBLAS into wheel
 repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
 
@@ -97,7 +105,7 @@ repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest
 archs = ["AMD64"]
 
 # GitHub Actions Windows runners have chocolatey pre-installed
-before-all = ["choco install -y openblas pkg-config"]
+before-all = ["choco install -y openblas"]
 
 # Install delvewheel for bundling DLLs into the wheel
 before-build = "pip install delvewheel"
