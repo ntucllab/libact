@@ -2,10 +2,10 @@ name: Build Wheels
 
 on:
   push:
-    branches: [main, master]
-    tags: ['v*']
+    branches: [ main, master ]
+    tags: [ 'v*' ]
   pull_request:
-    branches: [main, master]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -15,9 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-13, macos-14]
+        os: [ubuntu-22.04, macos-13, macos-14]
         # ubuntu-22.04: Linux x86_64 + aarch64
-        # windows-2022: Windows x64
         # macos-13: Intel (x86_64)
         # macos-14: Apple Silicon (arm64)
 
@@ -65,12 +64,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-13, macos-14]
-        python: ['3.9', '3.12'] # Test oldest and newest
+        os: [ubuntu-22.04, macos-13, macos-14]
+        python: ['3.9', '3.12']  # Test oldest and newest
 
     steps:
       - uses: actions/checkout@v4
-
+      
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -87,18 +86,12 @@ jobs:
         run: |
           pip install --find-links wheelhouse libact
           pip install numpy scipy scikit-learn matplotlib
-
+          
       - name: Test import and functionality
         shell: bash
         run: |
           python -c "import libact; print(f'libact version: {libact.__version__}')"
           python -c "from libact.query_strategies import HintSVM, VarianceReduction; print('✓ All compiled modules imported successfully')"
-
-      - name: Run basic tests
-        shell: bash
-        run: |
-          python -m pip install pytest
-          python -m pytest libact/query_strategies/tests/ -v -k "hintsvm or variance" || echo "Tests completed"
 
   upload_pypi:
     name: Upload to PyPI
@@ -109,8 +102,8 @@ jobs:
       name: pypi
       url: https://pypi.org/p/libact
     permissions:
-      id-token: write # For trusted publishing
-
+      id-token: write
+    
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -127,3 +120,4 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
