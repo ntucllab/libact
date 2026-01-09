@@ -15,4 +15,5 @@ query_strategies
 
 """
 
+__version__ = "0.1.6"
 __all__ = ["base", "labelers", "models", "query_strategies"]
