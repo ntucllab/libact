@@ -59,8 +59,7 @@ test-command = "python -c 'import libact; from libact.query_strategies import Hi
 test-requires = ["numpy>=2", "scipy>=1.13", "scikit-learn>=1.6", "matplotlib>=3.8"]
 
 [tool.cibuildwheel.linux]
-# Build for x86_64 and ARM64
-archs = ["x86_64", "aarch64"]
+# Architecture is set to "native" in workflow (each runner builds its own arch)
 # Use manylinux_2_28 (modern standard, matches NumPy 2.x)
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
@@ -96,8 +95,7 @@ environment = { PKG_CONFIG_PATH="/tmp:/usr/lib64/pkgconfig:/usr/lib/pkgconfig" }
 repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.macos]
-# Build for both Intel and Apple Silicon
-archs = ["x86_64", "arm64"]
+# Architecture is set to "native" in workflow (each runner builds its own arch)
 # Install OpenBLAS, LAPACK (for headers), and pkg-config
 before-all = [
     "brew install openblas lapack pkg-config",
