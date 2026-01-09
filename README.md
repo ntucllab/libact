@@ -2,7 +2,7 @@
 
 authors: [Yao-Yuan Yang](http://yyyang.me), Shao-Chuan Lee, Yu-An Chung, Tung-En Wu, Si-An Chen, [Hsuan-Tien Lin](http://www.csie.ntu.edu.tw/~htlin)
 
-[![Build Status](https://travis-ci.org/ntucllab/libact.svg)](https://travis-ci.org/ntucllab/libact)
+[![Build Status](https://github.com/ntucllab/libact/actions/workflows/tests.yml/badge.svg)](https://github.com/ntucllab/libact/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/libact/badge/?version=latest)](http://libact.readthedocs.org/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/libact.svg)](https://badge.fury.io/py/libact)
 [![codecov.io](https://codecov.io/github/ntucllab/libact/coverage.svg?branch=master)](https://codecov.io/github/ntucllab/libact?branch=master)
@@ -22,13 +22,13 @@ Comments and questions on the package is welcomed at `libact-users@googlegroups.
 ## Basic Dependencies
 
 - Python 3.9, 3.10, 3.11, 3.12
-  - _Note._ We will soon release Python 2.7, 3.3, 3.4, 3.5, and 3.6 installations in the new branch.
 
-- Python dependencies:
-
-```
-pip install -r requirements.txt
-```
+- Python dependencies (automatically installed with pip):
+  - numpy >= 2
+  - scipy >= 1.13
+  - scikit-learn >= 1.6
+  - matplotlib >= 3.8
+  - joblib
 
 ### BLAS/LAPACKE Dependencies
 
@@ -222,3 +222,5 @@ If you find this package useful, please cite the original works (see Reference o
 ## Acknowledgments
 
 The authors thank Chih-Wei Chang and other members of the [Computational Learning Lab](https://learner.csie.ntu.edu.tw/) at National Taiwan University for valuable discussions and various contributions to making this package better.
+
+
