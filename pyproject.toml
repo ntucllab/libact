@@ -110,16 +110,15 @@ repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.macos]
 # Architecture is set to "native" in workflow (each runner builds its own arch)
-# Install OpenBLAS (includes LAPACKE), pkg-config, and libomp (for OpenMP support on macOS)
+# Install lapack (provides lapacke.h headers) - Accelerate framework provides the library
 before-all = [
-    "brew install openblas pkg-config libomp",
+    "brew install lapack pkg-config",
 ]
 # Bundle libraries into wheel
 repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
 
 [tool.cibuildwheel.macos.environment]
+# Point to lapack headers (lapacke.h) - Accelerate framework provides BLAS/LAPACK libraries
 # Paths work for both ARM64 (/opt/homebrew) and Intel (/usr/local)
-# Include both opt (symlink) and Cellar (actual) paths as fallback
-PKG_CONFIG_PATH = "/opt/homebrew/opt/openblas/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:/opt/homebrew/Cellar/openblas/*/lib/pkgconfig:/usr/local/Cellar/openblas/*/lib/pkgconfig"
-CPPFLAGS = "-I/opt/homebrew/opt/openblas/include -I/usr/local/opt/openblas/include"
-LDFLAGS = "-L/opt/homebrew/opt/openblas/lib -L/usr/local/opt/openblas/lib -L/opt/homebrew/opt/libomp/lib -L/usr/local/opt/libomp/lib"
+CPPFLAGS = "-I/opt/homebrew/opt/lapack/include -I/usr/local/opt/lapack/include"
+LDFLAGS = "-L/opt/homebrew/opt/lapack/lib -L/usr/local/opt/lapack/lib"

@@ -52,10 +52,8 @@ jobs:
         with:
           path: |
             ~/Library/Caches/Homebrew
-            /opt/homebrew/Cellar/openblas
-            /opt/homebrew/Cellar/libomp
-            /usr/local/Cellar/openblas
-            /usr/local/Cellar/libomp
+            /opt/homebrew/Cellar/lapack
+            /usr/local/Cellar/lapack
           key: ${{ runner.os }}-${{ runner.arch }}-brew-${{ hashFiles('.github/workflows/build_wheels.yml') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-brew-
