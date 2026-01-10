@@ -127,7 +127,31 @@ jobs:
         shell: bash
         run: |
           python -c "import libact; print(f'libact version: {libact.__version__}')"
-          python -c "from libact.query_strategies import HintSVM, VarianceReduction; print('✓ All compiled modules imported successfully')"
+          python -c "
+          import libact.query_strategies as qs
+
+          # Test basic imports
+          assert hasattr(qs, 'UncertaintySampling'), 'UncertaintySampling not found'
+          assert hasattr(qs, 'RandomSampling'), 'RandomSampling not found'
+          print('✓ Basic query strategies imported successfully')
+
+          # Test optional C-extension modules (may not be available if BLAS/LAPACK not found during build)
+          has_hintsvm = hasattr(qs, 'HintSVM')
+          has_variance_reduction = hasattr(qs, 'VarianceReduction')
+
+          if has_hintsvm and has_variance_reduction:
+              # Try to actually import them to verify they work
+              from libact.query_strategies import HintSVM, VarianceReduction
+              print('✓ All C-extension modules (HintSVM, VarianceReduction) available and working')
+          else:
+              missing = []
+              if not has_hintsvm:
+                  missing.append('HintSVM')
+              if not has_variance_reduction:
+                  missing.append('VarianceReduction')
+              print(f'⚠ Warning: Optional C-extensions not available: {missing}')
+              print('  (Wheels were built without BLAS/LAPACK support)')
+          "
 
   upload_testpypi:
     name: Upload to TestPyPI

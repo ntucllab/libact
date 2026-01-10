@@ -14,9 +14,9 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install system dependencies
@@ -28,7 +28,7 @@ jobs:
             echo "backend: TkAgg" >> ~/.matplotlib/matplotlibrc
           else
             sudo apt-get update -qq
-            sudo apt-get install -y build-essential gfortran libatlas-base-dev liblapacke-dev
+            sudo apt-get install -y build-essential gfortran libopenblas-dev liblapacke-dev pkg-config
             sudo apt-get install -y python3-dev
           fi
       - name: Install Python dependencies
@@ -81,9 +81,9 @@ jobs:
         python-version: ['3.11']  # Test with one Python version to verify minimal install
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install minimal system dependencies

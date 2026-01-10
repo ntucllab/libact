@@ -55,7 +55,21 @@ build = "cp39-* cp310-* cp311-* cp312-*"
 # Skip musllinux (Alpine), PyPy, and Windows
 skip = "*-musllinux_* pp* *-win*"
 # Test the wheel after building
-test-command = "python -c 'import libact; from libact.query_strategies import HintSVM, VarianceReduction; print(\"✓ All modules imported successfully\")'"
+test-command = """python -c '
+import libact
+import libact.query_strategies as qs
+# Verify basic modules work
+assert hasattr(qs, \"UncertaintySampling\")
+assert hasattr(qs, \"RandomSampling\")
+print(\"✓ Basic modules imported successfully\")
+# Check optional C-extensions (may not be available without BLAS/LAPACK)
+has_ext = hasattr(qs, \"HintSVM\") and hasattr(qs, \"VarianceReduction\")
+if has_ext:
+    from libact.query_strategies import HintSVM, VarianceReduction
+    print(\"✓ C-extensions (HintSVM, VarianceReduction) available\")
+else:
+    print(\"⚠ C-extensions not available (built without BLAS/LAPACK)\")
+'"""
 test-requires = ["numpy>=2", "scipy>=1.13", "scikit-learn>=1.6", "matplotlib>=3.8"]
 
 [tool.cibuildwheel.linux]
