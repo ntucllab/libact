@@ -39,7 +39,8 @@ blas_dep = dependency('', required: false)
 lapack_dep = dependency('', required: false)
 
 if need_blas
-  blas_candidates = ['mkl', 'Accelerate', 'openblas', 'blis', 'lapack']
+  # Removed 'Accelerate' because it lacks lapacke.h required by variance_reduction.c
+  blas_candidates = ['mkl', 'openblas', 'blis', 'lapack']
   blas_opt = get_option('blas')
   lapack_opt = get_option('lapack')
 
