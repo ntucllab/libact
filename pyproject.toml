@@ -110,16 +110,16 @@ repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.macos]
 # Architecture is set to "native" in workflow (each runner builds its own arch)
-# Install OpenBLAS, LAPACK (for headers), and pkg-config
+# Install OpenBLAS (includes LAPACKE), pkg-config, and libomp (for OpenMP support on macOS)
 before-all = [
-    "brew install openblas lapack pkg-config",
-    "brew link --force --overwrite openblas lapack pkg-config || true",
+    "brew install openblas pkg-config libomp",
 ]
 # Bundle libraries into wheel
 repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
 
 [tool.cibuildwheel.macos.environment]
 # Paths work for both ARM64 (/opt/homebrew) and Intel (/usr/local)
-PKG_CONFIG_PATH = "/opt/homebrew/opt/openblas/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:/opt/homebrew/opt/lapack/lib/pkgconfig:/usr/local/opt/lapack/lib/pkgconfig"
-CPPFLAGS = "-I/opt/homebrew/opt/openblas/include -I/opt/homebrew/opt/lapack/include -I/usr/local/opt/openblas/include -I/usr/local/opt/lapack/include"
-LDFLAGS = "-L/opt/homebrew/opt/openblas/lib -L/opt/homebrew/opt/lapack/lib -L/usr/local/opt/openblas/lib -L/usr/local/opt/lapack/lib"
+# Include both opt (symlink) and Cellar (actual) paths as fallback
+PKG_CONFIG_PATH = "/opt/homebrew/opt/openblas/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:/opt/homebrew/Cellar/openblas/*/lib/pkgconfig:/usr/local/Cellar/openblas/*/lib/pkgconfig"
+CPPFLAGS = "-I/opt/homebrew/opt/openblas/include -I/usr/local/opt/openblas/include"
+LDFLAGS = "-L/opt/homebrew/opt/openblas/lib -L/usr/local/opt/openblas/lib -L/opt/homebrew/opt/libomp/lib -L/usr/local/opt/libomp/lib"
