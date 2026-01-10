@@ -2,7 +2,14 @@ name: Build Wheels
 
 on:
   push:
-    tags: ['v*']  # Only build wheels on version tags
+    tags: ['v*']  # Build wheels on version tags
+    branches: [main, master]  # Also build on direct pushes to main/master
+    paths:
+      - '**.py'
+      - '**.pyx'
+      - 'pyproject.toml'
+      - 'meson.build'
+      - '.github/workflows/build_wheels.yml'
   pull_request:
     branches: [main, master]
     paths:
