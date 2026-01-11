@@ -141,7 +141,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/libact-test
+      url: https://test.pypi.org/p/libact
     permissions:
       id-token: write
 
