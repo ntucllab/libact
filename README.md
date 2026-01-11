@@ -59,6 +59,8 @@ brew install openblas
 pip install libact
 ```
 
+> **Note:** For Windows users, it is recommended to use **Windows Subsystem for Linux (WSL)** as the primary environment for installing and running `libact`.
+
 - Install the latest development version
 
 ```shell
