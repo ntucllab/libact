@@ -36,28 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Cache pip packages
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      # Cache Homebrew (macOS only)
-      - name: Cache Homebrew
-        if: runner.os == 'macOS'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/Library/Caches/Homebrew
-            /opt/homebrew/Cellar/lapack
-            /usr/local/Cellar/lapack
-          key: ${{ runner.os }}-${{ runner.arch }}-brew-${{ hashFiles('.github/workflows/build_wheels.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-brew-
-
       # Set up ccache for faster C++ compilation
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -97,8 +75,8 @@ jobs:
   test_wheels:
     name: Test wheels
     needs: [build_wheels]
-    # Only run full test suite on tags and manual triggers, skip on PRs for faster feedback
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    # Run on: version tags, manual triggers, and re-runs (but NOT on regular branch pushes/PRs)
+    if: github.event_name == 'workflow_dispatch' || github.run_attempt > 1 || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

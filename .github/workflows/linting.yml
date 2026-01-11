@@ -3,24 +3,26 @@ name: Libact linting
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  lint:
     runs-on: ${{ matrix.os }}
-    continue-on-error: True
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.9]
+        python-version: ['3.9']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pylint
-      - run: pylint libact
+
+      - name: Run pylint (errors only)
+        run: pylint --errors-only libact
