@@ -9,6 +9,9 @@ py_src = [
   'random_sampling.py',
   'uncertainty_sampling.py',
   'variance_reduction.py',
+  'bald.py',
+  'coreset.py',
+  'information_density.py',
 ]
 
 py.install_sources(
