@@ -38,8 +38,11 @@ Currently, the following active learning algorithms are supported:
 
 - Binary Classification
 
+  - BALD - Bayesian Active Learning by Disagreement (bald.py)
+  - Core-Set - k-Center Greedy (coreset.py)
   - Density Weighted Uncertainty Sampling (density_weighted_uncertainty_sampling.py)
   - Hinted Sampling with SVM (hintsvm.py)
+  - Information Density (information_density.py)
   - Query By Committee (query_by_committee.py)
   - Querying Informative and Representative Examples (quire.py)
   - Random Sampling (random_sampling.py)

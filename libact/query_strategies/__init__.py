@@ -14,6 +14,9 @@ from .query_by_committee import QueryByCommittee
 from .quire import QUIRE
 from .random_sampling import RandomSampling
 from .density_weighted_uncertainty_sampling import DWUS
+from .bald import BALD
+from .coreset import CoreSet
+from .information_density import InformationDensity
 # don't import c extentions when on readthedocs server
 from .density_weighted_meta import DensityWeightedMeta
 if not ON_RTD:
@@ -38,8 +41,11 @@ else:
 
 __all__ = [
     'ActiveLearningByLearning',
+    'BALD',
+    'CoreSet',
     'DWUS',
     'HintSVM',
+    'InformationDensity',
     'QUIRE',
     'QueryByCommittee',
     'RandomSampling',

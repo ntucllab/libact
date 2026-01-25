@@ -48,3 +48,49 @@ ALBL combines the result of these query strategies and generate its own
 suggestion of which sample to query.
 ALBL will adaptively *learn* from each of the decision it made, using the given
 supervised learning model in :code:`model` parameter.
+
+Using Diverse Strategy Signals
+------------------------------
+
+ALBL works best when its component strategies provide orthogonal signals.
+The following example combines exploitation (uncertainty), exploration
+(diversity), and representativeness into a single ALBL instance:
+
+.. code-block:: python
+   :linenos:
+
+   from libact.query_strategies import ActiveLearningByLearning
+   from libact.query_strategies import UncertaintySampling
+   from libact.query_strategies import CoreSet
+   from libact.query_strategies import BALD
+   from libact.query_strategies import InformationDensity
+   from libact.models import LogisticRegression
+
+   model = LogisticRegression()
+
+   qs = ActiveLearningByLearning(
+            dataset,
+            T=quota,
+            query_strategies=[
+                UncertaintySampling(dataset, model=LogisticRegression(C=1.)),
+                CoreSet(dataset),
+                BALD(dataset, models=[
+                    LogisticRegression(C=0.1),
+                    LogisticRegression(C=1.0),
+                    LogisticRegression(C=10.0),
+                ]),
+                InformationDensity(dataset, model=LogisticRegression()),
+                ],
+            model=model,
+            uniform_sampler=True
+            )
+
+The strategies provide complementary signals:
+
+- **UncertaintySampling**: exploits model confidence boundaries
+- **CoreSet**: explores by maximizing geometric coverage (farthest-from-labeled)
+- **BALD**: measures epistemic uncertainty via ensemble disagreement
+- **InformationDensity**: balances uncertainty with representativeness to avoid outliers
+
+ALBL's multi-armed bandit mechanism will learn which signals are most useful for
+the given problem and adapt its selection accordingly.

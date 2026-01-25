@@ -154,6 +154,32 @@ This ensures that `ninja`, `meson`, and other build tools remain available in yo
 - You may have installed in editable mode with build isolation (which is not recommended)
 - Solution: Reinstall using the method above, OR use a regular install: `pip install .`
 
+## Available Query Strategies
+
+| Strategy | Type | Description |
+|----------|------|-------------|
+| `UncertaintySampling` | Exploitation | Selects samples where the model is least confident |
+| `CoreSet` | Diversity | k-Center Greedy, selects the point farthest from labeled set |
+| `BALD` | Epistemic Uncertainty | Bayesian Active Learning by Disagreement via ensemble (mutual information) |
+| `InformationDensity` | Representativeness | Density-weighted uncertainty — avoids querying outliers |
+| `QueryByCommittee` | Disagreement | Committee of models votes on most informative samples |
+| `QUIRE` | Informativeness + Representativeness | Combines uncertainty and density |
+| `RandomSampling` | Baseline | Uniform random selection |
+| `ActiveLearningByLearning` | Meta-algorithm | Multi-armed bandit that selects the best strategy on the fly |
+| `VarianceReduction` | Variance | Minimizes output variance (requires C extension) |
+| `HintSVM` | SVM-based | SVM-guided active learning (requires C extension) |
+| `DensityWeightedMeta` | Density | Weights informativeness by density |
+| `DWUS` | Density + Uncertainty | Density-weighted uncertainty sampling |
+
+## Available Models
+
+| Model | Description |
+|-------|-------------|
+| `LogisticRegression` | Logistic regression with probability output |
+| `SVM` | Support Vector Machine classifier |
+| `Perceptron` | Perceptron classifier |
+| `SklearnAdapter` / `SklearnProbaAdapter` | Wraps any scikit-learn estimator for use with libact |
+
 ## Usage
 
 The main usage of `libact` is as follows:
@@ -167,6 +193,50 @@ lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler insta
 trn_ds.update(ask_id, lb) # update the dataset with newly queried data
 ```
 
+### Using CoreSet, BALD, and InformationDensity Strategies
+
+```python
+from libact.query_strategies import (
+    CoreSet,
+    BALD,
+    InformationDensity,
+    ActiveLearningByLearning,
+)
+from libact.models import LogisticRegression
+
+# Core-Set (diversity-based, farthest-from-labeled)
+qs = CoreSet(dataset)
+
+# BALD (epistemic uncertainty via ensemble disagreement)
+qs = BALD(dataset, models=[
+    LogisticRegression(C=0.1),
+    LogisticRegression(C=1.0),
+    LogisticRegression(C=10.0),
+])
+
+# Information Density (uncertainty weighted by representativeness)
+qs = InformationDensity(dataset, model=LogisticRegression(), method='entropy')
+
+# With stronger density preference (beta=2) and cosine similarity
+qs = InformationDensity(dataset, model=LogisticRegression(),
+                        method='entropy', metric='cosine', beta=2.0)
+
+# ALBL with all three strategies combined
+qs = ActiveLearningByLearning(
+    dataset,
+    query_strategies=[
+        CoreSet(dataset),
+        BALD(dataset, models=[...]),
+        InformationDensity(dataset, model=LogisticRegression()),
+    ],
+    T=quota,
+    uniform_sampler=True,
+    model=model
+)
+```
+
+## Examples
+
 Some examples are available under the `examples` directory. Before running, use
 `examples/get_dataset.py` to retrieve the dataset used by the examples.
 
@@ -179,6 +249,8 @@ Available examples:
     that you want a human to label the selected sample for your algorithm.
   - [albl_plot](examples/albl_plot.py): This example compares the performance of ALBL
     with other active learning algorithms.
+  - [albl_new_strategies_benchmark](examples/albl_new_strategies_benchmark.py): Benchmarks
+    CoreSet, BALD, and InformationDensity query strategies individually and combined via ALBL.
   - [multilabel_plot](examples/multilabel_plot.py): This example compares the performance of
     algorithms under multilabel setting.
   - [alce_plot](examples/alce_plot.py): This example compares the performance of
