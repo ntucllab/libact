@@ -1,7 +1,11 @@
 py_src = [
   '__init__.py',
+  'test_bald.py',
+  'test_coreset.py',
   'test_density_weighted_meta.py',
+  'test_epsilon_uncertainty_sampling.py',
   'test_hintsvm.py',
+  'test_information_density.py',
   'test_quire.py',
   'test_realdata.py',
   'test_uncertainty_sampling.py',

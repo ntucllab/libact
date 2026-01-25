@@ -1,17 +1,18 @@
 py_src = [
   '__init__.py',
   'active_learning_by_learning.py',
+  'bald.py',
+  'coreset.py',
   'density_weighted_meta.py',
   'density_weighted_uncertainty_sampling.py',
+  'epsilon_uncertainty_sampling.py',
   'hintsvm.py',
+  'information_density.py',
   'query_by_committee.py',
   'quire.py',
   'random_sampling.py',
   'uncertainty_sampling.py',
   'variance_reduction.py',
-  'bald.py',
-  'coreset.py',
-  'information_density.py',
 ]
 
 py.install_sources(

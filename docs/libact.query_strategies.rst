@@ -83,6 +83,14 @@ libact.query_strategies.coreset module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.epsilon_uncertainty_sampling module
+-----------------------------------------------------------
+
+.. automodule:: libact.query_strategies.epsilon_uncertainty_sampling
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.information_density module
 --------------------------------------------------
 

@@ -16,6 +16,7 @@ from .random_sampling import RandomSampling
 from .density_weighted_uncertainty_sampling import DWUS
 from .bald import BALD
 from .coreset import CoreSet
+from .epsilon_uncertainty_sampling import EpsilonUncertaintySampling
 from .information_density import InformationDensity
 # don't import c extentions when on readthedocs server
 from .density_weighted_meta import DensityWeightedMeta
@@ -44,6 +45,7 @@ __all__ = [
     'BALD',
     'CoreSet',
     'DWUS',
+    'EpsilonUncertaintySampling',
     'HintSVM',
     'InformationDensity',
     'QUIRE',

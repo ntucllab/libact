@@ -159,6 +159,7 @@ This ensures that `ninja`, `meson`, and other build tools remain available in yo
 | Strategy | Type | Description |
 |----------|------|-------------|
 | `UncertaintySampling` | Exploitation | Selects samples where the model is least confident |
+| `EpsilonUncertaintySampling` | Exploration + Exploitation | ε-greedy: random with prob ε, uncertainty sampling otherwise |
 | `CoreSet` | Diversity | k-Center Greedy, selects the point farthest from labeled set |
 | `BALD` | Epistemic Uncertainty | Bayesian Active Learning by Disagreement via ensemble (mutual information) |
 | `InformationDensity` | Representativeness | Density-weighted uncertainty — avoids querying outliers |
