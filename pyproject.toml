@@ -10,7 +10,7 @@ requires = [
 
 [project]
 name = "libact"
-version = "0.1.6"
+version = "0.2.0"
 description = "Pool-based active learning in Python"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
