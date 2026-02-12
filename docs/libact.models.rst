@@ -40,7 +40,6 @@ libact.models.svm module
     :undoc-members:
     :show-inheritance:
 
-
 Module contents
 ---------------
 

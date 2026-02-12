@@ -1,0 +1,193 @@
+name: Build Wheels
+
+on:
+  push:
+    tags: ['v*']  # Build wheels on version tags
+    branches: [main, master]  # Also build on direct pushes to main/master
+    paths:
+      - '**.py'
+      - '**.pyx'
+      - 'pyproject.toml'
+      - 'meson.build'
+      - '.github/workflows/build_wheels.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - '**.py'
+      - '**.pyx'
+      - 'pyproject.toml'
+      - 'meson.build'
+      - '.github/workflows/build_wheels.yml'
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-15]
+        # ubuntu-latest: Linux x86_64 (native)
+        # ubuntu-24.04-arm: Linux aarch64 (native, no QEMU!)
+        # macos-15-intel: macOS Intel x86_64 (native)
+        # macos-15: macOS Apple Silicon arm64 (native)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set up ccache for faster C++ compilation
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.os }}-ccache
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22
+        env:
+          CIBW_BUILD_VERBOSITY: 1
+          # Build only native architecture (no cross-compilation or emulation)
+          CIBW_ARCHS: native
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+          retention-days: 7
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          retention-days: 7
+
+  test_wheels:
+    name: Test wheels
+    needs: [build_wheels]
+    # Run on: version tags, manual triggers, and re-runs (but NOT on regular branch pushes/PRs)
+    if: github.event_name == 'workflow_dispatch' || github.run_attempt > 1 || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-15]
+        python: ['3.9', '3.12'] # Test oldest and newest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: wheelhouse
+
+      - name: Install wheel and dependencies
+        shell: bash
+        run: |
+          pip install --find-links wheelhouse libact
+          pip install numpy scipy scikit-learn matplotlib
+
+      - name: Test import and functionality
+        shell: bash
+        run: |
+          python -c "import libact; print(f'libact version: {libact.__version__}')"
+          python -c "
+          import libact.query_strategies as qs
+
+          # Test basic imports
+          assert hasattr(qs, 'UncertaintySampling'), 'UncertaintySampling not found'
+          assert hasattr(qs, 'RandomSampling'), 'RandomSampling not found'
+          print('✓ Basic query strategies imported successfully')
+
+          # Test optional C-extension modules (may not be available if BLAS/LAPACK not found during build)
+          has_hintsvm = hasattr(qs, 'HintSVM')
+          has_variance_reduction = hasattr(qs, 'VarianceReduction')
+
+          if has_hintsvm and has_variance_reduction:
+              # Try to actually import them to verify they work
+              from libact.query_strategies import HintSVM, VarianceReduction
+              print('✓ All C-extension modules (HintSVM, VarianceReduction) available and working')
+          else:
+              missing = []
+              if not has_hintsvm:
+                  missing.append('HintSVM')
+              if not has_variance_reduction:
+                  missing.append('VarianceReduction')
+              print(f'⚠ Warning: Optional C-extensions not available: {missing}')
+              print('  (Wheels were built without BLAS/LAPACK support)')
+          "
+
+  upload_testpypi:
+    name: Upload to TestPyPI
+    needs: [build_wheels, build_sdist, test_wheels]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/libact
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+
+      - name: Download sdist
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  # upload_pypi:
+  #   name: Upload to PyPI
+  #   needs: [build_wheels, build_sdist, test_wheels]
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+  #   environment:
+  #     name: pypi
+  #     url: https://pypi.org/p/libact
+  #   permissions:
+  #     id-token: write
+
+  #   steps:
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: wheels-*
+  #         merge-multiple: true
+  #         path: dist
+
+  #     - name: Download sdist
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: sdist
+  #         path: dist
+
+  #     - name: Publish to PyPI
+  #       uses: pypa/gh-action-pypi-publish@release/v1

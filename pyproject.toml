@@ -1,0 +1,124 @@
+[build-system]
+build-backend = "mesonpy"
+requires = [
+    "meson-python>=0.16",
+    "ninja",
+    "cython",
+    "numpy",
+    "scipy-openblas32>=0.3.27",
+]
+
+[project]
+name = "libact"
+version = "0.2.0"
+description = "Pool-based active learning in Python"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Y.-Y. Yang", email = "b01902066@csie.ntu.edu.tw" },
+    { name = "S.-C. Lee", email = "b01902010@csie.ntu.edu.tw" },
+    { name = "Y.-A. Chung", email = "b01902040@csie.ntu.edu.tw" },
+    { name = "T.-E. Wu", email = "r00942129@ntu.edu.tw" },
+    { name = "H.-T. Lin", email = "htlin@csie.ntu.edu.tw" },
+]
+classifiers = [
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy>=2",
+    "scipy>=1.13",
+    "scikit-learn>=1.6",
+    "matplotlib>=3.8",
+    "joblib==1.5.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/ntucllab/libact"
+Repository = "https://github.com/ntucllab/libact"
+
+[project.optional-dependencies]
+dev = ["build>=1.2.2.post1", "meson>=1.5.0", "ninja", "cython", "numpy"]
+
+# Build wheels
+
+[tool.cibuildwheel]
+# Build for Python 3.9-3.12 on Linux and macOS only
+build = "cp39-* cp310-* cp311-* cp312-*"
+# Skip musllinux (Alpine), PyPy, and Windows
+skip = "*-musllinux_* pp* *-win*"
+# Test the wheel after building
+test-command = """python -c '
+import libact
+import libact.query_strategies as qs
+# Verify basic modules work
+assert hasattr(qs, \"UncertaintySampling\")
+assert hasattr(qs, \"RandomSampling\")
+print(\"✓ Basic modules imported successfully\")
+# Check optional C-extensions (may not be available without BLAS/LAPACK)
+has_ext = hasattr(qs, \"HintSVM\") and hasattr(qs, \"VarianceReduction\")
+if has_ext:
+    from libact.query_strategies import HintSVM, VarianceReduction
+    print(\"✓ C-extensions (HintSVM, VarianceReduction) available\")
+else:
+    print(\"⚠ C-extensions not available (built without BLAS/LAPACK)\")
+'"""
+test-requires = ["numpy>=2", "scipy>=1.13", "scikit-learn>=1.6", "matplotlib>=3.8"]
+
+[tool.cibuildwheel.linux]
+# Architecture is set to "native" in workflow (each runner builds its own arch)
+# Use manylinux_2_28 (modern standard, matches NumPy 2.x)
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
+# Install OpenBLAS and create pkg-config files (manylinux_2_28 may not include them)
+before-all = [
+    "dnf install -y openblas-devel lapack-devel",
+    """cat > /tmp/openblas.pc << 'EOF'
+prefix=/usr
+libdir=/usr/lib64
+includedir=/usr/include/openblas
+
+Name: OpenBLAS
+Description: OpenBLAS library
+Version: 0.3.0
+Libs: -L${libdir} -lopenblas
+Cflags: -I${includedir}
+EOF""",
+    """cat > /tmp/lapack.pc << 'EOF'
+prefix=/usr
+libdir=/usr/lib64
+includedir=/usr/include
+
+Name: LAPACK
+Description: LAPACK library
+Version: 3.0.0
+Libs: -L${libdir} -llapack -lblas
+Cflags: -I${includedir}
+EOF""",
+]
+# Set PKG_CONFIG_PATH to include /tmp where we created .pc files
+environment = { PKG_CONFIG_PATH="/tmp:/usr/lib64/pkgconfig:/usr/lib/pkgconfig" }
+# Bundle OpenBLAS libraries into the wheel
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+# Architecture is set to "native" in workflow (each runner builds its own arch)
+# Install lapack (provides lapacke.h headers) - Accelerate framework provides the library
+before-all = [
+    "brew install lapack pkg-config",
+]
+# Bundle libraries into wheel
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+
+[tool.cibuildwheel.macos.environment]
+# Point to lapack headers (lapacke.h) - Accelerate framework provides BLAS/LAPACK libraries
+# Paths work for both ARM64 (/opt/homebrew) and Intel (/usr/local)
+CPPFLAGS = "-I/opt/homebrew/opt/lapack/include -I/usr/local/opt/lapack/include"
+LDFLAGS = "-L/opt/homebrew/opt/lapack/lib -L/usr/local/opt/lapack/lib"

@@ -104,6 +104,8 @@ class UncertaintySampling(QueryStrategy):
             dvalue = self.model.predict_proba(X_pool)
         elif isinstance(self.model, ContinuousModel):
             dvalue = self.model.predict_real(X_pool)
+        else:
+            raise TypeError("model must be ContinuousModel or ProbabilisticModel")
 
         if self.method == 'lc':  # least confident
             score = -np.max(dvalue, axis=1)
@@ -116,6 +118,8 @@ class UncertaintySampling(QueryStrategy):
 
         elif self.method == 'entropy':
             score = np.sum(-dvalue * np.log(dvalue), axis=1)
+        else:
+            raise ValueError("method must be 'lc', 'sm', or 'entropy'")
         return zip(unlabeled_entry_ids, score)
 
 

@@ -67,6 +67,38 @@ libact.query_strategies.uncertainty_sampling module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.bald module
+------------------------------------
+
+.. automodule:: libact.query_strategies.bald
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libact.query_strategies.coreset module
+--------------------------------------
+
+.. automodule:: libact.query_strategies.coreset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libact.query_strategies.epsilon_uncertainty_sampling module
+-----------------------------------------------------------
+
+.. automodule:: libact.query_strategies.epsilon_uncertainty_sampling
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libact.query_strategies.information_density module
+--------------------------------------------------
+
+.. automodule:: libact.query_strategies.information_density
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.variance_reduction module
 -------------------------------------------------
 

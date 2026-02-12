@@ -205,5 +205,7 @@ class QueryByCommittee(QueryStrategy):
             avg_kl = self._kl_divergence_disagreement(proba)
             ask_idx = self.random_state_.choice(
                     np.where(np.isclose(avg_kl, np.max(avg_kl)))[0])
+        else:
+            raise ValueError("disagreement must be 'vote' or 'kl_divergence'")
 
         return unlabeled_entry_ids[ask_idx]
