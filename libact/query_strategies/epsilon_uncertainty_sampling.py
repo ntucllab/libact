@@ -170,7 +170,10 @@ class EpsilonUncertaintySampling(QueryStrategy):
 
         Returns
         -------
-        scores : list of (entry_id, score) tuples
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Uncertainty scores. Higher = more uncertain.
         """
         dataset = self.dataset
         self.model.train(dataset)
@@ -178,10 +181,10 @@ class EpsilonUncertaintySampling(QueryStrategy):
         X_pool = np.asarray(X_pool)
 
         if len(unlabeled_entry_ids) == 0:
-            return []
+            return np.array([], dtype=int), np.array([], dtype=float)
 
         scores = self._get_uncertainty_scores(X_pool)
-        return list(zip(unlabeled_entry_ids, scores))
+        return np.asarray(unlabeled_entry_ids), np.asarray(scores)
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self, return_score=False):
@@ -207,7 +210,8 @@ class EpsilonUncertaintySampling(QueryStrategy):
             ask_id = unlabeled_entry_ids[selected_idx]
 
         if return_score:
-            return ask_id, self._get_scores()
+            entry_ids, scores = self._get_scores()
+            return ask_id, list(zip(entry_ids, scores))
         else:
             return ask_id
 

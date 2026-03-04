@@ -181,31 +181,47 @@ class QueryByCommittee(QueryStrategy):
         # Train each model with newly updated label.
         self.teach_students()
 
-    @inherit_docstring_from(QueryStrategy)
-    def make_query(self):
+    def _get_scores(self):
+        """Return disagreement scores for all unlabeled samples.
+
+        Returns
+        -------
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Disagreement scores. Higher = more disagreement.
+        """
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
 
+        if len(unlabeled_entry_ids) == 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
         if self.disagreement == 'vote':
-            # Let the trained students vote for unlabeled data
             votes = np.zeros((len(X_pool), len(self.students)))
             for i, student in enumerate(self.students):
                 votes[:, i] = student.predict(X_pool)
-
-            vote_entropy = self._vote_disagreement(votes)
-            ask_idx = self.random_state_.choice(
-                    np.where(np.isclose(vote_entropy, np.max(vote_entropy)))[0])
+            scores = np.array(self._vote_disagreement(votes))
 
         elif self.disagreement == 'kl_divergence':
             proba = []
             for student in self.students:
                 proba.append(student.predict_proba(X_pool))
             proba = np.array(proba).transpose(1, 0, 2).astype(float)
-
-            avg_kl = self._kl_divergence_disagreement(proba)
-            ask_idx = self.random_state_.choice(
-                    np.where(np.isclose(avg_kl, np.max(avg_kl)))[0])
+            scores = self._kl_divergence_disagreement(proba)
         else:
             raise ValueError("disagreement must be 'vote' or 'kl_divergence'")
+
+        return np.asarray(unlabeled_entry_ids), np.asarray(scores)
+
+    @inherit_docstring_from(QueryStrategy)
+    def make_query(self):
+        unlabeled_entry_ids, scores = self._get_scores()
+
+        if len(unlabeled_entry_ids) == 0:
+            raise ValueError("No unlabeled samples available")
+
+        ask_idx = self.random_state_.choice(
+                np.where(np.isclose(scores, np.max(scores)))[0])
 
         return unlabeled_entry_ids[ask_idx]

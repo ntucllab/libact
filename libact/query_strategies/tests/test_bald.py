@@ -81,11 +81,11 @@ class BALDTestCase(unittest.TestCase):
         qs = BALD(trn_ds, models=models, random_state=42)
 
         # Get scores
-        scores = qs._get_scores()
+        entry_ids, scores = qs._get_scores()
         self.assertGreater(len(scores), 0)
 
         # All BALD scores should be non-negative (MI is non-negative)
-        for entry_id, score in scores:
+        for score in scores:
             self.assertGreaterEqual(score, -1e-10)  # Allow small numerical errors
 
     def test_update_retrains_ensemble(self):

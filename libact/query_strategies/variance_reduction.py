@@ -60,6 +60,20 @@ class VarianceReduction(QueryStrategy):
         self.sigma = kwargs.pop('sigma', 1.0)
         self.n_jobs = kwargs.pop('n_jobs', 1)
 
+    def _get_scores(self):
+        """VarianceReduction does not support per-sample scoring.
+
+        Raises
+        ------
+        NotImplementedError
+        """
+        raise NotImplementedError(
+            "VarianceReduction does not support _get_scores(). "
+            "Its computation is tightly coupled to the C extension. "
+            "Use make_query() directly, or wrap with a different strategy "
+            "for batch mode."
+        )
+
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         Xlabeled, y = self.dataset.get_labeled_entries()
