@@ -197,7 +197,7 @@ class InformationDensity(QueryStrategy):
         X_pool = np.asarray(X_pool)
 
         if len(unlabeled_entry_ids) == 0:
-            return []
+            return np.array([], dtype=int), np.array([], dtype=float)
 
         uncertainty = self._uncertainty_scores(X_pool)
         # Ensure non-negative uncertainty (ContinuousModel predict_real can
@@ -209,26 +209,22 @@ class InformationDensity(QueryStrategy):
 
         scores = uncertainty * (density ** self.beta)
 
-        return list(zip(unlabeled_entry_ids, scores))
+        return np.asarray(unlabeled_entry_ids), scores
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self, return_score=False):
-        dataset = self.dataset
-        unlabeled_entry_ids, _ = dataset.get_unlabeled_entries()
+        entry_ids, score_values = self._get_scores()
 
-        if len(unlabeled_entry_ids) == 0:
+        if len(entry_ids) == 0:
             raise ValueError("No unlabeled samples available")
-
-        scores = self._get_scores()
-        entry_ids, score_values = zip(*scores)
-        score_values = np.asarray(list(score_values))
 
         max_score = np.max(score_values)
         candidates = np.where(np.isclose(score_values, max_score))[0]
         selected_idx = self.random_state_.choice(candidates)
 
         if return_score:
-            return entry_ids[selected_idx], scores
+            return entry_ids[selected_idx], \
+                list(zip(entry_ids, score_values))
         else:
             return entry_ids[selected_idx]
 

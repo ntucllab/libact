@@ -129,12 +129,10 @@ class InformationDensityTestCase(unittest.TestCase):
         model = MockProbModel()
 
         qs = InformationDensity(trn_ds, model=model, beta=0.0, random_state=42)
-        scores = qs._get_scores()
+        entry_ids, score_values = qs._get_scores()
 
         # With beta=0, density^0 = 1 for all, so scores = uncertainty only
         # The first unlabeled point (most uncertain in MockProbModel) should score highest
-        entry_ids, score_values = zip(*scores)
-        score_values = list(score_values)
         max_idx = np.argmax(score_values)
         # First unlabeled has p=0.5 (max entropy)
         self.assertEqual(entry_ids[max_idx], 4)
@@ -260,12 +258,12 @@ class InformationDensityTestCase(unittest.TestCase):
         model = MockProbModel()
         qs = InformationDensity(trn_ds, model=model, random_state=42)
 
-        scores = qs._get_scores()
+        entry_ids, scores = qs._get_scores()
         unlabeled_ids = trn_ds.get_unlabeled_entries()[0]
         self.assertEqual(len(scores), len(unlabeled_ids))
 
         # All scores should be non-negative
-        for entry_id, score in scores:
+        for score in scores:
             self.assertGreaterEqual(score, 0.0)
 
     def test_empty_pool_error(self):
@@ -336,9 +334,9 @@ class InformationDensityTestCase(unittest.TestCase):
         qs = InformationDensity(trn_ds, model=model, method='lc',
                                 random_state=42)
 
-        scores = qs._get_scores()
+        entry_ids, scores = qs._get_scores()
         # All scores should be non-negative (uncertainty clamped to 0)
-        for entry_id, score in scores:
+        for score in scores:
             self.assertGreaterEqual(score, 0.0)
 
     def test_density_favors_dense_with_continuous_model(self):

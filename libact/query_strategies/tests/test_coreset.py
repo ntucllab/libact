@@ -154,20 +154,19 @@ class CoreSetTestCase(unittest.TestCase):
         trn_ds = init_dataset(self.X, self.y, n_labeled=4)
         qs = CoreSet(trn_ds, random_state=42)
 
-        scores = qs._get_scores()
+        entry_ids, scores = qs._get_scores()
 
         # Should have one score per unlabeled point
         unlabeled_ids = trn_ds.get_unlabeled_entries()[0]
         self.assertEqual(len(scores), len(unlabeled_ids))
 
         # Scores should be non-negative
-        for entry_id, score in scores:
+        for score in scores:
             self.assertGreaterEqual(score, 0.0)
 
         # The farthest point should have the highest score
-        scores_dict = dict(scores)
-        max_id = max(scores_dict, key=scores_dict.get)
-        self.assertEqual(max_id, 9)  # [5.0, 5.0] is farthest
+        max_idx = np.argmax(scores)
+        self.assertEqual(entry_ids[max_idx], 9)  # [5.0, 5.0] is farthest
 
 
 if __name__ == '__main__':

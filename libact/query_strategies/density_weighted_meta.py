@@ -99,10 +99,12 @@ class DensityWeightedMeta(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def _get_scores(self):
         dataset = self.dataset
-        X, _ = zip(*dataset.data)
-        scores = self.base_query_strategy._get_scores()
-        _, X_pool = dataset.get_unlabeled_entries()
-        unlabeled_entry_ids, base_scores = zip(*scores)
+        X, _ = dataset.get_entries()
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
+
+        if len(unlabeled_entry_ids) == 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+        _, base_scores = self.base_query_strategy._get_scores()
 
         self.clustering_method.fit(X)
         pool_cluster = self.clustering_method.predict(X_pool)
@@ -118,13 +120,16 @@ class DensityWeightedMeta(QueryStrategy):
         similarity = np.asarray(similarity)
 
         scores = base_scores * similarity**self.beta
-        return zip(unlabeled_entry_ids, scores)
+        return np.asarray(unlabeled_entry_ids), np.asarray(scores)
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
-        dataset = self.dataset
+        unlabeled_entry_ids, scores = self._get_scores()
 
-        unlabeled_entry_ids, scores = zip(*self._get_scores())
-        ask_id = self.random_state_.choice(np.where(scores == np.max(scores))[0])
+        if len(unlabeled_entry_ids) == 0:
+            raise ValueError("No unlabeled samples available")
+
+        ask_id = self.random_state_.choice(
+            np.where(np.isclose(scores, np.max(scores)))[0])
 
         return unlabeled_entry_ids[ask_id]

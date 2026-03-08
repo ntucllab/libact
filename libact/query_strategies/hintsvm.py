@@ -129,10 +129,22 @@ class HintSVM(QueryStrategy):
 
         self.svm_params['C'] = self.cl
 
-    @inherit_docstring_from(QueryStrategy)
-    def make_query(self):
+    def _get_scores(self):
+        """Return absolute decision values for all unlabeled samples.
+
+        Returns
+        -------
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Absolute decision values from HintSVM. Higher = more informative.
+        """
         dataset = self.dataset
         unlabeled_entry_ids, unlabeled_pool = dataset.get_unlabeled_entries()
+
+        if len(unlabeled_entry_ids) == 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
         labeled_pool, y = dataset.get_labeled_entries()
         if len(np.unique(y)) > 2:
             raise ValueError("HintSVM query strategy support binary class "
@@ -155,6 +167,15 @@ class HintSVM(QueryStrategy):
             np.array(unlabeled_pool, dtype=np.float64),
             self.svm_params)
 
-        p_val = [abs(float(val[0])) for val in p_val]
-        idx = int(np.argmax(p_val))
+        scores = np.array([abs(float(val[0])) for val in p_val])
+        return np.asarray(unlabeled_entry_ids), scores
+
+    @inherit_docstring_from(QueryStrategy)
+    def make_query(self):
+        unlabeled_entry_ids, scores = self._get_scores()
+
+        if len(unlabeled_entry_ids) == 0:
+            raise ValueError("No unlabeled samples available")
+
+        idx = int(np.argmax(scores))
         return unlabeled_entry_ids[idx]

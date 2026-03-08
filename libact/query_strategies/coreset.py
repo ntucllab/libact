@@ -79,25 +79,31 @@ class CoreSet(QueryStrategy):
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
 
-    @inherit_docstring_from(QueryStrategy)
-    def make_query(self):
+    def _get_scores(self):
+        """Return min-distances to labeled set for all unlabeled samples.
+
+        Returns
+        -------
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Min-distance from each unlabeled point to any labeled point.
+            Higher score means more informative.
+        """
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
         X_pool = np.asarray(X_pool)
 
         if len(unlabeled_entry_ids) == 0:
-            raise ValueError("No unlabeled samples available")
+            return np.array([], dtype=int), np.array([], dtype=float)
 
-        # Get labeled data
         labeled_entries = dataset.get_labeled_entries()
         X_labeled = np.asarray(labeled_entries[0])
 
-        # Fallback to random if no labeled data
         if len(X_labeled) == 0:
-            idx = self.random_state_.randint(0, len(unlabeled_entry_ids))
-            return unlabeled_entry_ids[idx]
+            return np.asarray(unlabeled_entry_ids), \
+                np.full(len(unlabeled_entry_ids), float('inf'))
 
-        # Transform features if transformer is provided
         if self.transformer is not None:
             X_pool_t = np.asarray(self.transformer.transform(X_pool))
             X_labeled_t = np.asarray(self.transformer.transform(X_labeled))
@@ -105,11 +111,22 @@ class CoreSet(QueryStrategy):
             X_pool_t = X_pool
             X_labeled_t = X_labeled
 
-        # Compute pairwise distances: (n_unlabeled, n_labeled)
         dist_matrix = cdist(X_pool_t, X_labeled_t, metric=self.metric)
-
-        # For each unlabeled point, find minimum distance to any labeled point
         min_distances = np.min(dist_matrix, axis=1)
+
+        return np.asarray(unlabeled_entry_ids), min_distances
+
+    @inherit_docstring_from(QueryStrategy)
+    def make_query(self):
+        unlabeled_entry_ids, min_distances = self._get_scores()
+
+        if len(unlabeled_entry_ids) == 0:
+            raise ValueError("No unlabeled samples available")
+
+        # Fallback to random if no labeled data (scores are all inf)
+        if np.all(np.isinf(min_distances)):
+            idx = self.random_state_.randint(0, len(unlabeled_entry_ids))
+            return unlabeled_entry_ids[idx]
 
         # Select the unlabeled point with maximum min-distance (farthest)
         max_dist = np.max(min_distances)
@@ -117,38 +134,3 @@ class CoreSet(QueryStrategy):
         selected_idx = self.random_state_.choice(candidates)
 
         return unlabeled_entry_ids[selected_idx]
-
-    def _get_scores(self):
-        """Return min-distances to labeled set for all unlabeled samples.
-
-        Returns
-        -------
-        scores : list of (entry_id, score) tuples
-            Each score is the minimum distance from that unlabeled point
-            to any labeled point. Higher score means more informative.
-        """
-        dataset = self.dataset
-        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
-        X_pool = np.asarray(X_pool)
-
-        if len(unlabeled_entry_ids) == 0:
-            return []
-
-        labeled_entries = dataset.get_labeled_entries()
-        X_labeled = np.asarray(labeled_entries[0])
-
-        if len(X_labeled) == 0:
-            return list(zip(unlabeled_entry_ids,
-                            [float('inf')] * len(unlabeled_entry_ids)))
-
-        if self.transformer is not None:
-            X_pool_t = np.asarray(self.transformer.transform(X_pool))
-            X_labeled_t = np.asarray(self.transformer.transform(X_labeled))
-        else:
-            X_pool_t = X_pool
-            X_labeled_t = X_labeled
-
-        dist_matrix = cdist(X_pool_t, X_labeled_t, metric=self.metric)
-        min_distances = np.min(dist_matrix, axis=1)
-
-        return list(zip(unlabeled_entry_ids, min_distances))
