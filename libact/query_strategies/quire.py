@@ -108,12 +108,26 @@ class QUIRE(QueryStrategy):
         self.Uindex.remove(entry_id)
         self.y[entry_id] = label
 
-    def make_query(self):
+    def _get_scores(self):
+        """Return QUIRE scores for all unlabeled samples.
+
+        The original QUIRE uses min(eva) where lower is better.
+        Scores are negated so higher = more informative.
+
+        Returns
+        -------
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Negated evaluation values. Higher = more informative.
+        """
         L = self.L
         Lindex = self.Lindex
         Uindex = self.Uindex
-        query_index = -1
-        min_eva = np.inf
+
+        if len(Uindex) == 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
         y_labeled = np.array([label for label in self.y if label is not None])
         det_Laa = np.linalg.det(L[np.ix_(Uindex, Uindex)])
         # efficient computation of inv(Laa)
@@ -123,11 +137,9 @@ class QUIRE(QueryStrategy):
         M1 = self.lmbda * np.eye(len(Uindex)) + self.K[np.ix_(Uindex, Uindex)]
         inv_Laa = M1 - M2
         iList = list(range(len(Uindex)))
-        if len(iList) == 1:
-            return Uindex[0]
+
+        all_eva = []
         for i, each_index in enumerate(Uindex):
-            # go through all unlabeled instances and compute their evaluation
-            # values one by one
             Uindex_r = Uindex[:]
             Uindex_r.remove(each_index)
             iList_r = iList[:]
@@ -147,8 +159,20 @@ class QUIRE(QueryStrategy):
             )
             eva = L[each_index][each_index] - \
                 det_Laa / L[each_index][each_index] + 2 * np.abs(tmp)
+            all_eva.append(eva)
 
-            if eva < min_eva:
-                query_index = each_index
-                min_eva = eva
-        return query_index
+        # Negate so higher = better (original uses min)
+        scores = -np.array(all_eva)
+        return np.array(Uindex, dtype=int), scores
+
+    def make_query(self):
+        entry_ids, scores = self._get_scores()
+
+        if len(entry_ids) == 0:
+            raise ValueError("No unlabeled samples available")
+
+        # Single unlabeled sample: return it directly
+        if len(entry_ids) == 1:
+            return entry_ids[0]
+
+        return entry_ids[np.argmax(scores)]

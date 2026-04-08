@@ -39,16 +39,27 @@ class QueryStrategy(with_metaclass(ABCMeta, object)):
         pass
 
     def _get_scores(self):
-        """Return the score used for making query, the larger the better. Read-only.
+        """Return acquisition scores for all unlabeled samples.
 
-        No modification to the internal states.
+        Subclasses should override this method to enable batch mode queries
+        and score-based strategy composition.
 
         Returns
         -------
-        (ask_id, scores): list of tuple (int, float)
-            The index of the next unlabeled sample to be queried and the score assigned.
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Acquisition scores. Higher = more informative.
+
+        Raises
+        ------
+        NotImplementedError
+            If the strategy does not support per-sample scoring.
         """
-        pass
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not implement _get_scores(). "
+            "This is required for batch mode and score-based composition."
+        )
 
     @abstractmethod
     def make_query(self):

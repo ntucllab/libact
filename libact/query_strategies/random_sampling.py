@@ -1,5 +1,7 @@
 """Random Sampling
 """
+import numpy as np
+
 from libact.base.interfaces import QueryStrategy
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 
@@ -41,6 +43,20 @@ class RandomSampling(QueryStrategy):
 
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
+
+    def _get_scores(self):
+        """Return uniform scores for all unlabeled samples.
+
+        Returns
+        -------
+        entry_ids : np.ndarray, shape (n_unlabeled,)
+            Global entry IDs of unlabeled samples.
+        scores : np.ndarray, shape (n_unlabeled,)
+            Uniform scores (all ones).
+        """
+        unlabeled_entry_ids, _ = self.dataset.get_unlabeled_entries()
+        scores = np.ones(len(unlabeled_entry_ids), dtype=float)
+        return unlabeled_entry_ids, scores
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):

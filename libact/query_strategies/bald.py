@@ -186,44 +186,6 @@ class BALD(QueryStrategy):
         # Retrain ensemble with the new labeled data
         self._train_ensemble()
 
-    @inherit_docstring_from(QueryStrategy)
-    def make_query(self):
-        dataset = self.dataset
-        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
-        X_pool = np.asarray(X_pool)
-
-        if len(unlabeled_entry_ids) == 0:
-            raise ValueError("No unlabeled samples available")
-
-        # Get predictions from all models
-        all_proba = []
-        for model in self.models:
-            proba = model.predict_proba(X_pool)
-            all_proba.append(np.asarray(proba))
-
-        all_proba = np.array(all_proba)  # shape: (n_models, n_samples, n_classes)
-
-        # Calculate BALD score: H[mean(P)] - mean(H[P])
-        # Mean probability across ensemble
-        mean_proba = np.mean(all_proba, axis=0)  # shape: (n_samples, n_classes)
-
-        # Entropy of mean predictions (total uncertainty)
-        entropy_mean = self._entropy(mean_proba)  # shape: (n_samples,)
-
-        # Mean entropy across models (expected data uncertainty)
-        entropies = np.array([self._entropy(p) for p in all_proba])  # shape: (n_models, n_samples)
-        mean_entropy = np.mean(entropies, axis=0)  # shape: (n_samples,)
-
-        # BALD score = mutual information
-        bald_scores = entropy_mean - mean_entropy  # shape: (n_samples,)
-
-        # Select sample with highest BALD score (break ties randomly)
-        max_score = np.max(bald_scores)
-        candidates = np.where(np.isclose(bald_scores, max_score))[0]
-        selected_idx = self.random_state_.choice(candidates)
-
-        return unlabeled_entry_ids[selected_idx]
-
     def _get_scores(self):
         """Return BALD scores for all unlabeled samples."""
         dataset = self.dataset
@@ -231,7 +193,7 @@ class BALD(QueryStrategy):
         X_pool = np.asarray(X_pool)
 
         if len(unlabeled_entry_ids) == 0:
-            return []
+            return np.array([], dtype=int), np.array([], dtype=float)
 
         # Get predictions from all models
         all_proba = np.array([
@@ -245,4 +207,18 @@ class BALD(QueryStrategy):
         mean_entropy = np.mean(entropies, axis=0)
         bald_scores = entropy_mean - mean_entropy
 
-        return list(zip(unlabeled_entry_ids, bald_scores))
+        return np.asarray(unlabeled_entry_ids), bald_scores
+
+    @inherit_docstring_from(QueryStrategy)
+    def make_query(self):
+        unlabeled_entry_ids, bald_scores = self._get_scores()
+
+        if len(unlabeled_entry_ids) == 0:
+            raise ValueError("No unlabeled samples available")
+
+        # Select sample with highest BALD score (break ties randomly)
+        max_score = np.max(bald_scores)
+        candidates = np.where(np.isclose(bald_scores, max_score))[0]
+        selected_idx = self.random_state_.choice(candidates)
+
+        return unlabeled_entry_ids[selected_idx]
