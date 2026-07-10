@@ -9,6 +9,7 @@ py_src = [
   'test_information_density.py',
   'test_quire.py',
   'test_realdata.py',
+  'test_seed_reproducibility.py',
   'test_uncertainty_sampling.py',
   'test_variance_reduction.py',
   'utils.py',

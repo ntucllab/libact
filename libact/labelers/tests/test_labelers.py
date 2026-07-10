@@ -39,5 +39,18 @@ class TestDatasetMethods(unittest.TestCase):
         ask_id = lbr.label(np.array([ 6.,  2., 21., 20.,  5.]))
         np.testing.assert_array_equal(ask_id, [0, 0, 1, 0, 1])
 
+    def test_label_random_state(self):
+        """same random_state gives the same label for duplicate features
+        carrying conflicting labels"""
+        X = np.vstack([np.zeros((2, 3)), np.ones((2, 3))])
+        y = np.array([1, 2, 3, 4])
+        dataset = Dataset(X, y)
+        lbr1 = IdealLabeler(dataset, random_state=1126)
+        lbr2 = IdealLabeler(dataset, random_state=1126)
+        labels1 = [lbr1.label(np.zeros(3)) for _ in range(20)]
+        labels2 = [lbr2.label(np.zeros(3)) for _ in range(20)]
+        self.assertEqual(labels1, labels2)
+        self.assertTrue(set(labels1) <= {1, 2})
+
 if __name__ == '__main__':
     unittest.main()

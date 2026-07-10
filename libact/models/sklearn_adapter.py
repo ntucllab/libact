@@ -4,6 +4,22 @@ from sklearn.base import clone
 from libact.base.interfaces import Model, ContinuousModel, ProbabilisticModel
 
 
+def _clone_estimator(estimator, random_state=None):
+    """Clone a scikit-learn estimator, optionally overriding its random_state.
+
+    When ``random_state`` is given and the estimator exposes a ``random_state``
+    parameter, the clone is reseeded with it. This lets ensemble strategies
+    give each cloned committee member a distinct, deterministic seed derived
+    from the strategy's own random_state (mirroring scikit-learn's ensemble
+    behavior). Estimators without a ``random_state`` parameter are cloned
+    unchanged.
+    """
+    cloned = clone(estimator)
+    if random_state is not None and 'random_state' in cloned.get_params():
+        cloned.set_params(random_state=random_state)
+    return cloned
+
+
 class SklearnAdapter(Model):
     """Implementation of the scikit-learn classifier to libact model interface.
 
@@ -49,8 +65,9 @@ class SklearnAdapter(Model):
         return self._model.score(*(testing_dataset.format_sklearn() + args),
                                 **kwargs)
 
-    def clone(self):
-        return SklearnProbaAdapter(clone(self._model))
+    def clone(self, random_state=None):
+        return SklearnProbaAdapter(
+            _clone_estimator(self._model, random_state))
 
 
 class SklearnProbaAdapter(ProbabilisticModel):
@@ -107,5 +124,6 @@ class SklearnProbaAdapter(ProbabilisticModel):
     def predict_proba(self, feature, *args, **kwargs):
         return self._model.predict_proba(feature, *args, **kwargs)
 
-    def clone(self):
-        return SklearnProbaAdapter(clone(self._model))
+    def clone(self, random_state=None):
+        return SklearnProbaAdapter(
+            _clone_estimator(self._model, random_state))

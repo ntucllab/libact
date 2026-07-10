@@ -1,8 +1,10 @@
+import os
+import tempfile
 import unittest
 
 import numpy as np
 
-from libact.base.dataset import Dataset
+from libact.base.dataset import Dataset, import_scipy_mat
 
 
 class TestDatasetMethods(unittest.TestCase):
@@ -105,6 +107,34 @@ class TestDatasetMethods(unittest.TestCase):
                 self.fail()
         with self.assertRaises(ValueError):
             dataset_s = dataset.labeled_uniform_sample(4, replace=False)
+
+    def test_labeled_uniform_sample_random_state(self):
+        dataset = self.setup_dataset()
+        dataset_1 = dataset.labeled_uniform_sample(10, random_state=1126)
+        dataset_2 = dataset.labeled_uniform_sample(10, random_state=1126)
+        dataset_3 = dataset.labeled_uniform_sample(
+            10, random_state=np.random.RandomState(1126))
+        X_1, y_1 = dataset_1.get_entries()
+        X_2, y_2 = dataset_2.get_entries()
+        X_3, y_3 = dataset_3.get_entries()
+        self.assertTrue(np.array_equal(X_1, X_2))
+        self.assertEqual(y_1.tolist(), y_2.tolist())
+        self.assertTrue(np.array_equal(X_1, X_3))
+        self.assertEqual(y_1.tolist(), y_3.tolist())
+
+    def test_import_scipy_mat_random_state(self):
+        from scipy.io import savemat
+        X = np.arange(40).reshape(20, 2)
+        y = np.arange(20).reshape(-1, 1)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            mat_path = os.path.join(tmp_dir, 'dataset.mat')
+            savemat(mat_path, {'X': X, 'y': y})
+            dataset_1 = import_scipy_mat(mat_path, random_state=1126)
+            dataset_2 = import_scipy_mat(mat_path, random_state=1126)
+        X_1, y_1 = dataset_1.get_entries()
+        X_2, y_2 = dataset_2.get_entries()
+        self.assertTrue(np.array_equal(X_1, X_2))
+        self.assertEqual(y_1.tolist(), y_2.tolist())
 
 
 if __name__ == '__main__':

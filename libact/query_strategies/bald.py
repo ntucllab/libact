@@ -123,7 +123,19 @@ class BALD(QueryStrategy):
             if not hasattr(base_model, 'clone'):
                 raise TypeError("base_model must have a 'clone()' method")
             self._base_model = base_model
-            self.models = [base_model.clone() for _ in range(self.n_models)]
+            # Give each cloned committee member a distinct, deterministic seed
+            # derived from random_state_ so a passed random_state fully controls
+            # the ensemble even when the base model is stochastic.
+            clone_seeds = self.random_state_.randint(
+                np.iinfo(np.int32).max, size=self.n_models)
+            self.models = []
+            for seed in clone_seeds:
+                try:
+                    model = base_model.clone(random_state=int(seed))
+                except TypeError:
+                    # Custom clone() implementations may not accept a seed.
+                    model = base_model.clone()
+                self.models.append(model)
         else:
             raise TypeError(
                 "__init__() requires either 'models' or 'base_model' argument"

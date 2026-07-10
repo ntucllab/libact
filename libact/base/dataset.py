@@ -6,11 +6,10 @@ May be exported in different formats for application on other libraries.
 """
 from __future__ import unicode_literals
 
-import random
 import numpy as np
 import scipy.sparse as sp
 
-from libact.utils import zip
+from libact.utils import check_random_state, zip
 
 
 class Dataset(object):
@@ -208,7 +207,8 @@ class Dataset(object):
         """
         return np.where(~self.get_labeled_mask())[0], self._X[~self.get_labeled_mask()]
 
-    def labeled_uniform_sample(self, sample_size, replace=True):
+    def labeled_uniform_sample(self, sample_size, replace=True,
+                               random_state=None):
         """Returns a Dataset object with labeled data only, which is
         resampled uniformly with given sample size.
         Parameter `replace` decides whether sampling with replacement or not.
@@ -216,9 +216,16 @@ class Dataset(object):
         Parameters
         ----------
         sample_size
+
+        random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+            If int, random_state is passed as parameter to generate
+            np.random.RandomState instance. if np.random.RandomState instance,
+            random_state is the random number generate. If None, the global
+            numpy random state is used, keeping the previous behavior.
         """
-        idx = np.random.choice(np.where(self.get_labeled_mask())[0],
-                               size=sample_size, replace=replace)
+        random_state_ = check_random_state(random_state)
+        idx = random_state_.choice(np.where(self.get_labeled_mask())[0],
+                                   size=sample_size, replace=replace)
         return Dataset(self._X[idx], self._y[idx])
 
 
@@ -229,13 +236,27 @@ def import_libsvm_sparse(filename):
     return Dataset(X.toarray(), y)
 
 
-def import_scipy_mat(filename):
+def import_scipy_mat(filename, random_state=None):
+    """Imports dataset file in scipy mat format and shuffles the entries.
+
+    Parameters
+    ----------
+    filename : str
+        Path to the mat file with 'X' and 'y' entries.
+
+    random_state : {int, np.random.RandomState instance, None}, optional (default=None)
+        If int, random_state is passed as parameter to generate
+        np.random.RandomState instance to shuffle the entries with. if
+        np.random.RandomState instance, random_state is the random number
+        generate. If None, the global numpy random state is used, keeping
+        the previous behavior.
+    """
     from scipy.io import loadmat
     data = loadmat(filename)
     X = data['X']
     y = data['y']
     zipper = list(zip(X, y))
-    np.random.shuffle(zipper)
+    check_random_state(random_state).shuffle(zipper)
     X, y = zip(*zipper)
     X, y = np.array(X), np.array(y).reshape(-1)
     return Dataset(X, y)

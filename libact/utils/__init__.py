@@ -13,7 +13,8 @@ IS_PY3 = (_VER[0] == 3)
 if IS_PY2:
     from future_builtins import zip
 
-__all__ = ['inherit_docstring_from', 'seed_random_state', 'zip']
+__all__ = ['inherit_docstring_from', 'seed_random_state', 'check_random_state',
+           'zip']
 
 zip = zip
 
@@ -31,12 +32,26 @@ def inherit_docstring_from(cls):
 def seed_random_state(seed):
     """Turn seed into np.random.RandomState instance
     """
-    if (seed is None) or (isinstance(seed, int)):
+    if (seed is None) or (isinstance(seed, (int, np.integer))):
         return np.random.RandomState(seed)
     elif isinstance(seed, np.random.RandomState):
         return seed
     raise ValueError("%r can not be used to generate numpy.random.RandomState"
                      " instance" % seed)
+
+
+def check_random_state(seed):
+    """Turn seed into a random number generator, keeping the global numpy
+    random state for a None seed.
+
+    Unlike :func:`seed_random_state`, which turns a None seed into a freshly
+    seeded np.random.RandomState instance, a None seed here keeps the global
+    numpy random state, preserving the unseeded behavior of code that used
+    the np.random module functions directly.
+    """
+    if seed is None:
+        return np.random
+    return seed_random_state(seed)
 
 def calc_cost(y, yhat, cost_matrix):
     """Calculate the cost with given cost matrix
