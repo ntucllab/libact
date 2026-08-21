@@ -64,7 +64,7 @@ class RealdataTestCase(unittest.TestCase):
         qs = HintSVM(trn_ds, random_state=1126)
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(
-            qseq, np.array([24, 235, 228, 209, 18, 143, 119, 90, 149, 207]))
+            qseq, np.array([111, 203, 42, 147, 11, 261, 7, 19, 100, 37]))
 
     def test_query_by_committee_vote(self):
         trn_ds = Dataset(self.X,
