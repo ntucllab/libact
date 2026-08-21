@@ -28,7 +28,7 @@ class DensityWeightedMetaTestCase(unittest.TestCase):
             [self.y[:6], [None] * 14]))
         base_qs = UncertaintySampling(
             trn_ds, method='lc',
-            model=LogisticRegression(solver='liblinear', multi_class="ovr"))
+            model=LogisticRegression(solver='liblinear'))
         similarity_metric = cosine_similarity
         clustering_method = KMeans(n_clusters=3, random_state=1126)
         qs = DensityWeightedMeta(
@@ -36,7 +36,7 @@ class DensityWeightedMetaTestCase(unittest.TestCase):
             similarity_metric=similarity_metric,
             clustering_method=clustering_method,
             beta=1.0, random_state=1126)
-        model = LogisticRegression(solver='liblinear', multi_class="ovr")
+        model = LogisticRegression(solver='liblinear')
         qseq = run_qs(trn_ds, qs, self.y, self.quota)
         assert_array_equal(qseq, np.array(
             [18, 13,  9, 12,  8, 16, 10, 19, 15,  7]))

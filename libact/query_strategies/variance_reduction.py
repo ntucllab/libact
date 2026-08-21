@@ -74,6 +74,22 @@ class VarianceReduction(QueryStrategy):
             "for batch mode."
         )
 
+    def make_query_batch(self, batch_size):
+        """VarianceReduction does not support batch queries.
+
+        Raises
+        ------
+        NotImplementedError
+            Always. The variance estimation is tightly coupled to the C
+            extension and provides no per-sample scoring; use
+            :py:meth:`make_query` instead.
+        """
+        raise NotImplementedError(
+            "VarianceReduction does not support batch querying: its "
+            "computation is tightly coupled to the C extension and "
+            "provides no per-sample scoring. Use make_query() instead."
+        )
+
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         Xlabeled, y = self.dataset.get_labeled_entries()

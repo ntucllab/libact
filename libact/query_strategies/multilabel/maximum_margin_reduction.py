@@ -74,8 +74,7 @@ class MaximumLossReductionMaximalConfidence(QueryStrategy):
         self.random_state_ = seed_random_state(random_state)
 
         self.logreg_param = kwargs.pop('logreg_param',
-                                       {'multi_class': 'multinomial',
-                                        'solver': 'newton-cg',
+                                       {'solver': 'newton-cg',
                                         'random_state': random_state})
         self.logistic_regression_ = LogisticRegression(**self.logreg_param)
 

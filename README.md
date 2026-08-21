@@ -172,6 +172,7 @@ This ensures that `ninja`, `meson`, and other build tools remain available in yo
 | `VarianceReduction` | Variance | Minimizes output variance (requires C extension) |
 | `HintSVM` | SVM-based | SVM-guided active learning (requires C extension) |
 | `DensityWeightedMeta` | Density | Weights informativeness by density |
+| `DiversityWeightedMeta` | Batch Diversity | Diversity-aware batch selection over any score-based strategy |
 | `DWUS` | Density + Uncertainty | Density-weighted uncertainty sampling |
 
 ## Available Models
@@ -194,6 +195,34 @@ ask_id = qs.make_query() # let the specified query strategy suggest a data to qu
 X, y = zip(*trn_ds.data)
 lb = lbr.label(X[ask_id]) # query the label of unlabeled data from labeler instance
 trn_ds.update(ask_id, lb) # update the dataset with newly queried data
+```
+
+### Batch querying
+
+Sequential querying retrains the model once per label, which is
+impractical for expensive models. Every score-based strategy also
+supports querying a batch of distinct samples in one call:
+
+```python
+ask_ids = qs.make_query_batch(10)         # top-10 by acquisition score
+labels = [lbr.label(X[i]) for i in ask_ids]
+trn_ds.update_batch(ask_ids, labels)      # strategies retrain once per batch
+```
+
+A plain top-k batch can contain redundant near-duplicate points. Wrap
+any base strategy with `DiversityWeightedMeta` to make batches
+diversity-aware:
+
+```python
+from libact.models import LogisticRegression
+from libact.query_strategies import DiversityWeightedMeta, UncertaintySampling
+
+qs = DiversityWeightedMeta(
+    trn_ds,
+    base_query_strategy=UncertaintySampling(trn_ds, model=LogisticRegression()),
+    lmbda=0.5,  # 0 = pure top-k, 1 = pure farthest-point
+)
+ask_ids = qs.make_query_batch(10)
 ```
 
 ### Using CoreSet, BALD, and InformationDensity Strategies
@@ -254,6 +283,9 @@ Available examples:
     with other active learning algorithms.
   - [albl_new_strategies_benchmark](examples/albl_new_strategies_benchmark.py): Benchmarks
     CoreSet, BALD, and InformationDensity query strategies individually and combined via ALBL.
+  - [batch_query_plot](examples/batch_query_plot.py): This example compares sequential
+    active learning with batch-mode querying (`make_query_batch` / `update_batch`),
+    including diversity-aware batches via `DiversityWeightedMeta`.
   - [multilabel_plot](examples/multilabel_plot.py): This example compares the performance of
     algorithms under multilabel setting.
   - [alce_plot](examples/alce_plot.py): This example compares the performance of

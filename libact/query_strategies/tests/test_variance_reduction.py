@@ -22,7 +22,7 @@ class VarianceReductionTestCase(unittest.TestCase):
                                          [None] * (len(self.y) - 2)]))
         qs = VarianceReduction(
                 trn_ds,
-                model=LogisticRegression(solver='liblinear', multi_class="ovr"),
+                model=LogisticRegression(solver='liblinear'),
                 sigma=0.1
             )
         qseq = run_qs(trn_ds, qs, self.y, self.quota)

@@ -186,6 +186,10 @@ class BALD(QueryStrategy):
         # Retrain ensemble with the new labeled data
         self._train_ensemble()
 
+    def update_batch(self, entry_ids, labels):
+        """Retrain the ensemble once for the whole batch of new labels."""
+        self._train_ensemble()
+
     def _get_scores(self):
         """Return BALD scores for all unlabeled samples."""
         dataset = self.dataset

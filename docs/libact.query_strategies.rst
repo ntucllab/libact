@@ -83,6 +83,14 @@ libact.query_strategies.coreset module
     :undoc-members:
     :show-inheritance:
 
+libact.query_strategies.diversity_weighted_meta module
+-------------------------------------------------------
+
+.. automodule:: libact.query_strategies.diversity_weighted_meta
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 libact.query_strategies.epsilon_uncertainty_sampling module
 -----------------------------------------------------------
 

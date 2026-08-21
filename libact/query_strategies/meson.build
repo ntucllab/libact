@@ -5,6 +5,7 @@ py_src = [
   'coreset.py',
   'density_weighted_meta.py',
   'density_weighted_uncertainty_sampling.py',
+  'diversity_weighted_meta.py',
   'epsilon_uncertainty_sampling.py',
   'hintsvm.py',
   'information_density.py',

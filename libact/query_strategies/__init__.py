@@ -22,6 +22,7 @@ from .epsilon_uncertainty_sampling import EpsilonUncertaintySampling
 from .information_density import InformationDensity
 # don't import c extentions when on readthedocs server
 from .density_weighted_meta import DensityWeightedMeta
+from .diversity_weighted_meta import DiversityWeightedMeta
 if not ON_RTD:
     try:
         from ._variance_reduction import estVar
@@ -56,4 +57,5 @@ __all__ = [
     'UncertaintySampling',
     'VarianceReduction',
     'DensityWeightedMeta',
+    'DiversityWeightedMeta',
 ]
