@@ -19,6 +19,9 @@ class HintSVM(QueryStrategy):
     Hinted Support Vector Machine is an active learning algorithm within the
     hined sampling framework with an extended support vector machine.
 
+    It queries the unlabeled instance closest to the hinted query boundary,
+    i.e. the one with the smallest absolute decision value.
+
     Parameters
     ----------
     Cl : float, >0, optional (default=0.1)
@@ -130,14 +133,23 @@ class HintSVM(QueryStrategy):
         self.svm_params['C'] = self.cl
 
     def _get_scores(self):
-        """Return absolute decision values for all unlabeled samples.
+        """Return acquisition scores for all unlabeled samples.
+
+        HintSVM performs uncertainty sampling against the hinted query
+        boundary: it queries the unlabeled instance *closest* to that
+        boundary, i.e. with the smallest absolute decision value (see
+        Li et al., ACML 2012, Algorithm 1 and Section 4.2). To follow the
+        ``_get_scores`` convention that higher = more informative, the score
+        is the *negative* absolute decision value, so the point closest to
+        the boundary has the highest score.
 
         Returns
         -------
         entry_ids : np.ndarray, shape (n_unlabeled,)
             Global entry IDs of unlabeled samples.
         scores : np.ndarray, shape (n_unlabeled,)
-            Absolute decision values from HintSVM. Higher = more informative.
+            Negative absolute decision values from HintSVM. Higher (closer to
+            zero) = closer to the hinted query boundary = more informative.
         """
         dataset = self.dataset
         unlabeled_entry_ids, unlabeled_pool = dataset.get_unlabeled_entries()
@@ -167,7 +179,7 @@ class HintSVM(QueryStrategy):
             np.array(unlabeled_pool, dtype=np.float64),
             self.svm_params)
 
-        scores = np.array([abs(float(val[0])) for val in p_val])
+        scores = np.array([-abs(float(val[0])) for val in p_val])
         return np.asarray(unlabeled_entry_ids), scores
 
     @inherit_docstring_from(QueryStrategy)
