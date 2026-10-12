@@ -44,6 +44,20 @@ dependencies = [
 Homepage = "https://github.com/ntucllab/libact"
 Repository = "https://github.com/ntucllab/libact"
 
+# Lint for correctness without making existing legacy style debt blocking.
+[tool.ruff]
+target-version = "py39"
+extend-exclude = ["docs/_build"]
+
+[tool.ruff.lint]
+select = ["E9", "F", "LOG", "RUF100"]
+
+[tool.ruff.lint.per-file-ignores]
+# These directories have pre-existing unused imports and locals. Other
+# Pyflakes findings remain blocking; F401/F841 still apply everywhere else.
+"examples/**/*.py" = ["F401", "F841"]
+"libact/**/*.py" = ["F401", "F841"]
+
 [project.optional-dependencies]
 dev = ["build>=1.2.2.post1", "meson>=1.5.0", "ninja", "cython", "numpy"]
 

@@ -15,8 +15,6 @@
 
 import sys
 import os
-import shlex
-import sys
 from unittest.mock import MagicMock
 
 
