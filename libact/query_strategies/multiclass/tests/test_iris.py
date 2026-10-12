@@ -7,9 +7,11 @@ from numpy.testing import assert_array_equal
 from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression as SkLogisticRegression
+from sklearn.multiclass import OneVsRestClassifier
 
 from libact.base.dataset import Dataset
-from libact.models import LogisticRegression
+from libact.models import SklearnProbaAdapter
 from libact.query_strategies.multiclass import ActiveLearningWithCostEmbedding as ALCE
 from libact.query_strategies.multiclass import EER
 from ...tests.utils import run_qs
@@ -56,7 +58,8 @@ class IrisTestCase(unittest.TestCase):
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
         qs = EER(ds,
-                 LogisticRegression(solver='liblinear', multi_class="ovr"),
+                 SklearnProbaAdapter(
+                     OneVsRestClassifier(SkLogisticRegression(solver='liblinear'))),
                  random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(
@@ -66,7 +69,8 @@ class IrisTestCase(unittest.TestCase):
         ds = Dataset(self.X + self.X_pool,
                      self.y[:3] + [None for _ in range(len(self.X_pool))])
         qs = EER(ds,
-                 LogisticRegression(solver='liblinear', multi_class="ovr"),
+                 SklearnProbaAdapter(
+                     OneVsRestClassifier(SkLogisticRegression(solver='liblinear'))),
                  loss='01', random_state=1126)
         qseq = run_qs(ds, qs, self.y_truth, self.quota)
         assert_array_equal(

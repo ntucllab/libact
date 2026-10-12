@@ -215,6 +215,54 @@ class EpsilonUncertaintySampling(QueryStrategy):
         else:
             return ask_id
 
+    def make_query_batch(self, batch_size):
+        """Epsilon-greedy batch query.
+
+        Each of the ``batch_size`` slots independently explores with
+        probability epsilon: the number of random picks is drawn from
+        ``Binomial(batch_size, epsilon)``. The remaining slots take the
+        highest-uncertainty samples, and the random picks are then drawn
+        without replacement from the rest of the pool, so the batch always
+        contains exactly ``batch_size`` distinct entries.
+
+        Parameters
+        ----------
+        batch_size : int
+            Number of samples to query. Must satisfy
+            ``1 <= batch_size <= n_unlabeled``.
+
+        Returns
+        -------
+        entry_ids : np.ndarray of int, shape (batch_size,)
+            Distinct entry ids; the exploitation picks come first in
+            descending uncertainty, followed by the exploration picks.
+        """
+        dataset = self.dataset
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
+        n_unlabeled = len(unlabeled_entry_ids)
+        self._check_batch_size(batch_size, n_unlabeled)
+
+        n_random = self.random_state_.binomial(batch_size, self.epsilon)
+        n_exploit = batch_size - n_random
+
+        self.model.train(dataset)
+        scores = self._get_uncertainty_scores(np.asarray(X_pool))
+
+        order = np.argsort(-scores, kind='stable')
+        selected = order[:n_exploit]
+        if n_random > 0:
+            # Exploration picks come from the complement of the
+            # exploitation picks, guaranteeing batch_size distinct ids.
+            explore = self.random_state_.choice(
+                order[n_exploit:], size=n_random, replace=False)
+            selected = np.concatenate([selected, explore])
+
+        return np.asarray(unlabeled_entry_ids)[selected]
+
     @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
+        self.model.train(self.dataset)
+
+    def update_batch(self, entry_ids, labels):
+        """Retrain the model once for the whole batch of new labels."""
         self.model.train(self.dataset)

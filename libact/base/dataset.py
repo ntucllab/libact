@@ -45,6 +45,7 @@ class Dataset(object):
         self._y = y
         self.modified = True
         self._update_callback = set()
+        self._batch_update_callback = set()
 
     def __len__(self):
         """
@@ -147,6 +148,91 @@ class Dataset(object):
         for callback in self._update_callback:
             callback(entry_id, new_label)
 
+    def update_batch(self, entry_ids, labels):
+        """Update multiple entries with their labels in a single call.
+
+        Labels are applied one entry at a time, in the given order.
+        Observers registered through :py:meth:`on_update_batch` (every
+        :py:class:`libact.base.interfaces.QueryStrategy` registers
+        itself there) are notified exactly once, with the whole batch,
+        after all labels have been applied — so strategies that retrain
+        a model in their update hook can train once per batch instead of
+        once per entry. Callbacks registered only through
+        :py:meth:`on_update` observe the same incremental per-entry
+        ``(entry_id, label)`` stream as the equivalent series of
+        individual ``update()`` calls.
+
+        Note that some observers impose assumptions of their own on the
+        update stream; for instance ActiveLearningByLearning assumes each
+        update corresponds to an entry it has itself queried via
+        ``make_query()``, and updating other entries is unsupported —
+        exactly as with individual ``update()`` calls.
+
+        Parameters
+        ----------
+        entry_ids : array-like of int, shape (n_updates,)
+            Distinct entry ids of the samples to update.
+
+        labels : sequence, shape (n_updates,)
+            Label for each entry. None marks an entry as unlabeled.
+
+        Raises
+        ------
+        ValueError
+            If entry_ids is not one-dimensional, labels is not a sequence,
+            their lengths differ, entry_ids contains duplicate entries, or
+            any entry id is out of range (not in ``[0, len(dataset))``).
+        """
+        entry_ids = np.asarray(entry_ids)
+        if entry_ids.ndim != 1:
+            raise ValueError(
+                "entry_ids must be a one-dimensional array-like; for a "
+                "single entry use update(entry_id, label)")
+        try:
+            n_labels = len(labels)
+        except TypeError:
+            raise ValueError(
+                "labels must be a sequence of the same length as entry_ids")
+        if entry_ids.shape[0] != n_labels:
+            raise ValueError(
+                "entry_ids and labels must have the same length, got "
+                "%d and %d" % (entry_ids.shape[0], n_labels))
+        if len(np.unique(entry_ids)) != entry_ids.shape[0]:
+            raise ValueError("entry_ids contains duplicate entries")
+        # Validate the ids are all in range *before* applying any update, so
+        # a bad id fails cleanly instead of leaving a partial update behind
+        # (and so negative ids are rejected rather than silently wrapping
+        # around to the wrong entry via numpy indexing).
+        if entry_ids.size and (entry_ids.min() < 0 or
+                               entry_ids.max() >= len(self)):
+            raise ValueError(
+                "entry_ids must all be in [0, %d), got values in [%s, %s]"
+                % (len(self), entry_ids.min(), entry_ids.max()))
+
+        if entry_ids.shape[0] == 0:
+            return
+
+        # Batch-aware observers are notified once after the whole batch
+        # is applied; skip their per-entry callback so they are not
+        # notified twice for the same labels.
+        batch_owners = set(
+            id(getattr(callback, '__self__', callback))
+            for callback in self._batch_update_callback
+        )
+        per_entry_callbacks = [
+            callback for callback in self._update_callback
+            if id(getattr(callback, '__self__', callback)) not in batch_owners
+        ]
+
+        self.modified = True
+        for entry_id, label in zip(entry_ids, labels):
+            self._y[entry_id] = label
+            for callback in per_entry_callbacks:
+                callback(entry_id, label)
+
+        for callback in self._batch_update_callback:
+            callback(entry_ids, labels)
+
     def on_update(self, callback):
         """
         Add callback function to call when dataset updated.
@@ -157,6 +243,26 @@ class Dataset(object):
             The function to be called when dataset is updated.
         """
         self._update_callback.add(callback)
+
+    def on_update_batch(self, callback):
+        """
+        Add callback function to call once per :py:meth:`update_batch`.
+
+        During :py:meth:`update_batch`, an observer registered here is
+        notified exactly once with the full batch, after all labels have
+        been applied, instead of receiving the per-entry callbacks it
+        registered via :py:meth:`on_update`. Individual
+        :py:meth:`update` calls still notify only the per-entry
+        callbacks.
+
+        Parameters
+        ----------
+        callback : callable
+            Called as ``callback(entry_ids, labels)`` where ``entry_ids``
+            is an np.ndarray of the updated entry ids and ``labels`` the
+            matching labels.
+        """
+        self._batch_update_callback.add(callback)
 
     def format_sklearn(self):
         """

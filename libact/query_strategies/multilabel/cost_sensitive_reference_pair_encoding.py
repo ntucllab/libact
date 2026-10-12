@@ -53,9 +53,8 @@ class CostSensitiveReferencePairEncoding(QueryStrategy):
        from libact.utils.multilabel import pairwise_f1_score
 
        base_model = LogisticRegression(
-               solver='liblinear', multi_class="ovr")
-       model = BinaryRelevance(LogisticRegression(solver='liblinear',
-                                                  multi_class="ovr"))
+               solver='liblinear')
+       model = BinaryRelevance(LogisticRegression(solver='liblinear'))
        qs = CostSensitiveReferencePairEncoding(
                dataset,
                scoring_fn=pairwise_f1_score,

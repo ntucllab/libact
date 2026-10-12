@@ -181,6 +181,10 @@ class QueryByCommittee(QueryStrategy):
         # Train each model with newly updated label.
         self.teach_students()
 
+    def update_batch(self, entry_ids, labels):
+        """Retrain the committee once for the whole batch of new labels."""
+        self.teach_students()
+
     def _get_scores(self):
         """Return disagreement scores for all unlabeled samples.
 

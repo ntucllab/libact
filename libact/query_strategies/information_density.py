@@ -235,3 +235,7 @@ class InformationDensity(QueryStrategy):
     @inherit_docstring_from(QueryStrategy)
     def update(self, entry_id, label):
         self.model.train(self.dataset)
+
+    def update_batch(self, entry_ids, labels):
+        """Retrain the model once for the whole batch of new labels."""
+        self.model.train(self.dataset)

@@ -4,7 +4,7 @@ This module implements the Core-Set approach for active learning, which selects
 the unlabeled point farthest from all labeled points (greedy k-Center).
 """
 import numpy as np
-from scipy.spatial.distance import cdist
+from sklearn.metrics.pairwise import pairwise_distances
 
 from libact.base.interfaces import QueryStrategy
 from libact.utils import inherit_docstring_from, seed_random_state
@@ -24,7 +24,7 @@ class CoreSet(QueryStrategy):
         The dataset to query from.
 
     metric : str, optional (default='euclidean')
-        Distance metric passed to ``scipy.spatial.distance.cdist``.
+        Distance metric passed to ``sklearn.metrics.pairwise_distances``.
         Common options: 'euclidean', 'cosine', 'cityblock', 'minkowski'.
 
     transformer : object with transform method, optional (default=None)
@@ -79,6 +79,14 @@ class CoreSet(QueryStrategy):
         random_state = kwargs.pop('random_state', None)
         self.random_state_ = seed_random_state(random_state)
 
+    def _transform(self, X):
+        """Apply the optional feature transformer."""
+        if self.transformer is not None:
+            X = self.transformer.transform(X)
+            if isinstance(X, (list, tuple)):
+                X = np.asarray(X)
+        return X
+
     def _get_scores(self):
         """Return min-distances to labeled set for all unlabeled samples.
 
@@ -92,29 +100,81 @@ class CoreSet(QueryStrategy):
         """
         dataset = self.dataset
         unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
-        X_pool = np.asarray(X_pool)
 
         if len(unlabeled_entry_ids) == 0:
             return np.array([], dtype=int), np.array([], dtype=float)
 
-        labeled_entries = dataset.get_labeled_entries()
-        X_labeled = np.asarray(labeled_entries[0])
+        X_labeled, _ = dataset.get_labeled_entries()
 
-        if len(X_labeled) == 0:
+        if X_labeled.shape[0] == 0:
             return np.asarray(unlabeled_entry_ids), \
                 np.full(len(unlabeled_entry_ids), float('inf'))
 
-        if self.transformer is not None:
-            X_pool_t = np.asarray(self.transformer.transform(X_pool))
-            X_labeled_t = np.asarray(self.transformer.transform(X_labeled))
-        else:
-            X_pool_t = X_pool
-            X_labeled_t = X_labeled
+        X_pool_t = self._transform(X_pool)
+        X_labeled_t = self._transform(X_labeled)
 
-        dist_matrix = cdist(X_pool_t, X_labeled_t, metric=self.metric)
+        # pairwise_distances handles both dense and sparse feature matrices
+        dist_matrix = pairwise_distances(
+            X_pool_t, X_labeled_t, metric=self.metric)
         min_distances = np.min(dist_matrix, axis=1)
 
         return np.asarray(unlabeled_entry_ids), min_distances
+
+    def make_query_batch(self, batch_size):
+        """Select a batch with the true greedy k-Center algorithm.
+
+        Unlike the default top-k of :py:meth:`_get_scores` (which can
+        return a cluster of mutually close points that are all far from
+        the labeled set), this recomputes the min-distance after every
+        pick: each selected point joins the covered set, so the next pick
+        maximizes the distance to the union of the labeled set and the
+        already-selected batch. This is the batch algorithm of Sener &
+        Savarese (2018).
+
+        Parameters
+        ----------
+        batch_size : int
+            Number of samples to query. Must satisfy
+            ``1 <= batch_size <= n_unlabeled``.
+
+        Returns
+        -------
+        entry_ids : np.ndarray of int, shape (batch_size,)
+            Distinct entry ids in selection order.
+        """
+        dataset = self.dataset
+        unlabeled_entry_ids, X_pool = dataset.get_unlabeled_entries()
+        n_unlabeled = len(unlabeled_entry_ids)
+        self._check_batch_size(batch_size, n_unlabeled)
+
+        X_labeled, _ = dataset.get_labeled_entries()
+        X_pool_t = self._transform(X_pool)
+
+        selected = []
+        if X_labeled.shape[0] == 0:
+            # No labeled data: seed the batch with a random pick, mirroring
+            # make_query's random fallback, then proceed greedily.
+            first = self.random_state_.randint(0, n_unlabeled)
+            selected.append(first)
+            min_distances = pairwise_distances(
+                X_pool_t, X_pool_t[[first]], metric=self.metric).ravel()
+        else:
+            X_labeled_t = self._transform(X_labeled)
+            min_distances = np.min(pairwise_distances(
+                X_pool_t, X_labeled_t, metric=self.metric), axis=1)
+
+        while len(selected) < batch_size:
+            masked = min_distances.copy()
+            masked[selected] = -np.inf
+            candidates = np.where(np.isclose(masked, np.max(masked)))[0]
+            pick = self.random_state_.choice(candidates)
+            selected.append(pick)
+            # The picked point now covers its neighborhood.
+            new_distances = pairwise_distances(
+                X_pool_t, X_pool_t[[pick]], metric=self.metric).ravel()
+            min_distances = np.minimum(min_distances, new_distances)
+
+        return np.asarray(unlabeled_entry_ids)[selected]
 
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):

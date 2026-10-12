@@ -214,6 +214,24 @@ class ActiveLearningByLearning(QueryStrategy):
         self.W.append(1. / self.query_dist[ask_idx])
         self.queried_hist_.append(entry_id)
 
+    def make_query_batch(self, batch_size):
+        """ALBL does not support batch queries.
+
+        Raises
+        ------
+        NotImplementedError
+            Always. ALBL is inherently sequential: each query requires the
+            reward feedback (the label) of the previous one to update its
+            multi-armed bandit. Call :py:meth:`make_query` and update the
+            dataset one sample at a time instead.
+        """
+        raise NotImplementedError(
+            "ActiveLearningByLearning is inherently sequential: each query "
+            "requires the reward feedback of the previous one. Batch "
+            "querying is not supported; call make_query() and update the "
+            "dataset one sample at a time."
+        )
+
     @inherit_docstring_from(QueryStrategy)
     def make_query(self):
         dataset = self.dataset
